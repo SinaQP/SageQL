@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sageql"
+version = "0.1.0"
+description = "Start AI conversations to plan database reports"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "SageQL contributors"}]
+dependencies = ["sqlglot>=26,<31"]
+
+[project.optional-dependencies]
+openai = ["openai>=1.99,<3"]
+dev = ["pytest>=8,<10", "build>=1,<2"]
+
+[project.scripts]
+sageql = "sageql.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sageql"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
