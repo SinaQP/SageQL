@@ -1,7 +1,9 @@
 import builtins
+import json
 
 from sageql import chat_cli
 from sageql.context import ContextResolution, ResolvedContext
+from sageql.discovery import DiscoverySelection
 from sageql.understanding import RequestAssessment
 
 
@@ -57,7 +59,7 @@ def test_chat_cli_collects_question_then_config_and_followup(monkeypatch, capsys
     for name in ("DB_SERVER_HOST", "DB_NAME", "DB_AUTHENTICATION", "DB_ODBC_DRIVER"):
         monkeypatch.delenv(name, raising=False)
 
-    exit_code = chat_cli.main([])
+    exit_code = chat_cli.main(["--no-discovery"])
     output = capsys.readouterr()
 
     assert exit_code == 0
@@ -92,7 +94,7 @@ def test_chat_cli_requires_each_database_field(monkeypatch, capsys):
     for name in ("DB_SERVER_HOST", "DB_NAME", "DB_AUTHENTICATION", "DB_ODBC_DRIVER"):
         monkeypatch.delenv(name, raising=False)
 
-    assert chat_cli.main([]) == 0
+    assert chat_cli.main(["--no-discovery"]) == 0
     assert "Please enter a value." in capsys.readouterr().err
 
 
@@ -124,7 +126,7 @@ def test_chat_cli_uses_llm_environment_defaults(monkeypatch, capsys):
 
     monkeypatch.setattr(chat_cli, "OpenAIChatProvider", FakeProvider)
 
-    assert chat_cli.main([]) == 0
+    assert chat_cli.main(["--no-discovery"]) == 0
     output = capsys.readouterr()
     assert "Request understanding:\nThe requested report." in output.out
     assert "test-key" not in output.out + output.err
@@ -158,7 +160,7 @@ def test_chat_cli_uses_database_environment_values(monkeypatch, capsys):
             return ready_context()
 
     monkeypatch.setattr(chat_cli, "OpenAIChatProvider", FakeProvider)
-    assert chat_cli.main([]) == 0
+    assert chat_cli.main(["--no-discovery"]) == 0
     assert prompts == ["What report would you like to create? "]
     assert "Request understanding:\nThe requested report." in capsys.readouterr().out
 
@@ -193,9 +195,60 @@ def test_chat_cli_asks_context_clarification(monkeypatch, capsys):
 
     monkeypatch.setattr(chat_cli, "OpenAIChatProvider", FakeProvider)
 
-    assert chat_cli.main([]) == 0
+    assert chat_cli.main(["--no-discovery"]) == 0
     output = capsys.readouterr().out
     assert "AI> Which time period?" in output
     assert "Resolved context:" in output
     assert "Time period: last quarter" in output
     assert "Comparison period: Not specified" in output
+
+
+def test_chat_cli_prints_verified_query_space(monkeypatch, capsys, tmp_path):
+    monkeypatch.setattr(builtins, "input", lambda prompt: "Revenue by region in 2025")
+    for name, value in {
+        "DB_SERVER_HOST": "private-host",
+        "DB_NAME": "private-db",
+        "DB_AUTHENTICATION": "Windows",
+        "DB_ODBC_DRIVER": "driver",
+        "LLM_API_KEY": "secret",
+        "LLM_BASE_URL": "https://example.test/v1",
+        "LLM_MODEL": "demo-model",
+    }.items():
+        monkeypatch.setenv(name, value)
+
+    schema_path = tmp_path / "schema.json"
+    schema_path.write_text(json.dumps({
+        "tables": [
+            {"schema": "sales", "name": "orders", "description": "Customer orders",
+             "columns": [{"name": "region_id", "data_type": "int"}]},
+            {"schema": "sales", "name": "regions",
+             "columns": [{"name": "id", "data_type": "int"}]},
+        ],
+        "relations": [{"name": "fk_orders_region", "child_table": "sales.orders",
+                       "child_columns": ["region_id"], "parent_table": "sales.regions",
+                       "parent_columns": ["id"]}],
+    }), encoding="utf-8")
+
+    class Provider:
+        def __init__(self, llm):
+            pass
+
+        def assess(self, messages):
+            return RequestAssessment(True, "Revenue by region in 2025", "")
+
+        def resolve_context(self, messages, understanding):
+            return ContextResolution(True, ResolvedContext("2025", ("region",), ("revenue",), (), ""), "")
+
+        def select_query_space(self, understanding, context, candidates):
+            return DiscoverySelection(tuple(candidates.tables), tuple(candidates.columns),
+                                      tuple(candidates.relations), tuple(candidates.definitions))
+
+    monkeypatch.setattr(chat_cli, "OpenAIChatProvider", Provider)
+    assert chat_cli.main(["--catalog", str(schema_path)]) == 0
+    output = capsys.readouterr().out
+    assert "Query space discovery:" in output
+    assert "sales.orders (table)" in output
+    assert "sales.orders.region_id (int)" in output
+    assert "sales.orders.region_id -> sales.regions.id" in output
+    assert "Customer orders" in output
+    assert "secret" not in output

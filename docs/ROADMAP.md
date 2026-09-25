@@ -38,9 +38,9 @@ Create useful reports from a user request and a configured database. Build this 
 
 **Enough information:** The report's subject and intended result are identifiable, and any ambiguity that would materially change the report has been resolved. Optional presentation preferences can wait. Never invent missing details.
 
-## Step 3: context resolution (current)
+## Step 3: context resolution (complete)
 
-**Outcome:** After request understanding, identify the user's time period, entities, metrics, filters, and comparison period. Ask one focused question when a material context detail is missing. Print the resolved context and stop.
+**Outcome:** After request understanding, identify the user's time period, entities, metrics, filters, and comparison period. Ask one focused question when a material context detail is missing. Print the resolved context and proceed to Step 4.
 
 **Acceptance criteria**
 
@@ -54,12 +54,29 @@ Create useful reports from a user request and a configured database. Build this 
 
 **Boundary:** Preserve relative time phrases such as “last quarter” as written. Converting them to exact dates requires calendar and timezone rules in a later step. Entity labels are business concepts, not verified database tables or columns.
 
+## Step 4: query space discovery (current)
+
+**Outcome:** After context resolution, accept a structured catalog supplied by the package user and print relevant tables/views, columns, supplied relations, and definitions. Stop there.
+
+**Acceptance criteria**
+
+- Accept a JSON catalog file through the CLI and the same JSON-shaped data directly through the Python API. Each table includes its columns; relations and definitions are optional.
+- Consider every supplied table and column within the documented candidate limits, without silently dropping objects from the user's catalog.
+- Keep schema objects in an immutable catalog and validate that columns and relations refer to real catalog objects.
+- Bound the candidate metadata sent to the configured LLM. Never include server, database connection details, credentials, or row values in its request.
+- Accept only IDs from the candidate catalog in the model's structured selection, rejecting unknown, duplicate, or inconsistent choices.
+- Show the four categories and explicitly report when no relevant foreign keys or definitions were selected.
+- Do not connect to the database in the current CLI flow. Existing Database configuration remains captured for later steps.
+- Offline tests cover JSON input, model selection, invalid output, and CLI flow. No database is needed.
+- `main.py --example` demonstrates the Python API from an inline question and schema dictionary; ordinary `main.py` arguments still start the interactive CLI.
+
+**Boundary:** Relations and definitions come from the user's catalog; they are not inferred from a live database. No database connection, SQL generation, row access, or report creation occurs in this step.
+
 ## Later steps (require a specific user request)
 
-- Connect to the configured database with explicit credential handling.
-- Discover approved schema and develop report requirements against real data.
+- Connect to a database only after a later user-approved step, then verify the supplied catalog against the actual schema.
 - Plan, validate, run, and format a report with appropriate access controls.
 
 ## Data boundaries
 
-The chat provider receives conversation messages and model configuration. It does not receive database host, database name, authentication method, ODBC driver, or database credentials in this step. Conversation messages are kept in memory for the life of the session. The app does not persist them.
+The chat provider receives conversation messages and model configuration. In Step 4 it also receives a bounded shortlist from the user-supplied catalog: table and column names/types, supplied relations, and descriptions/definitions. It does not receive database host, database name, authentication method, ODBC driver, credentials, or row values. Conversation messages are kept in memory for the life of the session. The app does not persist them.

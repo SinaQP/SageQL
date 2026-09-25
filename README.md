@@ -1,6 +1,6 @@
 # SageQL
 
-SageQL is a Python package for building reports step by step. The current flow starts with the user's report question, asks for clarification when needed, prints its understanding, and resolves the request's context. It does not connect to a database or create a report yet.
+SageQL is a Python package for building reports step by step. The current flow starts with the user's report question, asks for clarification when needed, resolves the request's context, and selects relevant objects from a schema catalog supplied by the package user. It does not connect to a database, generate SQL, or create a report yet.
 
 ## Run from `main.py`
 
@@ -11,14 +11,20 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e ".[openai]"
 Copy-Item .env.example .env
 notepad .env
-.\.venv\Scripts\python.exe main.py
+.\.venv\Scripts\python.exe main.py --example
 ```
 
-Put your API key in the `LLM_API_KEY` field of `.env`, or leave it blank and enter it at the hidden prompt. The example already contains the tested AvalAI Base URL and `gpt-5-nano` model. Fill in database fields if you know them; blank fields are requested interactively. `.env` is ignored by Git, and existing shell environment variables take precedence over the file. The OpenAI extra and API key are unnecessary for offline tests or a custom provider.
+Put your API key in the `LLM_API_KEY` field of `.env`. The example contains the AvalAI Base URL and `gpt-5-nano` model. `main.py --example` runs `EXAMPLE_QUESTION` through the public API using the inline `EXAMPLE_SCHEMA` dictionary, then prints the result of each step. Edit those two values in [main.py](main.py) to try your own case. It fills unused database configuration fields with placeholders and does not connect to a database. `.env` is ignored by Git, and existing shell environment variables take precedence over the file. The OpenAI extra is unnecessary for offline tests or a custom provider.
 
 ## Start a report conversation
 
-The main file asks for your report question first, then uses the configuration from `.env` and prompts for missing fields. You can also run the installed CLI directly if you set environment variables yourself:
+Without `--example`, the main file starts the interactive CLI. It asks for your report question first, then uses the configuration from `.env` and prompts for missing fields. Run it with your catalog:
+
+```powershell
+.\.venv\Scripts\python.exe main.py --catalog my-schema.json
+```
+
+You can also run the installed CLI directly if you set environment variables yourself:
 
 ```powershell
 sageql chat
@@ -33,7 +39,35 @@ The CLI first asks what report you want. It then collects these fields:
 | Authentication method | Model |
 | ODBC Driver | |
 
-If the request is unclear, answer the AI's clarification question at `You>`. Once understood, the program prints `Request understanding:` and resolves five context fields: time period, entities, metrics, filters, and comparison period. It asks another focused question if a material context detail is missing, then prints `Resolved context:` and stops. A time period is required; “all available data” is a valid answer. Empty optional filters and comparison periods print as `Not specified`. Relative phrases such as “last quarter” are preserved, not converted to exact dates. Type `/exit` to stop early. Without environment overrides, the Base URL defaults to `https://api.openai.com/v1` and the model to `gpt-5-nano`. A custom Base URL receives your API key, so use an endpoint you trust.
+If the request is unclear, answer the AI's clarification question at `You>`. Once understood, the program prints `Request understanding:` and resolves five context fields: time period, entities, metrics, filters, and comparison period. It asks another focused question if a material context detail is missing. A time period is required; “all available data” is a valid answer. Empty optional filters and comparison periods print as `Not specified`. Relative phrases such as “last quarter” are preserved, not converted to exact dates. Then Step 4 loads the JSON catalog you supply and prints relevant tables/views, columns, relations, and definitions. Type `/exit` to stop early. Use `.\.venv\Scripts\python.exe main.py --no-discovery` to stop after context resolution. Without environment overrides, the Base URL defaults to `https://api.openai.com/v1` and the model to `gpt-5-nano`. A custom Base URL receives your API key, so use an endpoint you trust.
+
+Supply the catalog path with `--catalog path/to/schema.json`, set `SCHEMA_CATALOG_PATH` in `.env`, or enter the path when prompted after context resolution. The current CLI does not open a database connection.
+
+### Schema catalog format
+
+See [schema.example.json](schema.example.json) for a runnable synthetic example. The top-level `tables` array is required. Each table needs a `name` and nonempty `columns` array. `schema`, `kind` (`TABLE` or `VIEW`), and `description` are optional. Each column needs a `name`; `data_type`, `nullable`, and `description` are optional. An omitted data type is recorded as `unknown`. `relations` and `definitions` are optional:
+
+```json
+{
+  "tables": [
+    {
+      "schema": "sales",
+      "name": "orders",
+      "columns": [
+        {"name": "amount", "data_type": "decimal"},
+        {"name": "ordered_at", "data_type": "date"}
+      ]
+    }
+  ],
+  "definitions": [
+    {"term": "revenue", "meaning": "Define revenue for your own database here."}
+  ]
+}
+```
+
+For a relation, add `name`, `child_table`, `child_columns`, `parent_table`, and `parent_columns` as shown in the example file. Table references use `schema.table` (or just `table` when no schema is supplied). The arrays of child and parent columns must line up positionally. The parser rejects missing references, duplicate names, unexpected fields, and malformed JSON. It does not check whether supplied names match a real database yet.
+
+Send at most 30 relevant tables, 500 total columns, 150 relations, and 200 definitions to one discovery request. SageQL rejects a larger candidate set rather than silently omitting supplied objects.
 
 For the tested AvalAI configuration, set the non-secret defaults and let the CLI ask for the key privately:
 
@@ -85,16 +119,33 @@ while not resolution.ready:
     print(resolution.clarification_question)
     resolution = context_session.submit(input("You> "))
 print("Resolved context:", resolution.context)
+
+from sageql import catalog_from_dict, discover_query_space
+
+catalog = catalog_from_dict({
+    "tables": [{
+        "schema": "sales", "name": "orders",
+        "columns": [{"name": "amount", "data_type": "decimal"},
+                    {"name": "ordered_at", "data_type": "date"}],
+    }],
+    "definitions": [{"term": "revenue", "meaning": "Define revenue for your database."}],
+})
+space = discover_query_space(catalog, provider, assessment.request_understanding, resolution.context)
+print("Tables:", [table.key for table in space.tables])
+print("Columns:", [column.key for column in space.columns])
+print("Relations:", [relation.name for relation in space.relations])
+print("Definitions:", [definition.term for definition in space.definitions])
 ```
 
-`conversation.history` contains successful user and assistant turns. You can inject another object with `assess(messages)` and `resolve_context(messages, understanding)` methods to use a different provider or test offline.
+`conversation.history` contains successful user and assistant turns. You can inject another object with `assess(messages)`, `resolve_context(messages, understanding)`, and `select_query_space(understanding, context, candidates)` methods to use a different provider or test offline.
 
 ## Current scope and privacy
 
-- Conversation messages and their request understanding go to the configured LLM endpoint. The Database configuration is held locally and is not sent to the LLM in this step.
-- Context fields are the model's interpretation of the request. They are not yet checked against database tables, columns, or data; review them before later steps.
+- Conversation messages, request understanding, resolved context, and the bounded user-supplied catalog go to the configured LLM endpoint. Database host, database name, authentication method, ODBC driver, and credentials stay local. Do not use a model endpoint that should not see your schema names or descriptions.
+- Context fields are the model's interpretation of the request. Step 4 verifies selected names against the supplied catalog, not a live database. Review the catalog and business definitions before later steps.
 - The API key is hidden at the CLI prompt and masked in `LLMConfig` representations. SageQL keeps chat history in memory only; it does not save it.
-- Authentication means the method name only. No database password or connection is used in this step.
+- Definitions come from user-supplied descriptions and glossary entries. Relations come from user-supplied relation entries. SageQL does not invent business definitions or joins.
+- The CLI reads the catalog file and does not connect to a database, run report queries, or read business rows.
 - The earlier experimental SQLite SQL proposal command is still available as `sageql "question" --schema schema.sql`, but it is separate from the report conversation.
 
 ## Development

@@ -6,8 +6,10 @@ import os
 import sys
 
 from sageql.chat_provider import OpenAIChatProvider
+from sageql.catalog_input import load_catalog_file
 from sageql.conversation import ChatConfig, ChatError, DatabaseConfig, LLMConfig
 from sageql.context import ContextResolutionSession, ResolvedContext
+from sageql.discovery import DiscoveryError, QuerySpace, discover_query_space
 from sageql.understanding import RequestUnderstandingSession
 
 
@@ -36,11 +38,35 @@ def _print_context(context: ResolvedContext) -> None:
     print(f"  Comparison period: {context.comparison_period or 'Not specified'}")
 
 
+def _print_query_space(space: QuerySpace) -> None:
+    print("Query space discovery:")
+    print("  Tables/views:")
+    for table in space.tables:
+        print(f"    {table.key} ({table.kind.lower()})")
+    print("  Columns:")
+    for column in space.columns:
+        print(f"    {column.key} ({column.data_type})")
+    print("  Relations:")
+    for relation in space.relations:
+        child = ", ".join(f"{relation.child_table}.{item}" for item in relation.child_columns)
+        parent = ", ".join(f"{relation.parent_table}.{item}" for item in relation.parent_columns)
+        print(f"    {child} -> {parent} [{relation.name}]")
+    print("  Definitions:")
+    for definition in space.definitions:
+        print(f"    {definition.term}: {definition.meaning} ({definition.source})")
+    if not space.relations:
+        print("    No relevant supplied relations selected.")
+    if not space.definitions:
+        print("    No relevant definitions selected or available.")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="sageql chat", description="Discuss a report request with an AI assistant"
     )
-    parser.parse_args(argv)
+    parser.add_argument("--no-discovery", action="store_true", help="stop after context resolution")
+    parser.add_argument("--catalog", help="path to a user-supplied schema catalog JSON file")
+    args = parser.parse_args(argv)
 
     try:
         first_question = _required_input("What report would you like to create? ")
@@ -100,10 +126,19 @@ def main(argv: list[str] | None = None) -> int:
                 return 0
             resolution = context_session.submit(answer)
         _print_context(resolution.context)
+        if not args.no_discovery:
+            catalog_path = args.catalog or os.getenv("SCHEMA_CATALOG_PATH", "")
+            if not catalog_path:
+                catalog_path = _required_input("Schema catalog JSON path: ")
+            catalog = load_catalog_file(catalog_path)
+            print("\nDiscovering query space from supplied schema...")
+            space = discover_query_space(catalog, provider, assessment.request_understanding,
+                                         resolution.context)
+            _print_query_space(space)
         return 0
     except (EOFError, KeyboardInterrupt):
         print("\nChat ended.")
         return 0
-    except (ValueError, ChatError) as exc:
+    except (ValueError, ChatError, DiscoveryError) as exc:
         print(f"sageql: {exc}", file=sys.stderr)
         return 1

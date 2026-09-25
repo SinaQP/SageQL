@@ -1,0 +1,37 @@
+{
+  "tables": [
+    {
+      "schema": "sales",
+      "name": "orders",
+      "kind": "TABLE",
+      "description": "Example customer orders",
+      "columns": [
+        {"name": "order_id", "data_type": "integer", "nullable": false},
+        {"name": "region_id", "data_type": "integer", "nullable": false},
+        {"name": "amount", "data_type": "decimal", "description": "Amount recorded for one order"},
+        {"name": "order_date", "data_type": "date"}
+      ]
+    },
+    {
+      "schema": "sales",
+      "name": "regions",
+      "kind": "TABLE",
+      "columns": [
+        {"name": "region_id", "data_type": "integer", "nullable": false},
+        {"name": "name", "data_type": "text"}
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "name": "fk_orders_region",
+      "child_table": "sales.orders",
+      "child_columns": ["region_id"],
+      "parent_table": "sales.regions",
+      "parent_columns": ["region_id"]
+    }
+  ],
+  "definitions": [
+    {"term": "revenue", "meaning": "In this example, revenue is the sum of sales.orders.amount."}
+  ]
+}
