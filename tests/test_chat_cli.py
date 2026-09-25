@@ -1,7 +1,16 @@
 import builtins
 
 from sageql import chat_cli
+from sageql.context import ContextResolution, ResolvedContext
 from sageql.understanding import RequestAssessment
+
+
+def ready_context():
+    return ContextResolution(
+        True,
+        ResolvedContext("last quarter", ("sales",), ("revenue",), (), ""),
+        "",
+    )
 
 
 def test_chat_cli_collects_question_then_config_and_followup(monkeypatch, capsys):
@@ -34,6 +43,10 @@ def test_chat_cli_collects_question_then_config_and_followup(monkeypatch, capsys
                 return RequestAssessment(False, "Sales report", "Which dates?")
             return RequestAssessment(True, "Sales report for last quarter.", "")
 
+        def resolve_context(self, messages, understanding):
+            assert understanding == "Sales report for last quarter."
+            return ready_context()
+
     monkeypatch.setattr(builtins, "input", fake_input)
     monkeypatch.setattr(chat_cli.getpass, "getpass", lambda prompt: "secret")
     monkeypatch.setattr(chat_cli, "OpenAIChatProvider", FakeProvider)
@@ -51,6 +64,8 @@ def test_chat_cli_collects_question_then_config_and_followup(monkeypatch, capsys
     assert prompts[0] == "What report would you like to create? "
     assert "AI> Which dates?" in output.out
     assert "Request understanding:\nSales report for last quarter." in output.out
+    assert "Resolved context:" in output.out
+    assert "Time period: last quarter" in output.out
     assert "secret" not in output.out + output.err
 
 
@@ -62,7 +77,12 @@ def test_chat_cli_requires_each_database_field(monkeypatch, capsys):
         chat_cli,
         "OpenAIChatProvider",
         lambda llm: type(
-            "P", (), {"assess": lambda self, messages: RequestAssessment(True, "A report.", "")}
+            "P",
+            (),
+            {
+                "assess": lambda self, messages: RequestAssessment(True, "A report.", ""),
+                "resolve_context": lambda self, messages, understanding: ready_context(),
+            },
         )(),
     )
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
@@ -99,6 +119,9 @@ def test_chat_cli_uses_llm_environment_defaults(monkeypatch, capsys):
         def assess(self, messages):
             return RequestAssessment(True, "The requested report.", "")
 
+        def resolve_context(self, messages, understanding):
+            return ready_context()
+
     monkeypatch.setattr(chat_cli, "OpenAIChatProvider", FakeProvider)
 
     assert chat_cli.main([]) == 0
@@ -131,7 +154,48 @@ def test_chat_cli_uses_database_environment_values(monkeypatch, capsys):
         def assess(self, messages):
             return RequestAssessment(True, "The requested report.", "")
 
+        def resolve_context(self, messages, understanding):
+            return ready_context()
+
     monkeypatch.setattr(chat_cli, "OpenAIChatProvider", FakeProvider)
     assert chat_cli.main([]) == 0
     assert prompts == ["What report would you like to create? "]
     assert "Request understanding:\nThe requested report." in capsys.readouterr().out
+
+
+def test_chat_cli_asks_context_clarification(monkeypatch, capsys):
+    answers = iter(["Show revenue by region", "Last quarter"])
+    monkeypatch.setattr(builtins, "input", lambda prompt: next(answers))
+    monkeypatch.setenv("DB_SERVER_HOST", "host")
+    monkeypatch.setenv("DB_NAME", "db")
+    monkeypatch.setenv("DB_AUTHENTICATION", "Windows")
+    monkeypatch.setenv("DB_ODBC_DRIVER", "driver")
+    monkeypatch.setenv("LLM_API_KEY", "test-key")
+    monkeypatch.setenv("LLM_BASE_URL", "https://example.test/v1")
+    monkeypatch.setenv("LLM_MODEL", "test-model")
+
+    class FakeProvider:
+        def __init__(self, llm):
+            pass
+
+        def assess(self, messages):
+            return RequestAssessment(True, "Revenue by region.", "")
+
+        def resolve_context(self, messages, understanding):
+            if len(messages) == 2:
+                return ContextResolution(
+                    False,
+                    ResolvedContext("", ("sales", "region"), ("revenue",), (), ""),
+                    "Which time period?",
+                )
+            assert messages[-1].content == "Last quarter"
+            return ready_context()
+
+    monkeypatch.setattr(chat_cli, "OpenAIChatProvider", FakeProvider)
+
+    assert chat_cli.main([]) == 0
+    output = capsys.readouterr().out
+    assert "AI> Which time period?" in output
+    assert "Resolved context:" in output
+    assert "Time period: last quarter" in output
+    assert "Comparison period: Not specified" in output

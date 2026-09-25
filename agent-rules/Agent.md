@@ -4,7 +4,7 @@ Read this file before changing code. `AGENTS.md` points here; keep both files in
 
 ## Product contract
 
-SageQL's end goal is report creation. The current user-approved workflow begins with the user's report question and accepts two configuration groups: Database (Server/Host, Database, Authentication method, ODBC Driver) and LLM (API Key, Base URL, Model). Next, assess whether the conversation contains enough information to understand the request. Ask one focused clarification question when it does not; when it does, print the request understanding and stop. Do not connect to a database, generate a report, or imply that either has happened in this slice. The earlier SQLite SQL proposal API remains experimental; never run generated SQL automatically.
+SageQL's end goal is report creation. The current user-approved workflow begins with the user's report question and accepts two configuration groups: Database (Server/Host, Database, Authentication method, ODBC Driver) and LLM (API Key, Base URL, Model). Assess whether the conversation contains enough information to understand the request, asking focused clarification questions as needed. Then resolve time period, entities, metrics, filters, and comparison period; clarify material gaps and print the resolved context. Do not connect to a database, generate a report, or imply that either has happened in this slice. The earlier SQLite SQL proposal API remains experimental; never run generated SQL automatically.
 
 ## Working rules
 

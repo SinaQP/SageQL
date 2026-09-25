@@ -10,6 +10,7 @@ from sageql.conversation import (
     Message,
     ReportConversation,
 )
+from sageql.context import ContextProvider, ContextResolution, ContextResolutionSession, ResolvedContext
 from sageql.errors import GenerationError, InvalidSQL
 from sageql.validation import validate_sql
 from sageql.understanding import RequestAssessment, RequestUnderstandingSession, UnderstandingProvider
@@ -19,6 +20,9 @@ __all__ = [
     "ChatConfig",
     "ChatError",
     "ChatProvider",
+    "ContextProvider",
+    "ContextResolution",
+    "ContextResolutionSession",
     "DatabaseConfig",
     "GeneratedQuery",
     "GenerationError",
@@ -26,6 +30,7 @@ __all__ = [
     "LLMConfig",
     "Message",
     "ReportConversation",
+    "ResolvedContext",
     "RequestAssessment",
     "RequestUnderstandingSession",
     "SQLProvider",

@@ -7,6 +7,7 @@ import sys
 
 from sageql.chat_provider import OpenAIChatProvider
 from sageql.conversation import ChatConfig, ChatError, DatabaseConfig, LLMConfig
+from sageql.context import ContextResolutionSession, ResolvedContext
 from sageql.understanding import RequestUnderstandingSession
 
 
@@ -20,6 +21,19 @@ def _required_input(label: str) -> str:
 
 def _configured_or_input(name: str, label: str) -> str:
     return os.environ.get(name, "").strip() or _required_input(label)
+
+
+def _next_message() -> str:
+    return _required_input("You> ")
+
+
+def _print_context(context: ResolvedContext) -> None:
+    print("Resolved context:")
+    print(f"  Time period: {context.time_period or 'Not specified'}")
+    print(f"  Entities: {', '.join(context.entities) or 'Not specified'}")
+    print(f"  Metrics: {', '.join(context.metrics) or 'Not specified'}")
+    print(f"  Filters: {', '.join(context.filters) or 'Not specified'}")
+    print(f"  Comparison period: {context.comparison_period or 'Not specified'}")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -56,9 +70,9 @@ def main(argv: list[str] | None = None) -> int:
             model=model or "gpt-5-nano",
         )
 
-        conversation = RequestUnderstandingSession(
-            ChatConfig(database=database, llm=llm), OpenAIChatProvider(llm)
-        )
+        config = ChatConfig(database=database, llm=llm)
+        provider = OpenAIChatProvider(llm)
+        conversation = RequestUnderstandingSession(config, provider)
         print("\nRequest understanding started. Type /exit to finish.\n")
         pending = first_question
         while True:
@@ -66,16 +80,27 @@ def main(argv: list[str] | None = None) -> int:
                 assessment = conversation.submit(pending)
                 if assessment.enough_information:
                     print(f"Request understanding:\n{assessment.request_understanding.strip()}")
-                    return 0
+                    break
                 print(f"AI> {assessment.clarification_question.strip()}\n")
             except ChatError as exc:
                 print(f"sageql: {exc}", file=sys.stderr)
 
-            pending = input("You> ").strip()
-            while not pending:
-                pending = input("You> ").strip()
+            pending = _next_message()
             if pending.lower() in {"/exit", "/quit"}:
                 return 0
+
+        context_session = ContextResolutionSession(
+            config, provider, conversation.history, assessment.request_understanding
+        )
+        resolution = context_session.start()
+        while not resolution.ready:
+            print(f"AI> {resolution.clarification_question.strip()}\n")
+            answer = _next_message()
+            if answer.lower() in {"/exit", "/quit"}:
+                return 0
+            resolution = context_session.submit(answer)
+        _print_context(resolution.context)
+        return 0
     except (EOFError, KeyboardInterrupt):
         print("\nChat ended.")
         return 0

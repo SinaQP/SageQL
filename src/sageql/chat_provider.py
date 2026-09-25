@@ -4,6 +4,7 @@ import json
 from typing import Any, Sequence
 
 from sageql.conversation import ChatError, LLMConfig, Message
+from sageql.context import ContextResolution, ResolvedContext
 from sageql.understanding import RequestAssessment
 
 
@@ -19,8 +20,11 @@ _UNDERSTANDING_INSTRUCTIONS = (
     "You assess what report the user wants. Decide whether the conversation "
     "contains enough information to describe the report's subject and intended "
     "result without inventing details. Ask for clarification only if an ambiguity "
-    "would materially change the report. Do not require every optional formatting "
-    "preference. If information is missing, ask exactly one focused question. "
+    "would materially change the report. Do not require optional presentation "
+    "choices such as chart type, ordering, or whether a comparison is displayed "
+    "as absolute change, percentage change, or both. If information is missing, "
+    "ask exactly one focused question and set enough_information false. Set "
+    "enough_information true only when clarification_question is empty. "
     "If enough information is present, write a concise request understanding "
     "using only details the user supplied. Do not generate SQL, connect to a "
     "database, or create a report. Return only the requested JSON object."
@@ -41,6 +45,59 @@ _UNDERSTANDING_FORMAT = {
             "required": [
                 "enough_information",
                 "request_understanding",
+                "clarification_question",
+            ],
+            "additionalProperties": False,
+        },
+    },
+}
+
+_CONTEXT_INSTRUCTIONS = (
+    "Resolve the understood report request into five fields: time_period, "
+    "entities, metrics, filters, and comparison_period. Use only information "
+    "stated in the conversation. Entities include named business objects and "
+    "grouping dimensions such as region or product. Metrics are quantities to "
+    "measure. Filters are selection conditions, not groupings. Write filter "
+    "values in the user's plain business language; do not invent column names, "
+    "SQL identifiers, or expressions such as status = completed. Preserve relative "
+    "time phrases such as 'last quarter' as written; do not invent exact dates "
+    "or fiscal-calendar rules. Use an empty string or empty array for optional "
+    "fields the user did not specify, except time_period. A ready context must "
+    "have a time period; if none was given, ask whether to use a specific range "
+    "or all available data. A comparison_period records which period "
+    "to compare against; do not ask whether the comparison is displayed as "
+    "absolute change, percentage change, or both. Ask exactly one focused clarification "
+    "question only when a missing or ambiguous detail would materially change "
+    "the report. Set ready false whenever clarification_question is nonempty; "
+    "set ready true only when clarification_question is empty and the context "
+    "can be described faithfully. "
+    "Do not invent database tables or columns, connect to a database, generate "
+    "SQL, or create a report. Return only the requested JSON object."
+)
+
+_CONTEXT_FORMAT = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "report_context",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "ready": {"type": "boolean"},
+                "time_period": {"type": "string"},
+                "entities": {"type": "array", "items": {"type": "string"}},
+                "metrics": {"type": "array", "items": {"type": "string"}},
+                "filters": {"type": "array", "items": {"type": "string"}},
+                "comparison_period": {"type": "string"},
+                "clarification_question": {"type": "string"},
+            },
+            "required": [
+                "ready",
+                "time_period",
+                "entities",
+                "metrics",
+                "filters",
+                "comparison_period",
                 "clarification_question",
             ],
             "additionalProperties": False,
@@ -108,6 +165,70 @@ class OpenAIChatProvider:
             }
             if not isinstance(result, dict) or set(result) != expected:
                 raise ValueError("unexpected assessment fields")
+            if result["enough_information"] is True and isinstance(
+                result["clarification_question"], str
+            ):
+                if result["clarification_question"].strip():
+                    result["enough_information"] = False
             return RequestAssessment(**result)
         except (TypeError, ValueError) as exc:
             raise ChatError("model returned an invalid request assessment") from exc
+
+    def resolve_context(
+        self, messages: Sequence[Message], understanding: str
+    ) -> ContextResolution:
+        request_messages = [
+            {"role": "system", "content": _CONTEXT_INSTRUCTIONS},
+            {"role": "user", "content": "Request understanding:\n" + understanding},
+        ]
+        request_messages.extend(
+            {"role": message.role, "content": message.content} for message in messages
+        )
+        try:
+            response = self._client.chat.completions.create(
+                model=self._model,
+                messages=request_messages,
+                response_format=_CONTEXT_FORMAT,
+            )
+            content = response.choices[0].message.content
+        except Exception as exc:
+            raise ChatError("model context request failed") from exc
+
+        try:
+            result = json.loads(content)
+            expected = {
+                "ready",
+                "time_period",
+                "entities",
+                "metrics",
+                "filters",
+                "comparison_period",
+                "clarification_question",
+            }
+            if not isinstance(result, dict) or set(result) != expected:
+                raise ValueError("unexpected context fields")
+            for name in ("entities", "metrics", "filters"):
+                if not isinstance(result[name], list):
+                    raise ValueError(f"{name} must be an array")
+            if result["ready"] is True and isinstance(result["clarification_question"], str):
+                if result["clarification_question"].strip():
+                    result["ready"] = False
+                elif isinstance(result["time_period"], str) and not result["time_period"].strip():
+                    result["ready"] = False
+                    result["clarification_question"] = (
+                        "What time period should this report cover, or should it use all available data?"
+                    )
+            context = ResolvedContext(
+                time_period=result["time_period"].strip(),
+                entities=tuple(value.strip() for value in result["entities"]),
+                metrics=tuple(value.strip() for value in result["metrics"]),
+                filters=tuple(value.strip() for value in result["filters"]),
+                comparison_period=result["comparison_period"].strip(),
+            )
+            return ContextResolution(
+                ready=result["ready"],
+                context=context,
+                clarification_question=result["clarification_question"],
+            )
+        except (AttributeError, TypeError, ValueError) as exc:
+            raise ChatError("model returned an invalid report context") from exc
