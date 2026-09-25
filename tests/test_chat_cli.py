@@ -39,6 +39,8 @@ def test_chat_cli_collects_question_then_config_and_followup(monkeypatch, capsys
     monkeypatch.delenv("LLM_API_KEY", raising=False)
     monkeypatch.delenv("LLM_BASE_URL", raising=False)
     monkeypatch.delenv("LLM_MODEL", raising=False)
+    for name in ("DB_SERVER_HOST", "DB_NAME", "DB_AUTHENTICATION", "DB_ODBC_DRIVER"):
+        monkeypatch.delenv(name, raising=False)
 
     exit_code = chat_cli.main([])
     output = capsys.readouterr()
@@ -59,17 +61,21 @@ def test_chat_cli_requires_each_database_field(monkeypatch, capsys):
     monkeypatch.delenv("LLM_API_KEY", raising=False)
     monkeypatch.delenv("LLM_BASE_URL", raising=False)
     monkeypatch.delenv("LLM_MODEL", raising=False)
+    for name in ("DB_SERVER_HOST", "DB_NAME", "DB_AUTHENTICATION", "DB_ODBC_DRIVER"):
+        monkeypatch.delenv(name, raising=False)
 
     assert chat_cli.main([]) == 0
     assert "Please enter a value." in capsys.readouterr().err
 
 
 def test_chat_cli_uses_llm_environment_defaults(monkeypatch, capsys):
-    answers = iter(["Report", "host", "db", "Windows", "driver", "", "", "/exit"])
+    answers = iter(["Report", "host", "db", "Windows", "driver", "/exit"])
     monkeypatch.setattr(builtins, "input", lambda prompt: next(answers))
     monkeypatch.setenv("LLM_API_KEY", "test-key")
     monkeypatch.setenv("LLM_BASE_URL", "https://example.test/v1")
     monkeypatch.setenv("LLM_MODEL", "test-model")
+    for name in ("DB_SERVER_HOST", "DB_NAME", "DB_AUTHENTICATION", "DB_ODBC_DRIVER"):
+        monkeypatch.delenv(name, raising=False)
     monkeypatch.setattr(
         chat_cli.getpass,
         "getpass",
@@ -91,3 +97,33 @@ def test_chat_cli_uses_llm_environment_defaults(monkeypatch, capsys):
     output = capsys.readouterr()
     assert "Which date range?" in output.out
     assert "test-key" not in output.out + output.err
+
+
+def test_chat_cli_uses_database_environment_values(monkeypatch, capsys):
+    prompts = []
+    answers = iter(["Report", "/exit"])
+
+    def fake_input(prompt):
+        prompts.append(prompt)
+        return next(answers)
+
+    monkeypatch.setattr(builtins, "input", fake_input)
+    monkeypatch.setenv("DB_SERVER_HOST", "host")
+    monkeypatch.setenv("DB_NAME", "db")
+    monkeypatch.setenv("DB_AUTHENTICATION", "Windows")
+    monkeypatch.setenv("DB_ODBC_DRIVER", "driver")
+    monkeypatch.setenv("LLM_API_KEY", "test-key")
+    monkeypatch.setenv("LLM_BASE_URL", "https://example.test/v1")
+    monkeypatch.setenv("LLM_MODEL", "test-model")
+
+    class FakeProvider:
+        def __init__(self, llm):
+            assert llm.model == "test-model"
+
+        def reply(self, messages):
+            return "Which date range?"
+
+    monkeypatch.setattr(chat_cli, "OpenAIChatProvider", FakeProvider)
+    assert chat_cli.main([]) == 0
+    assert prompts == ["What report would you like to create? ", "You> "]
+    assert "Which date range?" in capsys.readouterr().out

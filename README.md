@@ -2,19 +2,23 @@
 
 SageQL is a Python package for building reports step by step. The current step starts a conversation about the report the user wants and captures the configuration shown in the project diagram. It does not connect to a database or create a report yet.
 
-## Install
+## Run from `main.py`
 
-Python 3.10 or newer is required. From this repository:
+Python 3.10 or newer is required. In PowerShell, from this repository:
 
 ```powershell
-python -m pip install -e ".[openai]"
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[openai]"
+Copy-Item .env.example .env
+notepad .env
+.\.venv\Scripts\python.exe main.py
 ```
 
-The CLI asks for an API key without echoing it. You can set `LLM_API_KEY` (or `OPENAI_API_KEY`) instead. `LLM_BASE_URL` and `LLM_MODEL` set the defaults shown in the prompts. The OpenAI extra and API key are unnecessary for offline tests or a custom provider. Keep keys out of project files and source control.
+Put your API key in the `LLM_API_KEY` field of `.env`, or leave it blank and enter it at the hidden prompt. The example already contains the tested AvalAI Base URL and `gpt-5-nano` model. Fill in database fields if you know them; blank fields are requested interactively. `.env` is ignored by Git, and existing shell environment variables take precedence over the file. The OpenAI extra and API key are unnecessary for offline tests or a custom provider.
 
 ## Start a report conversation
 
-Run:
+The main file asks for your report question first, then uses the configuration from `.env` and prompts for missing fields. You can also run the installed CLI directly if you set environment variables yourself:
 
 ```powershell
 sageql chat
@@ -29,7 +33,7 @@ The CLI first asks what report you want. It then collects these fields:
 | Authentication method | Model |
 | ODBC Driver | |
 
-After the first AI reply, enter follow-up messages at `You>`. Type `/exit` to end the session. Without environment overrides, the Base URL defaults to `https://api.openai.com/v1` and the model to `gpt-6-astra`. A custom Base URL receives your API key, so use an endpoint you trust.
+After the first AI reply, enter follow-up messages at `You>`. Type `/exit` to end the session. Without environment overrides, the Base URL defaults to `https://api.openai.com/v1` and the model to `gpt-5-nano`. A custom Base URL receives your API key, so use an endpoint you trust.
 
 For the tested AvalAI configuration, set the non-secret defaults and let the CLI ask for the key privately:
 
@@ -56,7 +60,7 @@ database = DatabaseConfig(
 llm = LLMConfig(
     api_key=os.environ["OPENAI_API_KEY"],
     base_url="https://api.openai.com/v1",
-    model="gpt-6-astra",
+    model="gpt-5-nano",
 )
 conversation = ReportConversation(
     ChatConfig(database=database, llm=llm), OpenAIChatProvider(llm)

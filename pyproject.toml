@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [{name = "SageQL contributors"}]
-dependencies = ["sqlglot>=26,<31"]
+dependencies = ["sqlglot>=26,<31", "python-dotenv>=1.2,<2"]
 
 [project.optional-dependencies]
 openai = ["openai>=1.99,<3"]
