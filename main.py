@@ -6,13 +6,17 @@ From this directory:
 
 The example uses EXAMPLE_SCHEMA below and the LLM settings in .env. Edit that
 dictionary to supply your own tables, columns, relations, and definitions.
-The plan demo runs without an API key or database connection.
+The plan demo runs without an API key or external database. It creates a
+temporary SQLite file for read-only execution and removes it afterward.
 Running without --example starts the interactive CLI, which accepts a JSON file.
 """
 
 import os
 import json
+import sqlite3
 import sys
+import tempfile
+from contextlib import closing
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -28,6 +32,8 @@ from sageql import (
     PlanProposal,
     PlanningError,
     SQLGenerationError,
+    QueryExecutionError,
+    QueryValidationError,
     ProposedJoin,
     ProposedMeasure,
     QuerySpace,
@@ -37,7 +43,8 @@ from sageql import (
     discover_query_space,
     create_query_plan,
     review_query_plan,
-    generate_sql_from_plan,
+    prepare_report_query,
+    execute_sqlite_report,
 )
 from sageql.chat_cli import main as chat_main
 from sageql.chat_provider import OpenAIChatProvider
@@ -105,7 +112,6 @@ def _show_plan(plan, quality) -> None:
         print(f"  PASS: {check}")
     for item in quality.review_items:
         print(f"  REVIEW: {item}")
-    print("  Execution: Not performed.")
 
 
 def _show_sql(query) -> None:
@@ -113,11 +119,20 @@ def _show_sql(query) -> None:
     print(query.sql)
     print("Parameters:", dict(query.parameters))
     print("Required date bindings:", ", ".join(query.required_parameters) or "None")
-    print("Execution: Not performed.")
+
+
+def _show_validation(validation) -> None:
+    print("Validation:")
+    for check in validation.checks_passed:
+        print(f"  PASS: {check}")
+    for item in validation.issues:
+        print(f"  BLOCK: {item}")
+    for item in validation.review_items:
+        print(f"  REVIEW: {item}")
 
 
 def run_plan_demo() -> int:
-    """Show a validated operation plan and generated SQL without network or database."""
+    """Show planning, validation, and read-only execution on synthetic data."""
     catalog = catalog_from_dict(EXAMPLE_SCHEMA)
     space = QuerySpace(catalog.tables, catalog.columns, catalog.relations, catalog.definitions)
     context = ResolvedContext(
@@ -146,9 +161,34 @@ def run_plan_demo() -> int:
     try:
         plan = create_query_plan(EXAMPLE_QUESTION, context, space, DemoProvider())
         _show_plan(plan, review_query_plan(plan, context, space))
-        _show_sql(generate_sql_from_plan(plan, period_bounds=("2025-01-01", "2026-01-01")))
+        prepared = prepare_report_query(
+            plan, context, space, period_bounds=("2025-01-01", "2026-01-01")
+        )
+        _show_sql(prepared.query)
+        _show_validation(prepared.validation)
+        with tempfile.TemporaryDirectory(prefix="sageql-demo-") as folder:
+            database_path = Path(folder) / "synthetic.sqlite"
+            with closing(sqlite3.connect(database_path)) as connection:
+                connection.execute("CREATE TABLE orders (order_id INTEGER, region_id INTEGER, amount DECIMAL, order_date DATE)")
+                connection.execute("CREATE TABLE regions (region_id INTEGER, name TEXT)")
+                connection.executemany("INSERT INTO regions VALUES (?, ?)", [(1, "North"), (2, "South")])
+                connection.executemany("INSERT INTO orders VALUES (?, ?, ?, ?)", [
+                    (1, 1, 10, "2025-01-15"), (2, 1, 20, "2025-01-20"),
+                    (3, 2, 7, "2025-02-03"), (4, 1, 99, "2024-12-31"),
+                ])
+                connection.commit()
+            result = execute_sqlite_report(
+                database_path, prepared.query, plan, context, space,
+                attached_schemas={"sales": database_path},
+            )
+            print("Synthetic read-only execution:")
+            print("  Columns:", result.columns)
+            for row in result.rows:
+                print("  Row:", row)
+            print("  Truncated:", result.truncated)
         return 0
-    except (ValueError, PlanningError, SQLGenerationError) as exc:
+    except (ValueError, PlanningError, SQLGenerationError,
+            QueryValidationError, QueryExecutionError) as exc:
         print(f"sageql: {exc}", file=sys.stderr)
         return 1
 
@@ -219,12 +259,19 @@ def run_example() -> int:
         _show_plan(plan, quality)
         # This fixed example names calendar year 2025 explicitly. Other time
         # phrases need caller-supplied bounds before the query can be used.
-        _show_sql(generate_sql_from_plan(plan, period_bounds=("2025-01-01", "2026-01-01")))
+        prepared = prepare_report_query(
+            plan, resolution.context, space,
+            period_bounds=("2025-01-01", "2026-01-01")
+        )
+        _show_sql(prepared.query)
+        _show_validation(prepared.validation)
+        print("Execution: Not performed; this example has no database file.")
         return 0
     except (EOFError, KeyboardInterrupt):
         print("\nExample stopped.", file=sys.stderr)
         return 1
-    except (ValueError, ChatError, DiscoveryError, PlanningError, SQLGenerationError) as exc:
+    except (ValueError, ChatError, DiscoveryError, PlanningError, SQLGenerationError,
+            QueryValidationError) as exc:
         print(f"sageql: {exc}", file=sys.stderr)
         return 1
 
@@ -239,6 +286,7 @@ def main(argv: list[str] | None = None) -> int:
         print("       python main.py --no-discovery")
         print("       python main.py --no-planning")
         print("       python main.py --no-sql")
+        print("       python main.py --catalog PATH --period-start YYYY-MM-DD --period-end YYYY-MM-DD --execute-sqlite PATH [--sqlite-schema NAME=PATH]")
         return 0
     if args == ["--example"]:
         return run_example()

@@ -1,5 +1,7 @@
 import builtins
 import json
+import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 from sageql import chat_cli
@@ -304,4 +306,64 @@ def test_chat_cli_prints_query_plan_and_quality(monkeypatch, capsys):
     assert "Generated SQLite SQL" in output
     assert "Required date bindings: period_start, period_end" in output
     assert "Execution: Not performed." in output
+    assert "secret" not in output
+
+
+def test_chat_cli_executes_validated_query_on_read_only_sqlite(monkeypatch, capsys, tmp_path):
+    monkeypatch.setattr(builtins, "input", lambda prompt: "Monthly sum of amount by region in 2025")
+    for name, value in {
+        "DB_SERVER_HOST": "unused-host", "DB_NAME": "unused-db",
+        "DB_AUTHENTICATION": "unused", "DB_ODBC_DRIVER": "unused",
+        "LLM_API_KEY": "secret", "LLM_BASE_URL": "https://example.test/v1",
+        "LLM_MODEL": "demo",
+    }.items():
+        monkeypatch.setenv(name, value)
+
+    class Provider:
+        def __init__(self, llm):
+            pass
+
+        def assess(self, messages):
+            return RequestAssessment(True, "Monthly sum of sales.orders.amount by sales.regions.name in 2025", "")
+
+        def resolve_context(self, messages, understanding):
+            return ContextResolution(True, ResolvedContext(
+                "monthly 2025", ("sales.regions.name",), ("sum of sales.orders.amount",), (), ""
+            ), "")
+
+        def select_query_space(self, understanding, context, candidates):
+            return DiscoverySelection(tuple(candidates.tables), tuple(candidates.columns),
+                                      tuple(candidates.relations), tuple(candidates.definitions))
+
+        def propose_query_plan(self, understanding, context, candidates):
+            tables = {table.key: key for key, table in candidates.tables.items()}
+            columns = {column.key: key for key, column in candidates.columns.items()}
+            return PlanProposal(
+                tables["sales.orders"],
+                (ProposedJoin(next(iter(candidates.relations)), tables["sales.regions"], "left"),),
+                columns["sales.orders.order_date"], "month",
+                (columns["sales.regions.name"],),
+                (ProposedMeasure("sum of sales.orders.amount", "sum",
+                                 columns["sales.orders.amount"]),), (),
+            )
+
+    database_path = tmp_path / "sample.sqlite"
+    with closing(sqlite3.connect(database_path)) as connection:
+        connection.execute("CREATE TABLE orders (order_id INTEGER, region_id INTEGER, amount DECIMAL, order_date DATE)")
+        connection.execute("CREATE TABLE regions (region_id INTEGER, name TEXT)")
+        connection.execute("INSERT INTO regions VALUES (1, 'North')")
+        connection.execute("INSERT INTO orders VALUES (1, 1, 10, '2025-01-15')")
+        connection.commit()
+
+    monkeypatch.setattr(chat_cli, "OpenAIChatProvider", Provider)
+    schema_path = Path(__file__).resolve().parents[1] / "schema.example.json"
+    assert chat_cli.main([
+        "--catalog", str(schema_path), "--period-start", "2025-01-01",
+        "--period-end", "2026-01-01", "--execute-sqlite", str(database_path),
+        "--sqlite-schema", f"sales={database_path}",
+    ]) == 0
+    output = capsys.readouterr().out
+    assert "Validation:" in output
+    assert "Read-only SQLite result:" in output
+    assert "('2025-01-01', 'North', 10)" in output
     assert "secret" not in output

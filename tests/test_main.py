@@ -94,7 +94,7 @@ def test_example_requires_api_key(monkeypatch, capsys):
     assert "Set LLM_API_KEY" in capsys.readouterr().err
 
 
-def test_plan_demo_runs_without_model_or_database(monkeypatch, capsys):
+def test_plan_demo_runs_without_model_or_external_database(monkeypatch, capsys):
     monkeypatch.setattr(app_main, "load_dotenv", lambda **kwargs: None)
     monkeypatch.delenv("LLM_API_KEY", raising=False)
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
@@ -111,4 +111,5 @@ def test_plan_demo_runs_without_model_or_database(monkeypatch, capsys):
     assert "Generated SQLite SQL" in output
     assert "LEFT JOIN" in output
     assert "Required date bindings: None" in output
-    assert "Execution: Not performed." in output
+    assert "Synthetic read-only execution:" in output
+    assert "('2025-01-01', 'North', 30)" in output

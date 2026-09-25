@@ -88,6 +88,7 @@ class QueryPlan:
     filters: tuple[PlannedFilter, ...]
     comparison_period: str
     request_understanding: str
+    repairs: tuple[str, ...] = ()
 
     def operations(self) -> list[dict[str, Any]]:
         """Return ordered, JSON-shaped logical operations; these are not SQL."""
@@ -158,6 +159,13 @@ _GRAINS = {"none", "day", "week", "month", "quarter", "year"}
 _OPERATORS = {"eq", "neq", "gt", "gte", "lt", "lte", "in", "is_null", "is_not_null"}
 _NUMERIC_TYPES = ("int", "decimal", "numeric", "number", "float", "double", "real", "money")
 _TIME_TYPES = ("date", "time", "timestamp")
+
+
+def _requires_all_base_rows(understanding: str, base: Table) -> bool:
+    return bool(re.search(
+        rf"\b(?:all|every)\s+{re.escape(base.name)}\b|\ball\s+rows\b",
+        understanding, re.IGNORECASE,
+    ))
 
 
 def _unique(values: tuple[str, ...], label: str) -> None:
@@ -307,9 +315,17 @@ def create_query_plan(
     )
     if any(column is not None and column.table not in joined for column in referenced_columns):
         raise PlanningError("query plan uses a column from an unjoined table")
+    repairs: list[str] = []
+    if _requires_all_base_rows(understanding, base) and any(
+        join.join_type == "inner" for join in joins
+    ):
+        joins = [PlannedJoin(join.relation, join.to_table, "left")
+                 if join.join_type == "inner" else join for join in joins]
+        repairs.append("Changed inner joins to left joins to preserve all requested base rows.")
     return QueryPlan(
         base, tuple(joins), time_column, context.time_period, proposal.time_grain,
         dimensions, tuple(measures), tuple(filters), context.comparison_period, understanding,
+        tuple(repairs),
     )
 
 
@@ -321,6 +337,7 @@ def review_query_plan(plan: QueryPlan, context: ResolvedContext, space: QuerySpa
         "Every resolved metric and filter is mapped exactly once.",
     )
     review: list[str] = []
+    review.extend(plan.repairs)
     if plan.time_column is not None and plan.time_period.casefold() != "all available data":
         review.append(
             f"Confirm exact date boundaries and timezone for time phrase '{plan.time_period}' before execution."

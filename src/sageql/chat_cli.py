@@ -12,7 +12,9 @@ from sageql.conversation import ChatConfig, ChatError, DatabaseConfig, LLMConfig
 from sageql.context import ContextResolutionSession, ResolvedContext
 from sageql.discovery import DiscoveryError, QuerySpace, discover_query_space
 from sageql.planning import PlanQuality, PlanningError, QueryPlan, create_query_plan, review_query_plan
+from sageql.report_validation import QueryValidationError, validate_report_query
 from sageql.sql_generation import SQLGenerationError, SQLQuery, generate_sql_from_plan
+from sageql.execution import QueryExecutionError, execute_sqlite_report
 from sageql.understanding import RequestUnderstandingSession
 
 
@@ -79,7 +81,16 @@ def _print_sql(query: SQLQuery) -> None:
     print(query.sql)
     print("Parameters:", dict(query.parameters))
     print("Required date bindings:", ", ".join(query.required_parameters) or "None")
-    print("Execution: Not performed.")
+
+
+def _schema_paths(values: list[str]) -> dict[str, str]:
+    paths = {}
+    for value in values:
+        name, separator, path = value.partition("=")
+        if not separator or not name or not path or name in paths:
+            raise ValueError("--sqlite-schema must be a unique NAME=PATH entry")
+        paths[name] = path
+    return paths
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -90,7 +101,21 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--no-planning", action="store_true", help="stop after query-space discovery")
     parser.add_argument("--no-sql", action="store_true", help="stop after logical query planning")
     parser.add_argument("--catalog", help="path to a user-supplied schema catalog JSON file")
+    parser.add_argument("--period-start", help="inclusive ISO date for the report period")
+    parser.add_argument("--period-end", help="exclusive ISO date for the report period")
+    parser.add_argument("--comparison-start", help="inclusive ISO date for the comparison period")
+    parser.add_argument("--comparison-end", help="exclusive ISO date for the comparison period")
+    parser.add_argument("--execute-sqlite", metavar="PATH", help="execute on this SQLite file read-only")
+    parser.add_argument("--sqlite-schema", action="append", default=[], metavar="NAME=PATH",
+                        help="attach a named SQLite schema file read-only; repeat as needed")
+    parser.add_argument("--max-rows", type=int, default=50, help="maximum rows returned when executing")
     args = parser.parse_args(argv)
+    if args.execute_sqlite and (args.no_discovery or args.no_planning or args.no_sql):
+        parser.error("--execute-sqlite requires discovery, planning, and SQL generation")
+    if bool(args.period_start) != bool(args.period_end):
+        parser.error("provide both --period-start and --period-end")
+    if bool(args.comparison_start) != bool(args.comparison_end):
+        parser.error("provide both --comparison-start and --comparison-end")
 
     try:
         first_question = _required_input("What report would you like to create? ")
@@ -165,11 +190,40 @@ def main(argv: list[str] | None = None) -> int:
                 )
                 _print_plan(plan, review_query_plan(plan, resolution.context, space))
                 if not args.no_sql:
-                    _print_sql(generate_sql_from_plan(plan))
+                    period_bounds = ((args.period_start, args.period_end)
+                                     if args.period_start else None)
+                    comparison_bounds = ((args.comparison_start, args.comparison_end)
+                                         if args.comparison_start else None)
+                    query = generate_sql_from_plan(
+                        plan, period_bounds=period_bounds, comparison_bounds=comparison_bounds
+                    )
+                    _print_sql(query)
+                    validation = validate_report_query(query, plan, resolution.context, space)
+                    print("Validation:")
+                    for check in validation.checks_passed:
+                        print(f"  PASS: {check}")
+                    for issue in validation.issues:
+                        print(f"  BLOCK: {issue}")
+                    if args.execute_sqlite:
+                        if not validation.valid:
+                            raise QueryValidationError("query must pass validation before execution")
+                        result = execute_sqlite_report(
+                            args.execute_sqlite, query, plan, resolution.context, space,
+                            attached_schemas=_schema_paths(args.sqlite_schema),
+                            max_rows=args.max_rows,
+                        )
+                        print("Read-only SQLite result:")
+                        print("  Columns:", result.columns)
+                        for row in result.rows:
+                            print("  Row:", row)
+                        print("  Truncated:", result.truncated)
+                    else:
+                        print("Execution: Not performed.")
         return 0
     except (EOFError, KeyboardInterrupt):
         print("\nChat ended.")
         return 0
-    except (ValueError, ChatError, DiscoveryError, PlanningError, SQLGenerationError) as exc:
+    except (ValueError, ChatError, DiscoveryError, PlanningError, SQLGenerationError,
+            QueryValidationError, QueryExecutionError) as exc:
         print(f"sageql: {exc}", file=sys.stderr)
         return 1

@@ -90,6 +90,15 @@ def test_explicit_formula_in_understanding_needs_no_formula_review():
     assert not any("business formula" in item for item in quality.review_items)
 
 
+def test_all_base_rows_repair_inner_join_to_left_join():
+    plan = create_query_plan(
+        "Monthly revenue by region for 2025, using all orders",
+        context(), space(), Provider(proposal(joins=(ProposedJoin("r0", "t1", "inner"),)))
+    )
+    assert plan.joins[0].join_type == "left"
+    assert any("preserve all requested base rows" in item for item in plan.repairs)
+
+
 @pytest.mark.parametrize("bad", [
     proposal(base_table_id="t99"),
     proposal(joins=(ProposedJoin("r0", "t0", "left"),)),

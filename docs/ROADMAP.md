@@ -92,7 +92,7 @@ The user has not specified Step 5. Do not assume its purpose or claim it has bee
 
 **Boundary:** Structural validity means the plan references the supplied schema consistently. It cannot establish that the supplied schema matches a live database or that the model chose the correct business meaning. Comparison operations are placeholders until date alignment and calculations are defined.
 
-## Step 7: SQL generation (current)
+## Step 7: SQL generation (complete)
 
 **Outcome:** Render the validated logical plan into readable, parameterized SQLite SQL and show it in the demo and interactive flow.
 
@@ -108,10 +108,40 @@ The user has not specified Step 5. Do not assume its purpose or claim it has bee
 
 **Boundary:** SQLite is the only Step 7 dialect. The configured ODBC driver does not select a dialect yet. Caller-supplied bounds, join semantics, metric formulas, and filter values still need business review. SQL with required date bindings is a template until those bindings are supplied.
 
+## Step 8: validation and safety (complete for SQLite)
+
+**Outcome:** Check a SQL candidate before execution; discard a bad candidate and regenerate once from the structured plan when possible.
+
+**Acceptance criteria**
+
+- Parse one SELECT-only SQLite statement and reject invalid, multiple, or write statements.
+- Check the plan's tables, columns, and relations against the selected user-supplied query space.
+- Require exact agreement with a fresh deterministic rendering of the plan, including bound values. This also prevents omitted filters and added references in SQL.
+- Require every resolved metric and filter, plus any caller-specified `RequiredFilter`, to appear in the plan. Check explicit time, entity, and single-metric aggregation facts when they can be matched mechanically.
+- Block unbound date parameters. Report unresolved business interpretation as review items rather than claiming it is proved by syntax.
+- A supplied bad SQL candidate may be discarded and regenerated once; a bad plan, missing required filter, or missing dates fails closed.
+- When the request explicitly says to use all base-table rows, convert proposed inner joins to left joins and show the repair. Validation blocks an unrepaired inner join for that case.
+
+**Boundary:** Mechanical checks cannot prove a business definition, join cardinality, or the correctness of a model's interpretation of ambiguous language.
+
+## Step 9: query execution (complete for SQLite)
+
+**Outcome:** An explicit API call or `--execute-sqlite` flag runs the validated query on caller-chosen SQLite files and returns bounded rows.
+
+**Acceptance criteria**
+
+- Revalidate immediately before execution and never accept an existing read-write connection.
+- Open the file using SQLite `mode=ro`; attach named schema files explicitly using the same mode; enable `query_only` and a restrictive SQLite authorizer.
+- Permit reads only from supplied selected tables and columns and the functions used by the renderer. Deny writes, attachment, pragmas, and other actions from the report query.
+- Bound returned rows, elapsed time, and SQLite virtual-machine work. Mark truncated results, close connections, and sanitize database errors.
+- `main.py --plan-demo` creates a synthetic temporary database, executes the SQL read-only, prints rows, and removes the file. Tests cover validation failures, repair, authorization limits, and execution.
+
+**Boundary:** SQLite is the only executable dialect. ODBC connection fields captured earlier are not used by Step 9. Read-only local file access does not replace database permissions or human review of report semantics. Report formatting is still a later step.
+
 ## Later steps (require a specific user request)
 
 - Connect to a database only after a later user-approved step, then verify the supplied catalog against the actual schema.
-- Add reviewed database dialects, execute approved SQL with appropriate access controls, and format a report.
+- Add reviewed ODBC/database dialects and format returned rows as a report.
 
 ## Data boundaries
 
