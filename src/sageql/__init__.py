@@ -17,6 +17,11 @@ from sageql.discovery import (
     DiscoverySelection, QuerySpace, discover_query_space,
 )
 from sageql.odbc_catalog import ODBCCatalogSource
+from sageql.planning import (
+    PlanCandidates, PlanProposal, PlanQuality, PlanningError, PlanningProvider,
+    ProposedFilter, ProposedJoin, ProposedMeasure, QueryPlan, create_query_plan,
+    review_query_plan,
+)
 from sageql.schema import Column, Definition, Relation, SchemaCatalog, Table
 from sageql.errors import GenerationError, InvalidSQL
 from sageql.validation import validate_sql
@@ -46,6 +51,15 @@ __all__ = [
     "load_catalog_file",
     "Message",
     "ODBCCatalogSource",
+    "PlanCandidates",
+    "PlanProposal",
+    "PlanQuality",
+    "PlanningError",
+    "PlanningProvider",
+    "ProposedFilter",
+    "ProposedJoin",
+    "ProposedMeasure",
+    "QueryPlan",
     "QuerySpace",
     "Relation",
     "ReportConversation",
@@ -58,5 +72,7 @@ __all__ = [
     "UnderstandingProvider",
     "generate_sql",
     "discover_query_space",
+    "create_query_plan",
+    "review_query_plan",
     "validate_sql",
 ]

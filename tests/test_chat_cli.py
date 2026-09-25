@@ -1,9 +1,11 @@
 import builtins
 import json
+from pathlib import Path
 
 from sageql import chat_cli
 from sageql.context import ContextResolution, ResolvedContext
 from sageql.discovery import DiscoverySelection
+from sageql.planning import PlanProposal, ProposedJoin, ProposedMeasure
 from sageql.understanding import RequestAssessment
 
 
@@ -244,11 +246,60 @@ def test_chat_cli_prints_verified_query_space(monkeypatch, capsys, tmp_path):
                                       tuple(candidates.relations), tuple(candidates.definitions))
 
     monkeypatch.setattr(chat_cli, "OpenAIChatProvider", Provider)
-    assert chat_cli.main(["--catalog", str(schema_path)]) == 0
+    assert chat_cli.main(["--catalog", str(schema_path), "--no-planning"]) == 0
     output = capsys.readouterr().out
     assert "Query space discovery:" in output
     assert "sales.orders (table)" in output
     assert "sales.orders.region_id (int)" in output
     assert "sales.orders.region_id -> sales.regions.id" in output
     assert "Customer orders" in output
+    assert "secret" not in output
+
+
+def test_chat_cli_prints_query_plan_and_quality(monkeypatch, capsys):
+    monkeypatch.setattr(builtins, "input", lambda prompt: "Monthly sum of order amount by region in 2025")
+    for name, value in {
+        "DB_SERVER_HOST": "unused-host", "DB_NAME": "unused-db",
+        "DB_AUTHENTICATION": "unused", "DB_ODBC_DRIVER": "unused",
+        "LLM_API_KEY": "secret", "LLM_BASE_URL": "https://example.test/v1",
+        "LLM_MODEL": "demo",
+    }.items():
+        monkeypatch.setenv(name, value)
+
+    class Provider:
+        def __init__(self, llm):
+            pass
+
+        def assess(self, messages):
+            return RequestAssessment(True, "Monthly sum of order amount by region in 2025", "")
+
+        def resolve_context(self, messages, understanding):
+            return ContextResolution(True, ResolvedContext(
+                "monthly 2025", ("region",), ("sum of order amount",), (), ""
+            ), "")
+
+        def select_query_space(self, understanding, context, candidates):
+            return DiscoverySelection(tuple(candidates.tables), tuple(candidates.columns),
+                                      tuple(candidates.relations), tuple(candidates.definitions))
+
+        def propose_query_plan(self, understanding, context, candidates):
+            tables = {table.key: key for key, table in candidates.tables.items()}
+            columns = {column.key: key for key, column in candidates.columns.items()}
+            return PlanProposal(
+                tables["sales.orders"],
+                (ProposedJoin(next(iter(candidates.relations)), tables["sales.regions"], "left"),),
+                columns["sales.orders.order_date"], "month",
+                (columns["sales.regions.name"],),
+                (ProposedMeasure("sum of order amount", "sum", columns["sales.orders.amount"]),),
+                (),
+            )
+
+    monkeypatch.setattr(chat_cli, "OpenAIChatProvider", Provider)
+    schema_path = Path(__file__).resolve().parents[1] / "schema.example.json"
+    assert chat_cli.main(["--catalog", str(schema_path)]) == 0
+    output = capsys.readouterr().out
+    assert '"operation": "scan"' in output
+    assert '"operation": "aggregate"' in output
+    assert "Plan quality:" in output
+    assert "Execution: Not performed." in output
     assert "secret" not in output

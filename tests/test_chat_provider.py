@@ -6,6 +6,7 @@ from sageql import ChatError, LLMConfig, Message
 from sageql.chat_provider import OpenAIChatProvider
 from sageql.context import ResolvedContext
 from sageql.discovery import DiscoveryCandidates, DiscoveryError
+from sageql.planning import PlanCandidates, PlanningError
 from sageql.schema import Column, Definition, Relation, Table
 
 
@@ -201,4 +202,52 @@ def test_query_space_selection_rejects_malformed_output(content):
         provider.select_query_space(
             "A report", ResolvedContext("2025", ("orders",), (), (), ""),
             DiscoveryCandidates({}, {}, {}, {}),
+        )
+
+
+def test_query_planning_uses_structured_output_and_selected_ids():
+    completions = FakeCompletions(
+        '{"base_table_id":"t0","joins":[{"relation_id":"r0","to_table_id":"t1",'
+        '"join_type":"left"}],"time_column_id":"c1","time_grain":"month",'
+        '"dimensions":["c2"],"measures":[{"source_metric":"revenue",'
+        '"aggregation":"sum","column_id":"c0"}],"filters":[]}'
+    )
+    client = SimpleNamespace(chat=SimpleNamespace(completions=completions))
+    provider = OpenAIChatProvider(LLMConfig(api_key="secret"), client=client)
+    candidates = PlanCandidates(
+        {"t0": Table("orders"), "t1": Table("regions")},
+        {"c0": Column("orders", "amount", "decimal"),
+         "c1": Column("orders", "ordered_at", "date"),
+         "c2": Column("regions", "name", "text")},
+        {"r0": Relation("fk", "orders", ("region_id",), "regions", ("id",))},
+        (Definition("revenue", "Sum of orders.amount", "user glossary"),),
+    )
+    context = ResolvedContext("monthly 2025", ("region",), ("revenue",), (), "")
+
+    proposal = provider.propose_query_plan("Monthly revenue by region", context, candidates)
+
+    assert proposal.joins[0].join_type == "left"
+    assert proposal.measures[0].aggregation == "sum"
+    assert completions.kwargs["response_format"]["type"] == "json_schema"
+    payload = str(completions.kwargs)
+    assert "Sum of orders.amount" in payload
+    assert "secret" not in payload
+
+
+@pytest.mark.parametrize("content", [
+    "not-json",
+    '{"base_table_id":"t0","joins":[],"time_column_id":"c0","time_grain":"month",'
+    '"dimensions":[],"measures":"bad","filters":[]}',
+    '{"base_table_id":"t0","joins":[{"relation_id":1,"to_table_id":"t1",'
+    '"join_type":"left"}],"time_column_id":"c0","time_grain":"month",'
+    '"dimensions":[],"measures":[],"filters":[]}',
+])
+def test_query_planning_rejects_malformed_model_output(content):
+    completions = FakeCompletions(content)
+    client = SimpleNamespace(chat=SimpleNamespace(completions=completions))
+    provider = OpenAIChatProvider(LLMConfig(api_key="secret"), client=client)
+    with pytest.raises(PlanningError, match="invalid query plan"):
+        provider.propose_query_plan(
+            "Report", ResolvedContext("2025", ("orders",), (), (), ""),
+            PlanCandidates({}, {}, {}, ()),
         )

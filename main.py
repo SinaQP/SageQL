@@ -2,13 +2,16 @@ r"""Runnable SageQL example.
 
 From this directory:
     .\.venv\Scripts\python.exe main.py --example
+    .\.venv\Scripts\python.exe main.py --plan-demo
 
 The example uses EXAMPLE_SCHEMA below and the LLM settings in .env. Edit that
 dictionary to supply your own tables, columns, relations, and definitions.
+The plan demo runs without an API key or database connection.
 Running without --example starts the interactive CLI, which accepts a JSON file.
 """
 
 import os
+import json
 import sys
 from pathlib import Path
 
@@ -21,9 +24,18 @@ from sageql import (
     DatabaseConfig,
     DiscoveryError,
     LLMConfig,
+    PlanCandidates,
+    PlanProposal,
+    PlanningError,
+    ProposedJoin,
+    ProposedMeasure,
+    QuerySpace,
     RequestUnderstandingSession,
+    ResolvedContext,
     catalog_from_dict,
     discover_query_space,
+    create_query_plan,
+    review_query_plan,
 )
 from sageql.chat_cli import main as chat_main
 from sageql.chat_provider import OpenAIChatProvider
@@ -83,16 +95,63 @@ def _answer(question: str) -> str:
         print("Please enter an answer, or type /exit.", file=sys.stderr)
 
 
+def _show_plan(plan, quality) -> None:
+    print("\nQuery planning operations (not SQL):")
+    print(json.dumps(plan.operations(), indent=2, ensure_ascii=False))
+    print("Plan quality:")
+    for check in quality.checks_passed:
+        print(f"  PASS: {check}")
+    for item in quality.review_items:
+        print(f"  REVIEW: {item}")
+    print("  Execution: Not performed.")
+
+
+def run_plan_demo() -> int:
+    """Show a validated operation plan without an API key or database."""
+    catalog = catalog_from_dict(EXAMPLE_SCHEMA)
+    space = QuerySpace(catalog.tables, catalog.columns, catalog.relations, catalog.definitions)
+    context = ResolvedContext(
+        "monthly 2025", ("sales.regions.name",), ("sum of sales.orders.amount",), (), ""
+    )
+
+    class DemoProvider:
+        def propose_query_plan(
+            self, understanding: str, resolved: ResolvedContext, candidates: PlanCandidates
+        ) -> PlanProposal:
+            tables = {table.key: key for key, table in candidates.tables.items()}
+            columns = {column.key: key for key, column in candidates.columns.items()}
+            return PlanProposal(
+                base_table_id=tables["sales.orders"],
+                joins=(ProposedJoin(next(iter(candidates.relations)), tables["sales.regions"], "left"),),
+                time_column_id=columns["sales.orders.order_date"],
+                time_grain="month",
+                dimensions=(columns["sales.regions.name"],),
+                measures=(ProposedMeasure(
+                    "sum of sales.orders.amount", "sum", columns["sales.orders.amount"]
+                ),),
+                filters=(),
+            )
+
+    print("Offline planning demo: a fixed proposal validated against EXAMPLE_SCHEMA.")
+    try:
+        plan = create_query_plan(EXAMPLE_QUESTION, context, space, DemoProvider())
+        _show_plan(plan, review_query_plan(plan, context, space))
+        return 0
+    except (ValueError, PlanningError) as exc:
+        print(f"sageql: {exc}", file=sys.stderr)
+        return 1
+
+
 def run_example() -> int:
-    """Demonstrate the public API from question to selected schema objects."""
+    """Demonstrate the public API from question to validated logical plan."""
     api_key = os.getenv("LLM_API_KEY") or os.getenv("OPENAI_API_KEY")
     if not api_key:
         print("Set LLM_API_KEY in .env or the environment before running --example.", file=sys.stderr)
         return 1
 
     try:
-        # Database fields are part of the planned configuration, but Step 4
-        # uses the supplied JSON catalog and never opens a connection.
+        # Database fields are part of the configuration. This example uses
+        # the supplied catalog and never opens a connection.
         database = DatabaseConfig(
             server_host=os.getenv("DB_SERVER_HOST") or "not-connected",
             database=os.getenv("DB_NAME") or "example",
@@ -140,11 +199,18 @@ def run_example() -> int:
         print("  Columns:", [column.key for column in space.columns])
         print("  Relations:", [relation.name for relation in space.relations])
         print("  Definitions:", [definition.term for definition in space.definitions])
+
+        # Step 6: plan operations. Step 5 has not been defined in this prototype.
+        plan = create_query_plan(
+            assessment.request_understanding, resolution.context, space, provider
+        )
+        quality = review_query_plan(plan, resolution.context, space)
+        _show_plan(plan, quality)
         return 0
     except (EOFError, KeyboardInterrupt):
-        print("\nExample stopped before discovery completed.", file=sys.stderr)
+        print("\nExample stopped.", file=sys.stderr)
         return 1
-    except (ValueError, ChatError, DiscoveryError) as exc:
+    except (ValueError, ChatError, DiscoveryError, PlanningError) as exc:
         print(f"sageql: {exc}", file=sys.stderr)
         return 1
 
@@ -154,11 +220,15 @@ def main(argv: list[str] | None = None) -> int:
     args = sys.argv[1:] if argv is None else argv
     if args in (["--help"], ["-h"]):
         print("Usage: python main.py --example")
+        print("       python main.py --plan-demo")
         print("       python main.py --catalog PATH")
         print("       python main.py --no-discovery")
+        print("       python main.py --no-planning")
         return 0
     if args == ["--example"]:
         return run_example()
+    if args == ["--plan-demo"]:
+        return run_plan_demo()
     return chat_main(args)
 
 

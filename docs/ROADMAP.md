@@ -54,9 +54,9 @@ Create useful reports from a user request and a configured database. Build this 
 
 **Boundary:** Preserve relative time phrases such as “last quarter” as written. Converting them to exact dates requires calendar and timezone rules in a later step. Entity labels are business concepts, not verified database tables or columns.
 
-## Step 4: query space discovery (current)
+## Step 4: query space discovery (complete)
 
-**Outcome:** After context resolution, accept a structured catalog supplied by the package user and print relevant tables/views, columns, supplied relations, and definitions. Stop there.
+**Outcome:** After context resolution, accept a structured catalog supplied by the package user and print relevant tables/views, columns, supplied relations, and definitions.
 
 **Acceptance criteria**
 
@@ -72,11 +72,31 @@ Create useful reports from a user request and a configured database. Build this 
 
 **Boundary:** Relations and definitions come from the user's catalog; they are not inferred from a live database. No database connection, SQL generation, row access, or report creation occurs in this step.
 
+## Step 5: not yet defined
+
+The user has not specified Step 5. Do not assume its purpose or claim it has been implemented.
+
+## Step 6: query planning (current)
+
+**Outcome:** Turn the understood request, resolved context, and selected query space into an ordered logical operation plan. Show how the plan was checked and which choices need review before SQL generation.
+
+**Acceptance criteria**
+
+- A Python API and the interactive CLI produce scan, supplied-relation join, time filter, business filter, aggregate, and comparison operations when needed.
+- All table, column, and relation references are selected query-space IDs. Joins must extend a connected path from the base table.
+- Every resolved metric and filter is mapped once. Numeric aggregates use numeric columns when types are known; time operations use temporal columns when types are known.
+- A model proposal with unknown IDs, disconnected joins, missing mappings, or a conflicting explicit time grain fails before it becomes a plan.
+- The result keeps relative time and comparison phrases symbolic. The quality view marks date boundaries, calendar/timezone rules, metric formulas, inferred filter values, and comparison calculation for review when applicable.
+- `main.py --plan-demo` runs a deterministic offline example through the real plan validator and quality review. `main.py --example` runs the full model-driven path.
+- No database connection, SQL generation, row access, or report creation occurs in this step.
+
+**Boundary:** Structural validity means the plan references the supplied schema consistently. It cannot establish that the supplied schema matches a live database or that the model chose the correct business meaning. Comparison operations are placeholders until date alignment and calculations are defined.
+
 ## Later steps (require a specific user request)
 
 - Connect to a database only after a later user-approved step, then verify the supplied catalog against the actual schema.
-- Plan, validate, run, and format a report with appropriate access controls.
+- Translate an approved logical plan into SQL, validate it, execute it with appropriate access controls, and format a report.
 
 ## Data boundaries
 
-The chat provider receives conversation messages and model configuration. In Step 4 it also receives a bounded shortlist from the user-supplied catalog: table and column names/types, supplied relations, and descriptions/definitions. It does not receive database host, database name, authentication method, ODBC driver, credentials, or row values. Conversation messages are kept in memory for the life of the session. The app does not persist them.
+The chat provider receives conversation messages and model configuration. In Step 4 it also receives a bounded shortlist from the user-supplied catalog: table and column names/types, supplied relations, and descriptions/definitions. In Step 6 it receives the understanding, resolved context, and selected table/column/relation metadata and definitions. It does not receive database host, database name, authentication method, ODBC driver, credentials, or row values. Conversation messages are kept in memory for the life of the session. The app does not persist them.

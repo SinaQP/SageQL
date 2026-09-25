@@ -2,6 +2,7 @@
 
 import argparse
 import getpass
+import json
 import os
 import sys
 
@@ -10,6 +11,7 @@ from sageql.catalog_input import load_catalog_file
 from sageql.conversation import ChatConfig, ChatError, DatabaseConfig, LLMConfig
 from sageql.context import ContextResolutionSession, ResolvedContext
 from sageql.discovery import DiscoveryError, QuerySpace, discover_query_space
+from sageql.planning import PlanQuality, PlanningError, QueryPlan, create_query_plan, review_query_plan
 from sageql.understanding import RequestUnderstandingSession
 
 
@@ -60,11 +62,23 @@ def _print_query_space(space: QuerySpace) -> None:
         print("    No relevant definitions selected or available.")
 
 
+def _print_plan(plan: QueryPlan, quality: PlanQuality) -> None:
+    print("\nQuery plan (logical operations, no SQL):")
+    print(json.dumps(plan.operations(), indent=2, ensure_ascii=False))
+    print("Plan quality:")
+    for check in quality.checks_passed:
+        print(f"  PASS: {check}")
+    for item in quality.review_items:
+        print(f"  REVIEW: {item}")
+    print("  Execution: Not performed.")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="sageql chat", description="Discuss a report request with an AI assistant"
     )
     parser.add_argument("--no-discovery", action="store_true", help="stop after context resolution")
+    parser.add_argument("--no-planning", action="store_true", help="stop after query-space discovery")
     parser.add_argument("--catalog", help="path to a user-supplied schema catalog JSON file")
     args = parser.parse_args(argv)
 
@@ -135,10 +149,15 @@ def main(argv: list[str] | None = None) -> int:
             space = discover_query_space(catalog, provider, assessment.request_understanding,
                                          resolution.context)
             _print_query_space(space)
+            if not args.no_planning:
+                plan = create_query_plan(
+                    assessment.request_understanding, resolution.context, space, provider
+                )
+                _print_plan(plan, review_query_plan(plan, resolution.context, space))
         return 0
     except (EOFError, KeyboardInterrupt):
         print("\nChat ended.")
         return 0
-    except (ValueError, ChatError, DiscoveryError) as exc:
+    except (ValueError, ChatError, DiscoveryError, PlanningError) as exc:
         print(f"sageql: {exc}", file=sys.stderr)
         return 1

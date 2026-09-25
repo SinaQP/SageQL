@@ -3,6 +3,7 @@ from pathlib import Path
 import main as app_main
 from sageql.context import ContextResolution, ResolvedContext
 from sageql.discovery import DiscoverySelection
+from sageql.planning import PlanProposal, ProposedJoin, ProposedMeasure
 from sageql.understanding import RequestAssessment
 
 
@@ -58,6 +59,18 @@ def test_example_runs_public_api_with_supplied_catalog(monkeypatch, capsys):
                 tuple(candidates.relations), tuple(candidates.definitions)
             )
 
+        def propose_query_plan(self, understanding, context, candidates):
+            tables = {value.key: key for key, value in candidates.tables.items()}
+            columns = {value.key: key for key, value in candidates.columns.items()}
+            return PlanProposal(
+                tables["sales.orders"],
+                (ProposedJoin(next(iter(candidates.relations)), tables["sales.regions"], "left"),),
+                columns["sales.orders.order_date"], "month",
+                (columns["sales.regions.name"],),
+                (ProposedMeasure("amount", "sum", columns["sales.orders.amount"]),),
+                (),
+            )
+
     monkeypatch.setattr(app_main, "OpenAIChatProvider", Provider)
     assert app_main.main(["--example"]) == 0
     output = capsys.readouterr().out
@@ -65,6 +78,8 @@ def test_example_runs_public_api_with_supplied_catalog(monkeypatch, capsys):
     assert "Resolved context:" in output
     assert "sales.orders" in output
     assert "fk_orders_region" in output
+    assert '"operation": "aggregate"' in output
+    assert "Plan quality:" in output
     assert "test-key" not in output
 
 
@@ -74,3 +89,20 @@ def test_example_requires_api_key(monkeypatch, capsys):
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     assert app_main.main(["--example"]) == 1
     assert "Set LLM_API_KEY" in capsys.readouterr().err
+
+
+def test_plan_demo_runs_without_model_or_database(monkeypatch, capsys):
+    monkeypatch.setattr(app_main, "load_dotenv", lambda **kwargs: None)
+    monkeypatch.delenv("LLM_API_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.setattr(app_main, "OpenAIChatProvider", lambda *args: (_ for _ in ()).throw(
+        AssertionError("offline demo must not call the model")
+    ))
+
+    assert app_main.main(["--plan-demo"]) == 0
+    output = capsys.readouterr().out
+    assert "Offline planning demo" in output
+    assert '"operation": "join"' in output
+    assert "Plan quality:" in output
+    assert "REVIEW: Bind the time phrase" in output
+    assert "Execution: Not performed." in output
