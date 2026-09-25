@@ -12,6 +12,7 @@ from sageql.conversation import (
 )
 from sageql.errors import GenerationError, InvalidSQL
 from sageql.validation import validate_sql
+from sageql.understanding import RequestAssessment, RequestUnderstandingSession, UnderstandingProvider
 
 __all__ = [
     "Candidate",
@@ -25,7 +26,10 @@ __all__ = [
     "LLMConfig",
     "Message",
     "ReportConversation",
+    "RequestAssessment",
+    "RequestUnderstandingSession",
     "SQLProvider",
+    "UnderstandingProvider",
     "generate_sql",
     "validate_sql",
 ]

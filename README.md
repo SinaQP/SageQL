@@ -1,6 +1,6 @@
 # SageQL
 
-SageQL is a Python package for building reports step by step. The current step starts a conversation about the report the user wants and captures the configuration shown in the project diagram. It does not connect to a database or create a report yet.
+SageQL is a Python package for building reports step by step. The current flow starts with the user's report question, asks for clarification when needed, and prints its understanding once the request is clear. It does not connect to a database or create a report yet.
 
 ## Run from `main.py`
 
@@ -33,7 +33,7 @@ The CLI first asks what report you want. It then collects these fields:
 | Authentication method | Model |
 | ODBC Driver | |
 
-After the first AI reply, enter follow-up messages at `You>`. Type `/exit` to end the session. Without environment overrides, the Base URL defaults to `https://api.openai.com/v1` and the model to `gpt-5-nano`. A custom Base URL receives your API key, so use an endpoint you trust.
+If the request is unclear, answer the AI's clarification question at `You>`. Once it has enough information, the program prints `Request understanding:` and stops. Type `/exit` to stop early. Without environment overrides, the Base URL defaults to `https://api.openai.com/v1` and the model to `gpt-5-nano`. A custom Base URL receives your API key, so use an endpoint you trust.
 
 For the tested AvalAI configuration, set the non-secret defaults and let the CLI ask for the key privately:
 
@@ -48,7 +48,7 @@ sageql chat
 ```python
 import os
 
-from sageql import ChatConfig, DatabaseConfig, LLMConfig, ReportConversation
+from sageql import ChatConfig, DatabaseConfig, LLMConfig, RequestUnderstandingSession
 from sageql.chat_provider import OpenAIChatProvider
 
 database = DatabaseConfig(
@@ -62,14 +62,17 @@ llm = LLMConfig(
     base_url="https://api.openai.com/v1",
     model="gpt-5-nano",
 )
-conversation = ReportConversation(
+conversation = RequestUnderstandingSession(
     ChatConfig(database=database, llm=llm), OpenAIChatProvider(llm)
 )
-print(conversation.ask("I want a monthly sales report"))
-print(conversation.ask("Show revenue by region for the last year"))
+assessment = conversation.submit("I want a monthly sales report")
+while not assessment.enough_information:
+    print(assessment.clarification_question)
+    assessment = conversation.submit(input("You> "))
+print("Request understanding:", assessment.request_understanding)
 ```
 
-`conversation.history` contains successful user and assistant turns. You can inject another object with a `reply(messages)` method to use a different provider or test offline.
+`conversation.history` contains successful user and assistant turns. You can inject another object with an `assess(messages)` method to use a different provider or test offline.
 
 ## Current scope and privacy
 

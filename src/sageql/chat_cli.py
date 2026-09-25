@@ -6,7 +6,8 @@ import os
 import sys
 
 from sageql.chat_provider import OpenAIChatProvider
-from sageql.conversation import ChatConfig, ChatError, DatabaseConfig, LLMConfig, ReportConversation
+from sageql.conversation import ChatConfig, ChatError, DatabaseConfig, LLMConfig
+from sageql.understanding import RequestUnderstandingSession
 
 
 def _required_input(label: str) -> str:
@@ -55,15 +56,18 @@ def main(argv: list[str] | None = None) -> int:
             model=model or "gpt-5-nano",
         )
 
-        conversation = ReportConversation(
+        conversation = RequestUnderstandingSession(
             ChatConfig(database=database, llm=llm), OpenAIChatProvider(llm)
         )
-        print("\nChat started. Type /exit to finish.\n")
+        print("\nRequest understanding started. Type /exit to finish.\n")
         pending = first_question
         while True:
             try:
-                answer = conversation.ask(pending)
-                print(f"AI> {answer}\n")
+                assessment = conversation.submit(pending)
+                if assessment.enough_information:
+                    print(f"Request understanding:\n{assessment.request_understanding.strip()}")
+                    return 0
+                print(f"AI> {assessment.clarification_question.strip()}\n")
             except ChatError as exc:
                 print(f"sageql: {exc}", file=sys.stderr)
 

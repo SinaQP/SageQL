@@ -38,3 +38,37 @@ def test_chat_provider_rejects_empty_output():
     provider = OpenAIChatProvider(LLMConfig(api_key="secret"), client=client)
     with pytest.raises(ChatError, match="empty answer"):
         provider.reply([Message("user", "Report")])
+
+
+def test_assessment_uses_structured_output_and_history():
+    completions = FakeCompletions(
+        '{"enough_information":false,"request_understanding":"Sales report",'
+        '"clarification_question":"Which time period?"}'
+    )
+    client = SimpleNamespace(chat=SimpleNamespace(completions=completions))
+    provider = OpenAIChatProvider(LLMConfig(api_key="secret"), client=client)
+
+    result = provider.assess([Message("user", "Sales report")])
+
+    assert not result.enough_information
+    assert result.clarification_question == "Which time period?"
+    assert completions.kwargs["response_format"]["type"] == "json_schema"
+    assert [message["role"] for message in completions.kwargs["messages"]] == ["system", "user"]
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "not-json",
+        '{"enough_information":"yes","request_understanding":"A report","clarification_question":""}',
+        '{"enough_information":true,"request_understanding":"","clarification_question":""}',
+        '{"enough_information":false,"request_understanding":"A report","clarification_question":""}',
+        '{"enough_information":true,"request_understanding":"A report","clarification_question":"","extra":1}',
+    ],
+)
+def test_assessment_rejects_invalid_output(content):
+    completions = FakeCompletions(content)
+    client = SimpleNamespace(chat=SimpleNamespace(completions=completions))
+    provider = OpenAIChatProvider(LLMConfig(api_key="secret"), client=client)
+    with pytest.raises(ChatError, match="invalid request assessment"):
+        provider.assess([Message("user", "Report")])

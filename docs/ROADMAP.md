@@ -4,7 +4,7 @@
 
 Create useful reports from a user request and a configured database. Build this in user-approved steps; report generation is a later step.
 
-## Step 1: report-planning conversation (current)
+## Step 1: report-planning conversation (complete)
 
 **Outcome:** The user enters a report question, supplies the configuration shown in the diagram, and can continue a conversation with an AI assistant about the desired report.
 
@@ -23,6 +23,20 @@ Create useful reports from a user request and a configured database. Build this 
 - Offline tests verify the conversation, model adapter, and CLI. No database or model credentials are needed for tests.
 
 **Boundary:** This step does not connect to the database, inspect its schema, generate SQL, or create a report. The existing SQL proposal API is an earlier experiment and remains available separately.
+
+## Step 2: request understanding (current)
+
+**Outcome:** The AI determines what report the user wants. If the request is materially ambiguous, it asks one focused clarification question and reassesses the reply with full conversation history. Once sufficiently clear, the program prints a concise understanding of the request and ends this test flow.
+
+**Acceptance criteria**
+
+- The provider returns a structured decision: enough information, current understanding, and clarification question.
+- A request ready for the next step prints `Request understanding` and exits without generating a report.
+- An incomplete request asks one question and preserves the conversation for the next assessment.
+- Malformed or contradictory provider output fails closed; failed turns are not added to history.
+- Offline tests cover ready, clarification, invalid output, and CLI behavior.
+
+**Enough information:** The report's subject and intended result are identifiable, and any ambiguity that would materially change the report has been resolved. Optional presentation preferences can wait. Never invent missing details.
 
 ## Later steps (require a specific user request)
 
