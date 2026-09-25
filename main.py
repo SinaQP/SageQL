@@ -27,6 +27,7 @@ from sageql import (
     PlanCandidates,
     PlanProposal,
     PlanningError,
+    SQLGenerationError,
     ProposedJoin,
     ProposedMeasure,
     QuerySpace,
@@ -36,6 +37,7 @@ from sageql import (
     discover_query_space,
     create_query_plan,
     review_query_plan,
+    generate_sql_from_plan,
 )
 from sageql.chat_cli import main as chat_main
 from sageql.chat_provider import OpenAIChatProvider
@@ -106,8 +108,16 @@ def _show_plan(plan, quality) -> None:
     print("  Execution: Not performed.")
 
 
+def _show_sql(query) -> None:
+    print("\nGenerated SQLite SQL (review before execution):")
+    print(query.sql)
+    print("Parameters:", dict(query.parameters))
+    print("Required date bindings:", ", ".join(query.required_parameters) or "None")
+    print("Execution: Not performed.")
+
+
 def run_plan_demo() -> int:
-    """Show a validated operation plan without an API key or database."""
+    """Show a validated operation plan and generated SQL without network or database."""
     catalog = catalog_from_dict(EXAMPLE_SCHEMA)
     space = QuerySpace(catalog.tables, catalog.columns, catalog.relations, catalog.definitions)
     context = ResolvedContext(
@@ -136,14 +146,15 @@ def run_plan_demo() -> int:
     try:
         plan = create_query_plan(EXAMPLE_QUESTION, context, space, DemoProvider())
         _show_plan(plan, review_query_plan(plan, context, space))
+        _show_sql(generate_sql_from_plan(plan, period_bounds=("2025-01-01", "2026-01-01")))
         return 0
-    except (ValueError, PlanningError) as exc:
+    except (ValueError, PlanningError, SQLGenerationError) as exc:
         print(f"sageql: {exc}", file=sys.stderr)
         return 1
 
 
 def run_example() -> int:
-    """Demonstrate the public API from question to validated logical plan."""
+    """Demonstrate the public API from question to generated SQLite SQL."""
     api_key = os.getenv("LLM_API_KEY") or os.getenv("OPENAI_API_KEY")
     if not api_key:
         print("Set LLM_API_KEY in .env or the environment before running --example.", file=sys.stderr)
@@ -206,11 +217,14 @@ def run_example() -> int:
         )
         quality = review_query_plan(plan, resolution.context, space)
         _show_plan(plan, quality)
+        # This fixed example names calendar year 2025 explicitly. Other time
+        # phrases need caller-supplied bounds before the query can be used.
+        _show_sql(generate_sql_from_plan(plan, period_bounds=("2025-01-01", "2026-01-01")))
         return 0
     except (EOFError, KeyboardInterrupt):
         print("\nExample stopped.", file=sys.stderr)
         return 1
-    except (ValueError, ChatError, DiscoveryError, PlanningError) as exc:
+    except (ValueError, ChatError, DiscoveryError, PlanningError, SQLGenerationError) as exc:
         print(f"sageql: {exc}", file=sys.stderr)
         return 1
 
@@ -224,6 +238,7 @@ def main(argv: list[str] | None = None) -> int:
         print("       python main.py --catalog PATH")
         print("       python main.py --no-discovery")
         print("       python main.py --no-planning")
+        print("       python main.py --no-sql")
         return 0
     if args == ["--example"]:
         return run_example()

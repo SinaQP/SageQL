@@ -323,7 +323,7 @@ def review_query_plan(plan: QueryPlan, context: ResolvedContext, space: QuerySpa
     review: list[str] = []
     if plan.time_column is not None and plan.time_period.casefold() != "all available data":
         review.append(
-            f"Bind the time phrase '{plan.time_period}' to exact date boundaries and a timezone before SQL."
+            f"Confirm exact date boundaries and timezone for time phrase '{plan.time_period}' before execution."
         )
     if plan.time_grain != "none":
         review.append("Confirm the calendar and timezone used for time grouping.")
@@ -331,6 +331,8 @@ def review_query_plan(plan: QueryPlan, context: ResolvedContext, space: QuerySpa
         review.append("Confirm that the selected time column has a temporal data type.")
     if plan.comparison_period:
         review.append("Define comparison-period alignment and the comparison calculation before SQL.")
+    if plan.joins and plan.measures:
+        review.append("Confirm join cardinality does not multiply rows used by aggregates.")
     for measure in plan.measures:
         if measure.column is not None and measure.column.data_type.casefold() == "unknown":
             review.append(f"Confirm the data type used for metric '{measure.source_metric}'.")
@@ -338,12 +340,20 @@ def review_query_plan(plan: QueryPlan, context: ResolvedContext, space: QuerySpa
                              for definition in space.definitions)
         explicit_formula = (
             measure.column is not None
-            and measure.column.key.casefold() in measure.source_metric.casefold()
-            and measure.aggregation in measure.source_metric.casefold()
+            and any(
+                measure.column.key.casefold() in phrase.casefold()
+                and measure.aggregation in phrase.casefold()
+                for phrase in (measure.source_metric, plan.request_understanding)
+            )
         )
         if not has_definition and not explicit_formula:
             review.append(f"Confirm the business formula for metric '{measure.source_metric}'.")
     for condition in plan.filters:
+        if any(join.join_type == "left" and join.to_table.key == condition.column.table
+               for join in plan.joins):
+            review.append(
+                f"Confirm filter '{condition.source_filter}' should exclude unmatched left-join rows."
+            )
         if any(value.casefold() not in condition.source_filter.casefold() for value in condition.values):
             review.append(f"Confirm inferred filter values for '{condition.source_filter}'.")
         review.append(f"Check that filter values for '{condition.source_filter}' exist in the database.")

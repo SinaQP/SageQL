@@ -76,7 +76,7 @@ Create useful reports from a user request and a configured database. Build this 
 
 The user has not specified Step 5. Do not assume its purpose or claim it has been implemented.
 
-## Step 6: query planning (current)
+## Step 6: query planning (complete)
 
 **Outcome:** Turn the understood request, resolved context, and selected query space into an ordered logical operation plan. Show how the plan was checked and which choices need review before SQL generation.
 
@@ -92,10 +92,26 @@ The user has not specified Step 5. Do not assume its purpose or claim it has bee
 
 **Boundary:** Structural validity means the plan references the supplied schema consistently. It cannot establish that the supplied schema matches a live database or that the model chose the correct business meaning. Comparison operations are placeholders until date alignment and calculations are defined.
 
+## Step 7: SQL generation (current)
+
+**Outcome:** Render the validated logical plan into readable, parameterized SQLite SQL and show it in the demo and interactive flow.
+
+**Acceptance criteria**
+
+- Render selected tables and supplied joins, time buckets, filters, dimensions, and aggregate measures deterministically; the model does not write the SQL string.
+- Quote schema, table, and column identifiers; keep filter values and date boundaries in named bind parameters.
+- Accept exact ISO start and exclusive end dates from the caller. Leave named parameters marked as required when dates remain unresolved.
+- Render comparison periods as labeled base and comparison rows when requested, without inventing a delta calculation.
+- Validate the generated statement as a single read-only SQLite query before returning it.
+- `main.py --plan-demo` prints the SQL and parameters; offline tests execute it against synthetic in-memory SQLite tables and check the returned totals.
+- The package does not open a production database connection or execute the generated report query.
+
+**Boundary:** SQLite is the only Step 7 dialect. The configured ODBC driver does not select a dialect yet. Caller-supplied bounds, join semantics, metric formulas, and filter values still need business review. SQL with required date bindings is a template until those bindings are supplied.
+
 ## Later steps (require a specific user request)
 
 - Connect to a database only after a later user-approved step, then verify the supplied catalog against the actual schema.
-- Translate an approved logical plan into SQL, validate it, execute it with appropriate access controls, and format a report.
+- Add reviewed database dialects, execute approved SQL with appropriate access controls, and format a report.
 
 ## Data boundaries
 

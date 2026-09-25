@@ -301,5 +301,7 @@ def test_chat_cli_prints_query_plan_and_quality(monkeypatch, capsys):
     assert '"operation": "scan"' in output
     assert '"operation": "aggregate"' in output
     assert "Plan quality:" in output
+    assert "Generated SQLite SQL" in output
+    assert "Required date bindings: period_start, period_end" in output
     assert "Execution: Not performed." in output
     assert "secret" not in output

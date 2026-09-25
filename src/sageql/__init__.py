@@ -23,6 +23,7 @@ from sageql.planning import (
     review_query_plan,
 )
 from sageql.schema import Column, Definition, Relation, SchemaCatalog, Table
+from sageql.sql_generation import SQLGenerationError, SQLQuery, generate_sql_from_plan
 from sageql.errors import GenerationError, InvalidSQL
 from sageql.validation import validate_sql
 from sageql.understanding import RequestAssessment, RequestUnderstandingSession, UnderstandingProvider
@@ -67,10 +68,13 @@ __all__ = [
     "RequestAssessment",
     "RequestUnderstandingSession",
     "SQLProvider",
+    "SQLGenerationError",
+    "SQLQuery",
     "SchemaCatalog",
     "Table",
     "UnderstandingProvider",
     "generate_sql",
+    "generate_sql_from_plan",
     "discover_query_space",
     "create_query_plan",
     "review_query_plan",

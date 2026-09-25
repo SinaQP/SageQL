@@ -80,6 +80,9 @@ def test_example_runs_public_api_with_supplied_catalog(monkeypatch, capsys):
     assert "fk_orders_region" in output
     assert '"operation": "aggregate"' in output
     assert "Plan quality:" in output
+    assert "Generated SQLite SQL" in output
+    assert "SUM(t0.\"amount\")" in output
+    assert "'period_start': '2025-01-01'" in output
     assert "test-key" not in output
 
 
@@ -104,5 +107,8 @@ def test_plan_demo_runs_without_model_or_database(monkeypatch, capsys):
     assert "Offline planning demo" in output
     assert '"operation": "join"' in output
     assert "Plan quality:" in output
-    assert "REVIEW: Bind the time phrase" in output
+    assert "REVIEW: Confirm exact date boundaries" in output
+    assert "Generated SQLite SQL" in output
+    assert "LEFT JOIN" in output
+    assert "Required date bindings: None" in output
     assert "Execution: Not performed." in output

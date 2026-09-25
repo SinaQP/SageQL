@@ -12,6 +12,7 @@ from sageql.conversation import ChatConfig, ChatError, DatabaseConfig, LLMConfig
 from sageql.context import ContextResolutionSession, ResolvedContext
 from sageql.discovery import DiscoveryError, QuerySpace, discover_query_space
 from sageql.planning import PlanQuality, PlanningError, QueryPlan, create_query_plan, review_query_plan
+from sageql.sql_generation import SQLGenerationError, SQLQuery, generate_sql_from_plan
 from sageql.understanding import RequestUnderstandingSession
 
 
@@ -73,12 +74,21 @@ def _print_plan(plan: QueryPlan, quality: PlanQuality) -> None:
     print("  Execution: Not performed.")
 
 
+def _print_sql(query: SQLQuery) -> None:
+    print("\nGenerated SQLite SQL (review before execution):")
+    print(query.sql)
+    print("Parameters:", dict(query.parameters))
+    print("Required date bindings:", ", ".join(query.required_parameters) or "None")
+    print("Execution: Not performed.")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="sageql chat", description="Discuss a report request with an AI assistant"
     )
     parser.add_argument("--no-discovery", action="store_true", help="stop after context resolution")
     parser.add_argument("--no-planning", action="store_true", help="stop after query-space discovery")
+    parser.add_argument("--no-sql", action="store_true", help="stop after logical query planning")
     parser.add_argument("--catalog", help="path to a user-supplied schema catalog JSON file")
     args = parser.parse_args(argv)
 
@@ -154,10 +164,12 @@ def main(argv: list[str] | None = None) -> int:
                     assessment.request_understanding, resolution.context, space, provider
                 )
                 _print_plan(plan, review_query_plan(plan, resolution.context, space))
+                if not args.no_sql:
+                    _print_sql(generate_sql_from_plan(plan))
         return 0
     except (EOFError, KeyboardInterrupt):
         print("\nChat ended.")
         return 0
-    except (ValueError, ChatError, DiscoveryError, PlanningError) as exc:
+    except (ValueError, ChatError, DiscoveryError, PlanningError, SQLGenerationError) as exc:
         print(f"sageql: {exc}", file=sys.stderr)
         return 1

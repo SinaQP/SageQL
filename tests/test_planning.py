@@ -76,6 +76,20 @@ def test_plan_has_ordered_operations_and_quality_review():
     assert any("exact date boundaries" in item for item in quality.review_items)
 
 
+def test_explicit_formula_in_understanding_needs_no_formula_review():
+    resolved = ResolvedContext("monthly 2025", ("region",), ("sales.orders.amount",), (), "")
+    class FormulaProvider:
+        def propose_query_plan(self, understanding, context, candidates):
+            return proposal(measures=(ProposedMeasure("sales.orders.amount", "sum", "c0"),))
+
+    plan = create_query_plan(
+        "Monthly sum of sales.orders.amount by region for 2025",
+        resolved, space(), FormulaProvider()
+    )
+    quality = review_query_plan(plan, resolved, space())
+    assert not any("business formula" in item for item in quality.review_items)
+
+
 @pytest.mark.parametrize("bad", [
     proposal(base_table_id="t99"),
     proposal(joins=(ProposedJoin("r0", "t0", "left"),)),
