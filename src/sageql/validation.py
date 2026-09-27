@@ -22,19 +22,21 @@ _FORBIDDEN = (
 )
 
 
-def validate_sql(sql: str) -> str:
-    """Accept one parsed SQLite SELECT query; return its original SQL text.
+def validate_sql(sql: str, *, dialect: str = "sqlite") -> str:
+    """Accept one parsed SELECT query; return its original SQL text.
 
     This is a structural filter for generated output, not permission to execute
     the SQL. Database permissions and read-only connections are still required.
     """
+    if dialect not in {"sqlite", "tsql"}:
+        raise InvalidSQL("unsupported SQL dialect")
     if not isinstance(sql, str) or not sql.strip():
         raise InvalidSQL("model returned empty SQL")
 
     try:
-        statements = sqlglot.parse(sql, read="sqlite", error_level=ErrorLevel.RAISE)
+        statements = sqlglot.parse(sql, read=dialect, error_level=ErrorLevel.RAISE)
     except (ParseError, ValueError) as exc:
-        raise InvalidSQL("model returned invalid SQLite SQL") from exc
+        raise InvalidSQL("invalid SQL syntax") from exc
 
     if len(statements) != 1 or statements[0] is None:
         raise InvalidSQL("expected exactly one SQL statement")

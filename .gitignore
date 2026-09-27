@@ -5,3 +5,5 @@ __pycache__/
 dist/
 *.egg-info/
 .env
+sageql_rahtal/reports/
+sageql_rahtal/local_config.py

@@ -1,0 +1,1 @@
+For all available data, show one row per activity date with the sum of activity hours across all users. Do not group by user or compare periods.
