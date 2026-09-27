@@ -138,10 +138,18 @@ The user has not specified Step 5. Do not assume its purpose or claim it has bee
 
 **Boundary:** SQLite is the only executable dialect. ODBC connection fields captured earlier are not used by Step 9. Read-only local file access does not replace database permissions or human review of report semantics. Report formatting is still a later step.
 
+## Rahtal daily-performance integration pilot
+
+**Outcome:** A person edits the ignored `sageql_rahtal/local_config.py` to set the question and run options, runs `sageql_rahtal/run.py`, and receives a unique Markdown and JSON report for each run. A tracked example config and `--question` file override support reuse. The report records input, model stages, schema discovery, plan and repairs, deterministic T-SQL, validation, timings, and bounded query results or the reason the run stopped.
+
+**Acceptance criteria:** Verify the approved `Activities`, `User`, and `Person` catalog against live SQL Server metadata. Exclude nonapproved private fields. Keep database connection settings and rows out of model requests. Read question, mode, bounds, and limits from local config while keeping secrets in `.env`; reject malformed values and incomplete date pairs before model calls. Bound each model request and disable transport retries so endpoint stalls become timed failure reports. Apply activity and profile soft-delete policies in generated SQL. Revalidate the exact SQL and ordered parameters before execution. Refuse a login with effective table-write permission. Save reports on success, clarification, and failure. Offline tests cover policy SQL, local config, and the read-only gate; a manual smoke test uses real data only when a read-only login is available.
+
+**Current finding:** The configured local Rahtal login has effective `INSERT`, `UPDATE`, and `DELETE` on the approved tables. A first live SELECT completed before this was discovered; the guard now blocks further execution with that login. A later `--no-execute` run completed through SQL validation with the sample question and recorded a policy repair plus removal of unused joins. The new default local-config run also completed through SQL validation on 2026-09-27 and saved a per-stage report. A dedicated SELECT-only login is needed to complete a guarded live execution test. The local config and reports directory are ignored by Git.
+
 ## Later steps (require a specific user request)
 
-- Connect to a database only after a later user-approved step, then verify the supplied catalog against the actual schema.
-- Add reviewed ODBC/database dialects and format returned rows as a report.
+- Expand the pilot beyond Rahtal only with a separate reviewed dialect and policy design.
+- Define Step 5 and format returned rows as a final report.
 
 ## Data boundaries
 

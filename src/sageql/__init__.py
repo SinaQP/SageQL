@@ -31,6 +31,10 @@ from sageql.report_validation import (
 from sageql.execution import QueryExecutionError, QueryResult, execute_sqlite_report
 from sageql.errors import GenerationError, InvalidSQL
 from sageql.validation import validate_sql
+from sageql.tsql import (
+    TSQLQuery, TSQLResult, TSQLReportError, render_tsql_report,
+    validate_tsql_report, execute_tsql_report,
+)
 from sageql.understanding import RequestAssessment, RequestUnderstandingSession, UnderstandingProvider
 
 __all__ = [
@@ -93,4 +97,10 @@ __all__ = [
     "create_query_plan",
     "review_query_plan",
     "validate_sql",
+    "TSQLQuery",
+    "TSQLResult",
+    "TSQLReportError",
+    "render_tsql_report",
+    "validate_tsql_report",
+    "execute_tsql_report",
 ]
