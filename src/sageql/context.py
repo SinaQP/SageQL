@@ -79,6 +79,7 @@ class ContextResolutionSession:
         self._understanding = understanding.strip()
         self._started = False
         self._context: ResolvedContext | None = None
+        self._provisional_context: ResolvedContext | None = None
 
     @property
     def history(self) -> tuple[Message, ...]:
@@ -87,6 +88,11 @@ class ContextResolutionSession:
     @property
     def context(self) -> ResolvedContext | None:
         return self._context
+
+    @property
+    def provisional_context(self) -> ResolvedContext | None:
+        """Latest context snapshot, including one still awaiting clarification."""
+        return self._provisional_context
 
     def start(self) -> ContextResolution:
         if self._started:
@@ -123,6 +129,7 @@ class ContextResolutionSession:
     def _accept_result(self, result: ContextResolution, user_message: Message | None) -> None:
         if user_message is not None:
             self._history.append(user_message)
+        self._provisional_context = result.context
         if result.ready:
             self._context = result.context
         else:

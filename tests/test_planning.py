@@ -108,6 +108,8 @@ def test_all_base_rows_repair_inner_join_to_left_join():
     proposal(dimensions=("c99",)),
     proposal(dimensions=({},)),
     proposal(measures=()),
+    proposal(measures=(ProposedMeasure("revenue", "sum", "c0"),
+                       ProposedMeasure("revenue", "sum", "c0"))),
     proposal(measures=(ProposedMeasure("revenue", "count_rows", None),)),
     proposal(measures=(ProposedMeasure("revenue", "sum", "c4"),)),
     proposal(measures=(ProposedMeasure("invented", "sum", "c0"),)),
@@ -158,3 +160,59 @@ def test_provider_failure_is_sanitized():
     with pytest.raises(PlanningError, match="provider failed") as error:
         create_query_plan("Monthly revenue by region", context(), space(), FailingProvider())
     assert "private schema detail" not in str(error.value)
+
+
+def test_invalid_semantic_plan_gets_one_validated_revision():
+    class RevisingProvider:
+        feedback = None
+        calls = 0
+
+        def propose_query_plan(self, understanding, context, candidates):
+            self.calls += 1
+            return proposal(measures=())
+
+        def revise_query_plan(self, understanding, context, candidates, feedback):
+            self.calls += 1
+            self.feedback = feedback
+            return proposal()
+
+    provider = RevisingProvider()
+    plan = create_query_plan("Monthly revenue by region for 2025", context(), space(), provider)
+    assert provider.calls == 2
+    assert provider.feedback == "query plan does not map every resolved metric"
+    assert plan.measures[0].source_metric == "revenue"
+
+
+def test_invalid_revision_still_fails_closed_without_more_calls():
+    class RevisingProvider:
+        calls = 0
+
+        def propose_query_plan(self, understanding, context, candidates):
+            self.calls += 1
+            return proposal(base_table_id="t99")
+
+        def revise_query_plan(self, understanding, context, candidates, feedback):
+            self.calls += 1
+            return proposal(base_table_id="t99")
+
+    provider = RevisingProvider()
+    with pytest.raises(PlanningError, match="unknown base table"):
+        create_query_plan("Monthly revenue by region for 2025", context(), space(), provider)
+    assert provider.calls == 2
+
+
+def test_provider_failure_is_not_retried_even_when_revision_is_supported():
+    class FailingProvider:
+        revision_called = False
+
+        def propose_query_plan(self, understanding, context, candidates):
+            raise PlanningError("pilot policy rejected this plan")
+
+        def revise_query_plan(self, understanding, context, candidates, feedback):
+            self.revision_called = True
+            return proposal()
+
+    provider = FailingProvider()
+    with pytest.raises(PlanningError, match="pilot policy rejected"):
+        create_query_plan("Monthly revenue by region for 2025", context(), space(), provider)
+    assert not provider.revision_called
