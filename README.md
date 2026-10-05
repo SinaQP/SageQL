@@ -1,6 +1,31 @@
 # SageQL
 
-SageQL is a Python package for building reports step by step. The current flow starts with the user's report question, asks for clarification when needed, resolves context, selects relevant objects from a user-supplied schema catalog, plans database operations, generates and validates SQLite SQL, and can execute it against an explicitly selected SQLite file. Formatting returned rows into a report is a later step.
+SageQL is a Python SDK that a developer embeds in their backend to let authorized users create and refine reports through chat. The host registers SQL Server tables or trusted reporting views, approved metrics/dimensions/filters, model infrastructure, and per-user access policies. SageQL interprets a report specification, validates it, generates parameterized SQL itself, and returns a typed table/chart payload for your frontend.
+
+The new `sageql.sdk` API includes persistent conversations, clarification, report refinement, revision checks and idempotent retries. SQL Server is the production adapter target; SQLite supplies an offline reference. The [embedding guide](docs/SDK.md) documents installation, configuration, the JSON contract and limits. The [architecture](docs/ARCHITECTURE.md) records the broader design. The existing staged CLI/API and Rahtal real-data pilot remain available.
+
+## Try the embedded report flow
+
+To use the **existing Rahtal SQL Server database and real model**, run:
+
+```powershell
+.\.venv\Scripts\python.exe sageql_rahtal/web.py --env-file E:\Coding\rahtal-be\.env --port 8766
+```
+
+Open `http://127.0.0.1:8766`. The server saves a local workspace token in `.venv/rahtal-web/host-token.txt`; use it in the sign-in dialog. This mode reads the approved existing employee/profile and activity tables and never falls back to synthetic data. See the [Rahtal frontend instructions](sageql_rahtal/README.md#local-frontend-on-the-real-database). VPN access to the configured SQL Server is required when it is on the internal network.
+
+The following offline commands exercise the same SDK using synthetic data and a scripted interpreter:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[openai,odbc,dev]"
+.\.venv\Scripts\python.exe examples/sdk_demo.py
+.\.venv\Scripts\python.exe examples/web/server.py --demo
+```
+
+Open `http://127.0.0.1:8765`, ask “Daily activity hours for September,” answer “2026,” then request “Group it by employee instead.” This uses synthetic data and a deterministic interpreter without credentials or remote calls. The [frontend guide](examples/web/README.md) also covers SQL Server mode. The first SDK slice queries one registered table/view per dataset; reviewed reporting views can contain business joins. Model-selected joins, arbitrary formulas, timestamp/calendar conversion and production authentication are outside this slice.
+
+Registered dimension-only reports can list employee names without adding an aggregate. The sections below document the earlier staged workflow. Its experimental model-written SQL API is separate from the SDK engine.
 
 ## Inspect planning, SQL, validation, and execution without an API key
 
@@ -190,13 +215,13 @@ print("Validation:", prepared.validation.checks_passed, prepared.validation.revi
 
 ## Rahtal live test pilot
 
-For a locally configured daily-performance question against the Rahtal SQL Server database, use the isolated [Rahtal test app](sageql_rahtal/README.md). Edit its ignored `local_config.py` for the question and run options; credentials stay in `.env`. It saves a stage-by-stage report per run. The general SageQL CLI below remains SQLite-only; the pilot is the supported narrow SQL Server path.
+For a locally configured daily-performance question against the Rahtal SQL Server database, use the isolated [Rahtal test app](sageql_rahtal/README.md). Edit its ignored `local_config.py` for the question and run options; credentials stay in `.env`. It saves a stage-by-stage report per run. The historical general CLI remains SQLite-only; the pilot and the separately scoped SDK adapter provide SQL Server paths.
 
 ## Current scope and privacy
 
 - Conversation messages, request understanding, resolved context, and bounded user-supplied schema metadata go to the configured LLM endpoint. Planning sends the selected query space. Database host, database name, authentication method, ODBC driver, and credentials stay local. Do not use a model endpoint that should not see your schema names or descriptions.
 - Context fields are the model's interpretation of the request. Step 4 verifies selected names against the supplied catalog. In Step 6 the model selects resolved metrics and filters by temporary IDs; SageQL restores their original phrases and validates references, joins, metric/filter coverage, and basic type/time-grain compatibility. If the request explicitly asks for all base-table rows, an inner join is changed to a left join and the repair is shown. Step 7 renders the plan deterministically. Step 8 checks the SELECT statement, selected tables/columns, required filters, explicit interpretation facts, and exact agreement with the plan. A bad SQL candidate is discarded and regenerated once with `prepare_report_query`; unresolved dates and missing required filters block execution. These checks cannot prove ambiguous business meaning, join cardinality, or that the supplied catalog matches the live file. Review those choices and use `RequiredFilter` in the Python API for mandatory tenant or policy conditions.
-- The API key is hidden at the CLI prompt and masked in `LLMConfig` representations. SageQL keeps chat history in memory only; it does not save it.
+- The API key is hidden at the CLI prompt and masked in `LLMConfig` representations. Historical CLI history stays in memory. SDK stores explicitly persist messages and report rows under host-controlled permissions and retention.
 - Definitions come from user-supplied descriptions and glossary entries. Relations come from user-supplied relation entries. SageQL does not invent business definitions or joins.
 - The general CLI executes only with `--execute-sqlite`. It opens files with SQLite `mode=ro`, validates again, restricts reads with an authorizer, and caps returned rows and work. Filter and date values are bind parameters. A comparison-period operation yields labeled rows, while alignment and delta calculation still need definition. The separate Rahtal pilot supports its approved SQL Server scope; arbitrary ODBC schemas are not supported by that runner.
 - The earlier experimental SQLite SQL proposal command is still available as `sageql "question" --schema schema.sql`, but it is separate from the report conversation.
