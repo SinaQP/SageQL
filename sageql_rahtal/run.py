@@ -39,6 +39,19 @@ class NeedsClarification(Exception):
     """The question needs another user-written detail before querying data."""
 
 
+def _ask_clarification(question: str, read: Callable[[str], str]) -> str:
+    """Collect a substantive answer without treating it as a new report request."""
+    while True:
+        try:
+            answer = read(f"AI> {question.strip()}\nYou> ").strip()
+        except (EOFError, KeyboardInterrupt):
+            raise NeedsClarification(question) from None
+        if answer.casefold() in {"/exit", "/quit"}:
+            raise NeedsClarification(question)
+        if answer:
+            return answer
+
+
 @dataclass(frozen=True)
 class LocalConfig:
     question: str
@@ -216,7 +229,17 @@ class _PilotPlanningProvider:
         self.repairs: list[str] = []
 
     def propose_query_plan(self, understanding, context, candidates):
-        proposal = self.provider.propose_query_plan(understanding, context, candidates)
+        return self._propose(understanding, context, candidates, None)
+
+    def revise_query_plan(self, understanding, context, candidates, feedback):
+        return self._propose(understanding, context, candidates, feedback)
+
+    def _propose(self, understanding, context, candidates, feedback):
+        self.repairs.clear()
+        self.proposal = None
+        proposal = (self.provider.propose_query_plan(understanding, context, candidates)
+                    if feedback is None else self.provider.revise_query_plan(
+                        understanding, context, candidates, feedback))
         self.proposal = proposal
         if proposal.base_table_id not in candidates.tables:
             return proposal
@@ -290,7 +313,8 @@ def _save(report: dict[str, Any], folder: Path) -> tuple[Path, Path]:
     return json_path, md_path
 
 
-def run(args: argparse.Namespace) -> int:
+def run(args: argparse.Namespace, answer_input: Callable[[str], str] | None = None) -> int:
+    read_answer = answer_input if answer_input is not None else input
     request_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid4().hex[:8]
     started = time.perf_counter()
     report: dict[str, Any] = {"request_id": request_id,
@@ -365,13 +389,21 @@ def run(args: argparse.Namespace) -> int:
         )
         understanding_session = RequestUnderstandingSession(config, provider)
         assessment = stage("2. Request understanding", lambda: understanding_session.submit(question), asdict)
-        if not assessment.enough_information:
-            raise NeedsClarification(assessment.clarification_question)
+        while not assessment.enough_information:
+            answer = stage("2. Clarification answer",
+                           lambda: _ask_clarification(assessment.clarification_question, read_answer),
+                           lambda value: {"question": assessment.clarification_question, "answer": value})
+            assessment = stage("2. Request understanding",
+                               lambda: understanding_session.submit(answer), asdict)
         context_session = ContextResolutionSession(
             config, provider, understanding_session.history, assessment.request_understanding)
         resolution = stage("3. Context resolution", context_session.start, asdict)
-        if not resolution.ready:
-            raise NeedsClarification(resolution.clarification_question)
+        while not resolution.ready:
+            answer = stage("3. Clarification answer",
+                           lambda: _ask_clarification(resolution.clarification_question, read_answer),
+                           lambda value: {"question": resolution.clarification_question, "answer": value,
+                                          "context_so_far": asdict(resolution.context)})
+            resolution = stage("3. Context resolution", lambda: context_session.submit(answer), asdict)
         context = resolution.context
         schema = settings["RAHTAL_DB_SCHEMA"]
         catalog = stage("4a. Live catalog verification",
@@ -462,7 +494,7 @@ def main() -> int:
     parser.add_argument("--timeout", type=int)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--execute", dest="no_execute", action="store_const", const=False,
-                      help="Override RUN_MODE and execute with a SELECT-only login")
+                      help="Override RUN_MODE and execute a validated report query")
     mode.add_argument("--no-execute", dest="no_execute", action="store_const", const=True,
                       help="Override RUN_MODE and stop after SQL validation")
     parser.set_defaults(no_execute=None)

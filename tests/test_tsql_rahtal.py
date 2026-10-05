@@ -1,16 +1,20 @@
 """Offline checks for the Rahtal T-SQL pilot and execution guard."""
 
 import argparse
+import json
+import sys
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
-from sageql.context import ResolvedContext
+from sageql.context import ContextResolution, ResolvedContext
 from sageql.discovery import QuerySpace
 from sageql.planning import (PlanCandidates, PlanProposal, PlannedJoin, PlannedMeasure,
                              PlannedFilter, ProposedFilter, ProposedJoin, ProposedMeasure, QueryPlan)
 from sageql.tsql import TSQLReportError, execute_tsql_report, render_tsql_report, validate_tsql_report
+from sageql.understanding import RequestAssessment
 from sageql_rahtal.catalog import daily_performance_catalog, policy_columns
 from sageql_rahtal.run import _PilotPlanningProvider, _load_local_config, _resolve_options, run
 
@@ -72,6 +76,120 @@ def test_local_config_rejects_invalid_model_timeout(tmp_path):
                            encoding="utf-8")
     with pytest.raises(ValueError, match="LLM_TIMEOUT_SECONDS"):
         _load_local_config(config_path)
+
+
+def test_runner_continues_same_conversation_through_execution_after_multiple_clarifications(
+    tmp_path, monkeypatch,
+):
+    import sageql_rahtal.run as runner
+
+    class Provider:
+        def __init__(self):
+            self.understanding_histories = []
+            self.context_histories = []
+
+        def assess(self, messages):
+            self.understanding_histories.append(tuple(messages))
+            if len(self.understanding_histories) == 1:
+                return RequestAssessment(False, "", "Which measure?")
+            if len(self.understanding_histories) == 2:
+                return RequestAssessment(False, "", "Which users?")
+            return RequestAssessment(True, "Total activity hours for all users", "")
+
+        def resolve_context(self, messages, understanding):
+            assert understanding == "Total activity hours for all users"
+            self.context_histories.append(tuple(messages))
+            partial = ResolvedContext("", ("activities",), ("activity hours",), (), "")
+            dated = replace(partial, time_period="all available data")
+            if len(self.context_histories) == 1:
+                return ContextResolution(False, partial, "Which period?")
+            if len(self.context_histories) == 2:
+                return ContextResolution(False, dated, "How should results be grouped?")
+            return ContextResolution(True, dated, "")
+
+        def propose_query_plan(self, understanding, context, candidates):
+            assert context.time_period == "all available data"
+            amount_id = next(key for key, column in candidates.columns.items()
+                             if column.key == "dbo.functionality_activities.time")
+            return PlanProposal("t0", (), "", "none", (),
+                                (ProposedMeasure("activity hours", "sum", amount_id),), ())
+
+    provider = Provider()
+    monkeypatch.setitem(sys.modules, "openai", SimpleNamespace(OpenAI=lambda **kwargs: object()))
+    monkeypatch.setattr(runner, "OpenAIChatProvider", lambda *args, **kwargs: provider)
+    monkeypatch.setattr(runner, "_load_settings", lambda path: {
+        "RAHTAL_DB_SERVER": "test-host", "RAHTAL_DB_DATABASE": "test-db",
+        "RAHTAL_DB_USERNAME": "test-user", "RAHTAL_DB_PASSWORD": "test-password",
+        "RAHTAL_DB_DRIVER": "test-driver", "RAHTAL_DB_SCHEMA": "dbo",
+        "RAHTAL_LLM_API_KEY": "test-key", "RAHTAL_LLM_BASE_URL": "https://example.test",
+        "RAHTAL_LLM_MODEL": "test-model",
+    })
+    monkeypatch.setattr(runner, "_check_live_catalog", lambda settings, catalog: catalog)
+    monkeypatch.setattr(runner, "discover_query_space",
+                        lambda catalog, provider, understanding, context: QuerySpace(
+                            catalog.tables, catalog.columns, catalog.relations, catalog.definitions))
+    monkeypatch.setattr(runner, "_connect", lambda settings: _Connection())
+    config_path = tmp_path / "local_config.py"
+    config_path.write_text('QUESTION = "Show daily performance"\nRUN_MODE = "execute"\n',
+                           encoding="utf-8")
+    replies = iter(("", "activity hours", "all users", "all available data", "no grouping"))
+    prompts = []
+
+    def answer_input(prompt):
+        prompts.append(prompt)
+        return next(replies)
+
+    reports = tmp_path / "reports"
+    assert run(_cli_args(config_path, reports=str(reports)), answer_input) == 0
+
+    report = json.loads(next(reports.glob("*.json")).read_text(encoding="utf-8"))
+    assert report["status"] == "completed"
+    assert report["row_count"] == 1
+    assert [entry["stage"] for entry in report["stages"]][-4:] == [
+        "6. Query planning", "7. SQL generation", "8. Validation and safety", "9. Query execution"
+    ]
+    assert len(provider.understanding_histories) == 3
+    assert len(provider.context_histories) == 3
+    assert [message.content for message in provider.understanding_histories[-1]
+            if message.role == "user"] == [
+        "Show daily performance", "activity hours", "all users"
+    ]
+    assert [message.content for message in provider.context_histories[-1]
+            if message.role == "user"] == [
+        "Show daily performance", "activity hours", "all users", "all available data", "no grouping"
+    ]
+    assert len(prompts) == 5
+    assert sum(stage["stage"] == "3. Clarification answer" for stage in report["stages"]) == 2
+    assert [stage["details"]["context_so_far"]["time_period"] for stage in report["stages"]
+            if stage["stage"] == "3. Clarification answer"] == ["", "all available data"]
+
+
+def test_runner_keeps_pending_clarification_when_input_closes(tmp_path, monkeypatch):
+    import sageql_rahtal.run as runner
+
+    class Provider:
+        def assess(self, messages):
+            return RequestAssessment(False, "", "Which measure?")
+
+    monkeypatch.setitem(sys.modules, "openai", SimpleNamespace(OpenAI=lambda **kwargs: object()))
+    monkeypatch.setattr(runner, "OpenAIChatProvider", lambda *args, **kwargs: Provider())
+    monkeypatch.setattr(runner, "_load_settings", lambda path: {
+        "RAHTAL_DB_SERVER": "test-host", "RAHTAL_DB_DATABASE": "test-db",
+        "RAHTAL_DB_DRIVER": "test-driver", "RAHTAL_DB_SCHEMA": "dbo",
+        "RAHTAL_LLM_API_KEY": "test-key", "RAHTAL_LLM_BASE_URL": "https://example.test",
+        "RAHTAL_LLM_MODEL": "test-model",
+    })
+    config_path = tmp_path / "local_config.py"
+    config_path.write_text('QUESTION = "Show performance"\n', encoding="utf-8")
+
+    def closed_input(prompt):
+        raise EOFError
+
+    reports = tmp_path / "reports"
+    assert run(_cli_args(config_path, reports=str(reports)), closed_input) == 2
+    report = json.loads(next(reports.glob("*.json")).read_text(encoding="utf-8"))
+    assert report["status"] == "needs_clarification"
+    assert report["error"] == "Which measure?"
 
 
 def _fixture():
@@ -187,23 +305,30 @@ class _Connection:
         self.closed = True
 
 
-def test_writable_login_is_rejected_before_report_sql():
+@pytest.mark.parametrize("writable", [False, True], ids=["read_only_login", "privileged_login"])
+def test_login_executes_validated_report_regardless_of_write_permissions(writable):
     plan, context, space = _fixture()
     query = render_tsql_report(plan, policy_columns=policy_columns())
-    connection = _Connection(writable=True)
-    with pytest.raises(TSQLReportError, match="dedicated read-only login"):
-        execute_tsql_report(lambda: connection, query, plan, context, space,
-                            policy_columns=policy_columns())
-    assert len(connection._cursor.statements) == 1
-    assert connection.closed
-
-
-def test_readonly_login_executes_validated_report():
-    plan, context, space = _fixture()
-    query = render_tsql_report(plan, policy_columns=policy_columns())
-    connection = _Connection()
+    connection = _Connection(writable=writable)
     result = execute_tsql_report(lambda: connection, query, plan, context, space,
                                  policy_columns=policy_columns())
     assert result.rows == (("A", 2.0),)
-    assert len(connection._cursor.statements) == 4  # Three permission checks, then the report SELECT.
+    assert connection._cursor.statements == [query.sql]
     assert connection.closed
+
+
+@pytest.mark.parametrize("unsafe_sql", [
+    "INSERT INTO [dbo].[functionality_activities] ([time]) VALUES (1)",
+    "UPDATE [dbo].[functionality_activities] SET [time] = 1",
+    "DELETE FROM [dbo].[functionality_activities]",
+    "MERGE INTO [dbo].[functionality_activities] AS t USING [dbo].[authentication_user] AS s ON t.[user_id] = s.[id] WHEN MATCHED THEN DELETE",
+    "CREATE TABLE [dbo].[unsafe] ([id] int)",
+    "SELECT 1; SELECT 2",
+    "SELECT * FROM [dbo].[unsafe]",
+])
+def test_unsafe_sql_is_rejected_before_opening_privileged_connection(unsafe_sql):
+    plan, context, space = _fixture()
+    query = replace(render_tsql_report(plan, policy_columns=policy_columns()), sql=unsafe_sql)
+    with pytest.raises(TSQLReportError):
+        execute_tsql_report(lambda: pytest.fail("connection must not open"), query,
+                            plan, context, space, policy_columns=policy_columns())

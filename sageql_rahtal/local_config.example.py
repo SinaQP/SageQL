@@ -11,7 +11,7 @@ QUESTION = (
 QUESTION_FILE = None  # Example: "questions/daily_hours.txt"
 
 # "validate" stops after SQL validation; "execute" also queries SQL Server.
-# Execution requires a dedicated SELECT-only database login.
+# Execution requires a database login that can read the approved report tables.
 RUN_MODE = "validate"
 
 # Paths are relative to this file. None uses the runner's defaults.

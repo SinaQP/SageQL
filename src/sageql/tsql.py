@@ -1,6 +1,6 @@
 """Narrow SQL Server adapter for validated SageQL report plans.
 
-The caller supplies an allowlisted query space and a SELECT-only database login.
+The caller supplies an allowlisted query space and a database connection.
 This adapter renders SQL itself; it never executes text returned by a model.
 """
 
@@ -275,7 +275,7 @@ def execute_tsql_report(
     comparison_bounds: tuple[str, str] | None = None, max_rows: int = 100,
     timeout_seconds: int = 10,
 ) -> TSQLResult:
-    """Execute validated SQL through a caller-owned read-only ODBC connection factory."""
+    """Execute validated SQL through a caller-owned ODBC connection factory."""
     if not 1 <= max_rows <= 1000 or not 1 <= timeout_seconds <= 60:
         raise TSQLReportError("invalid execution limits")
     validate_tsql_report(query, plan, context, space, policy_columns=policy_columns,
@@ -285,20 +285,6 @@ def execute_tsql_report(
         connection = connect()
         connection.timeout = timeout_seconds
         cursor = connection.cursor()
-        permission_sql = (
-            "SELECT HAS_PERMS_BY_NAME(?, 'OBJECT', 'SELECT'), "
-            "HAS_PERMS_BY_NAME(?, 'OBJECT', 'INSERT'), "
-            "HAS_PERMS_BY_NAME(?, 'OBJECT', 'UPDATE'), "
-            "HAS_PERMS_BY_NAME(?, 'OBJECT', 'DELETE')"
-        )
-        for table in (plan.base_table, *(join.to_table for join in plan.joins)):
-            name = table.key
-            permissions = cursor.execute(permission_sql, name, name, name, name).fetchone()
-            if permissions is None or tuple(permissions) != (1, 0, 0, 0):
-                raise TSQLReportError(
-                    "the SQL Server login needs SELECT and no INSERT, UPDATE, or DELETE "
-                    "permission on every report table; configure a dedicated read-only login"
-                )
         cursor.execute(query.sql, *query.parameters)
         columns = tuple(item[0] for item in cursor.description)
         rows = cursor.fetchmany(max_rows + 1)

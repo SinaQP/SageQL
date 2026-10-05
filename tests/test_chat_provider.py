@@ -1,3 +1,4 @@
+import json
 from types import SimpleNamespace
 
 import pytest
@@ -5,8 +6,8 @@ import pytest
 from sageql import ChatError, LLMConfig, Message
 from sageql.chat_provider import OpenAIChatProvider
 from sageql.context import ResolvedContext
-from sageql.discovery import DiscoveryCandidates, DiscoveryError
-from sageql.planning import PlanCandidates, PlanningError
+from sageql.discovery import DiscoveryCandidates, DiscoveryError, QuerySpace
+from sageql.planning import PlanCandidates, PlanningError, create_query_plan
 from sageql.schema import Column, Definition, Relation, Table
 
 
@@ -18,6 +19,17 @@ class FakeCompletions:
     def create(self, **kwargs):
         self.kwargs = kwargs
         return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=self.content))])
+
+
+class SequencedCompletions:
+    def __init__(self, *contents):
+        self.contents = iter(contents)
+        self.calls = []
+
+    def create(self, **kwargs):
+        self.calls.append(kwargs)
+        return SimpleNamespace(choices=[SimpleNamespace(
+            message=SimpleNamespace(content=next(self.contents)))])
 
 
 def test_chat_provider_sends_history_and_model_only():
@@ -209,7 +221,7 @@ def test_query_planning_uses_structured_output_and_selected_ids():
     completions = FakeCompletions(
         '{"base_table_id":"t0","joins":[{"relation_id":"r0","to_table_id":"t1",'
         '"join_type":"left"}],"time_column_id":"c1","time_grain":"month",'
-        '"dimensions":["c2"],"measures":[{"source_metric":"revenue",'
+        '"dimensions":["c2"],"measures":[{"metric_id":"m0",'
         '"aggregation":"sum","column_id":"c0"}],"filters":[]}'
     )
     client = SimpleNamespace(chat=SimpleNamespace(completions=completions))
@@ -228,10 +240,84 @@ def test_query_planning_uses_structured_output_and_selected_ids():
 
     assert proposal.joins[0].join_type == "left"
     assert proposal.measures[0].aggregation == "sum"
+    assert proposal.measures[0].source_metric == "revenue"
     assert completions.kwargs["response_format"]["type"] == "json_schema"
+    plan_properties = completions.kwargs["response_format"]["json_schema"]["schema"]["properties"]
+    assert plan_properties["base_table_id"]["enum"] == ["t0", "t1"]
+    assert plan_properties["measures"]["items"]["properties"]["metric_id"]["enum"] == ["m0"]
     payload = str(completions.kwargs)
     assert "Sum of orders.amount" in payload
     assert "secret" not in payload
+    assert json.loads(completions.kwargs["messages"][1]["content"])["context"]["metrics"] == [
+        {"id": "m0", "text": "revenue"}
+    ]
+
+
+def test_query_planning_binds_context_ids_to_original_phrases():
+    context = ResolvedContext(
+        "2025", ("orders",), ("Net revenue (USD)", "Number of orders"),
+        ("Completed orders", "Online channel"), "",
+    )
+    query_space = QuerySpace(
+        (Table("orders"),),
+        (Column("orders", "amount", "decimal"), Column("orders", "order_date", "date"),
+         Column("orders", "status", "text"), Column("orders", "channel", "text")),
+        (), (),
+    )
+    result = {
+        "base_table_id": "t0", "joins": [], "time_column_id": "c1", "time_grain": "none",
+        "dimensions": [],
+        "measures": [
+            {"metric_id": "m1", "aggregation": "count_rows", "column_id": ""},
+            {"metric_id": "m0", "aggregation": "sum", "column_id": "c0"},
+        ],
+        "filters": [
+            {"filter_id": "f1", "column_id": "c3", "operator": "eq", "values": ["Online"]},
+            {"filter_id": "f0", "column_id": "c2", "operator": "eq", "values": ["Completed"]},
+        ],
+    }
+    completions = FakeCompletions(json.dumps(result))
+    provider = OpenAIChatProvider(
+        LLMConfig(api_key="secret"),
+        client=SimpleNamespace(chat=SimpleNamespace(completions=completions)),
+    )
+
+    plan = create_query_plan("Orders in 2025", context, query_space, provider)
+
+    assert [item.source_metric for item in plan.measures] == [
+        "Number of orders", "Net revenue (USD)"
+    ]
+    assert [item.source_filter for item in plan.filters] == [
+        "Online channel", "Completed orders"
+    ]
+    sent_context = json.loads(completions.kwargs["messages"][1]["content"])["context"]
+    assert sent_context["metrics"] == [
+        {"id": "m0", "text": "Net revenue (USD)"},
+        {"id": "m1", "text": "Number of orders"},
+    ]
+    assert sent_context["filters"] == [
+        {"id": "f0", "text": "Completed orders"},
+        {"id": "f1", "text": "Online channel"},
+    ]
+
+
+@pytest.mark.parametrize("field, bad_id", [("metric_id", "m99"), ("filter_id", "f99")])
+def test_query_planning_rejects_unknown_context_ids(field, bad_id):
+    output = {
+        "base_table_id": "t0", "joins": [], "time_column_id": "", "time_grain": "none",
+        "dimensions": [], "measures": [{"metric_id": "m0", "aggregation": "count_rows", "column_id": ""}],
+        "filters": [{"filter_id": "f0", "column_id": "c0", "operator": "eq", "values": ["x"]}],
+    }
+    output["measures" if field == "metric_id" else "filters"][0][field] = bad_id
+    provider = OpenAIChatProvider(
+        LLMConfig(api_key="secret"),
+        client=SimpleNamespace(chat=SimpleNamespace(completions=FakeCompletions(json.dumps(output)))),
+    )
+    with pytest.raises(PlanningError, match="invalid query plan"):
+        provider.propose_query_plan(
+            "Report", ResolvedContext("2025", ("orders",), ("revenue",), ("active",), ""),
+            PlanCandidates({}, {}, {}, ()),
+        )
 
 
 @pytest.mark.parametrize("content", [
@@ -251,3 +337,30 @@ def test_query_planning_rejects_malformed_model_output(content):
             "Report", ResolvedContext("2025", ("orders",), (), (), ""),
             PlanCandidates({}, {}, {}, ()),
         )
+
+
+def test_planning_recovers_from_malformed_model_response_without_echoing_it():
+    query_space = QuerySpace(
+        (Table("orders"),),
+        (Column("orders", "amount", "decimal"), Column("orders", "ordered_at", "date")),
+        (), (),
+    )
+    valid = {"base_table_id": "t0", "joins": [], "time_column_id": "c1",
+             "time_grain": "none", "dimensions": [],
+             "measures": [{"metric_id": "m0", "aggregation": "sum", "column_id": "c0"}],
+             "filters": []}
+    completions = SequencedCompletions("private malformed output", json.dumps(valid))
+    provider = OpenAIChatProvider(
+        LLMConfig(api_key="secret"),
+        client=SimpleNamespace(chat=SimpleNamespace(completions=completions)),
+    )
+
+    plan = create_query_plan(
+        "Order revenue in 2025", ResolvedContext("2025", ("orders",), ("revenue",), (), ""),
+        query_space, provider,
+    )
+
+    assert plan.measures[0].source_metric == "revenue"
+    assert len(completions.calls) == 2
+    assert "private malformed output" not in str(completions.calls[1])
+    assert "required JSON plan structure" in completions.calls[1]["messages"][-1]["content"]

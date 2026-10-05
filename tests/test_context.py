@@ -65,10 +65,13 @@ def test_clarifies_context_and_keeps_answer():
     session = ContextResolutionSession(config(), provider, initial_history(), "Monthly revenue report.")
     first = session.start()
     assert not first.ready
+    assert session.context is None
+    assert session.provisional_context == context("")
     second = session.submit("Last quarter")
 
     assert second.ready
     assert second.context.time_period == "last quarter"
+    assert session.provisional_context == second.context
     assert provider.calls[1][-2:] == (
         Message("assistant", "Which time period?"),
         Message("user", "Last quarter"),
@@ -88,6 +91,7 @@ def test_failed_context_call_does_not_advance_history():
         session.start()
     assert session.history == initial_history()
     assert session.context is None
+    assert session.provisional_context is None
 
 
 @pytest.mark.parametrize(
