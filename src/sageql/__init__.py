@@ -36,9 +36,11 @@ from sageql.tsql import (
     validate_tsql_report, execute_tsql_report,
 )
 from sageql.understanding import RequestAssessment, RequestUnderstandingSession, UnderstandingProvider
+from sageql.sdk import SageQL
 
 __all__ = [
     "Candidate",
+    "SageQL",
     "ChatConfig",
     "ChatError",
     "ChatProvider",

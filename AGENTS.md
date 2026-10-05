@@ -2,6 +2,10 @@
 
 Before changing code, read [agent-rules/Agent.md](agent-rules/Agent.md). Follow its product contract, working rules, and verification workflow.
 
-The current approved flow includes logical query planning, SQLite SQL generation, validation, and explicit read-only SQLite execution after query-space discovery. The isolated `sageql_rahtal/` pilot has a narrow SQL Server renderer and guarded executor for approved daily-performance tables only. Its ignored `local_config.py` holds questions and run options; credentials belong in `.env`. Step 5 has not been defined. Never run model-written SQL. Do not extend ODBC execution beyond the pilot without its own scope and safety design.
+The approved embedded SDK in `sageql.sdk` accepts developer-registered single tables/views, reporting concepts, infrastructure and trusted per-actor policies; it supports persistent report conversations, deterministic SQL Server compilation/execution and table/chart JSON. Its separate scope and safety design is [docs/SDK_SQL_SERVER.md](docs/SDK_SQL_SERVER.md); joins and broader operations need another scoped design. Execution requires explicit host opt-in. Never run model-written SQL or accept infrastructure/identity from browser messages.
+
+The historical flow still includes logical planning, SQLite generation/validation and explicit read-only SQLite execution after discovery. The isolated `sageql_rahtal/` pilot retains its approved daily-performance scope; ignored `local_config.py` holds questions/run options and `.env` holds credentials. Step 5 has not been defined.
+
+The explicitly selected Rahtal frontend uses the SDK with approved existing employee-profile and activity sources, a real configured interpreter, and a fixed local reporting principal protected by a workspace token. Registered dimension-only listings use bounded DISTINCT SELECTs and the same mandatory policies. The frontend creates no database objects and does not enable model-selected joins or production employee authorization.
 
 When reporting work, include a commit message based on the actual changes.

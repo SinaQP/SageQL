@@ -29,4 +29,41 @@ Every run saves a unique Markdown and JSON report in ignored `sageql_rahtal/repo
 
 The SQL Server adapter accepts only an exact deterministic SELECT built from a validated SageQL plan. It checks the selected tables and columns, inserts soft-delete policies (`activity.is_deleted = 0` in `WHERE`, and `person.is_deleted = 0` in the join), binds filter/date values, revalidates before execution, and limits returned rows and query time. A login with write permissions can execute a validated report query; SageQL does not execute write SQL. The runner has no per-user row authorization, so do not expose it as a user-facing service.
 
+## Local frontend on the real database
+
+The new local frontend uses `sageql.sdk` with the existing Rahtal database and the configured real model interpreter. It does not use the offline keyword demo and does not create a reporting view or write database rows.
+
+```powershell
+.\.venv\Scripts\python.exe sageql_rahtal/web.py --env-file E:\Coding\rahtal-be\.env --port 8766
+```
+
+Open `http://127.0.0.1:8766`. Sign in with the generated local workspace token stored at `.venv/rahtal-web/host-token.txt`. The token protects the loopback reporting host and is separate from the database/model credentials. An explicitly configured `RAHTAL_HOST_TOKEN` (or process `SAGEQL_HOST_TOKEN`) takes precedence; optional `RAHTAL_HOST_SUBJECT` selects the trusted host principal. No principal or tenant may be supplied by browser requests.
+
+The known configuration locations, when no `--env-file` is provided, are `sageql_rahtal/.env`, the SageQL root `.env`, the adjacent `rahtal-be/.env`, and the historical `D:/Coding/QuerySmith/rahtal/.env`. Set `RAHTAL_ENV_FILE` to select an explicit file. Exported `RAHTAL_*` settings override file settings. The sibling backend's existing `DB_HOST`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`, optional `DB_PORT`, `AVALAI_API_KEY`, and `AVALAI_BASE_URL` are mapped locally; its declared ODBC Driver 17 is the default for this format. A Rahtal-format file retains Driver 18 by default. Set `RAHTAL_LLM_MODEL` to override the default `gpt-5-nano` for the sibling format. Credentials are read from their original file and are never copied to tracked configuration.
+
+Supported questions include:
+
+- “Show my employees' names.” This returns distinct first/last name combinations from non-deleted profiles. Include employee IDs when different employees share a name.
+- “Show employee names and job positions.”
+- “How many employee profiles are there?”
+- “Daily activity hours for September.” Answer the model's year clarification with a Gregorian year.
+- “Show activity hours by employee ID for all available data.”
+- “Now show the total instead.”
+
+Names and hours come from separate approved sources. Hours grouped by employee name require a separately reviewed relationship/view design; this demo currently groups hours by employee ID. Profiles are not assumed to be unique per user or equivalent to active authenticated users. Listing outputs are bounded distinct registered fields, not arbitrary row access. Both datasets independently enforce `is_deleted = 0`.
+
+Chat uses readable field labels such as “first name” and “last name.” If the host cannot connect to Rahtal, it explains the database/VPN connection failure and offers a retry; it does not claim a report query ran. Restore connectivity before retrying. Real database reports cannot be verified while the SQL Server endpoint is unreachable.
+
+The host uses one fixed local administrator reporting principal with access to the approved Rahtal datasets. It binds only `127.0.0.1`, requires its workspace token, checks request origins, and cannot serve as production employee authorization. Private session state and report rows are saved under ignored `.venv/rahtal-web/`; protect and delete them according to local retention needs. The model receives permitted business metadata and conversation/specifications, never database credentials, physical table names, mandatory policy values or returned names/rows.
+
+The connection requires access to the configured SQL Server network. A VPN that only proxies browser traffic may not route this private database endpoint. A SQL login timeout is a connectivity failure; this mode never substitutes sample data. Gregorian date-only reporting is supported; ambiguous years such as 1403 require calendar clarification, and confirmed Jalali dates need Gregorian bounds until explicit conversion support is implemented.
+
+Offline verification:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/test_rahtal_sdk.py tests/test_sdk_web.py -q
+```
+
+Those tests use synthetic connections/providers. Live SQL Server and real-model checks must be reported separately.
+
 `Step 5` and final formatted report generation remain undefined. This app is a diagnostic pilot for stages 1–4 and 6–9. Quality items in its report call out semantic choices that SQL checks cannot prove. A completed run is evidence for that question and dataset, not proof that other questions are correct.
