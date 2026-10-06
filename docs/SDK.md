@@ -23,6 +23,36 @@ The first command creates temporary synthetic data, asks a clarification questio
 
 ## Configure the backend
 
+### Persian by default
+
+`SageQL`, `OpenAIReportAgent`, `OpenAIReportInterpreter`, and the historical `OpenAIChatProvider`
+default to `language="fa"`. Assistant prompts, clarifications and explanations
+request Persian output even for English input. The configured model interprets
+Persian greetings, informal requests, refinements, Persian/Arabic digits and
+Arabic/Persian letter variants. Original conversation text and literal text
+filter values remain intact; names are never transliterated to guess stored values.
+Model understanding depends on the configured model; offline tests use fakes.
+
+SDK greetings, safe error replies, title connectors/time grains and built-in
+date/period headers use Persian. Register business `label` and metric `unit`
+values in Persian to obtain fully Persian report titles and headers, for example
+`MetricDefinition("activity_hours", "ساعات فعالیت", "sum", "hours", "ساعت")`.
+Arbitrary host labels and returned text rows are preserved, not automatically
+translated. The shipped web and Rahtal catalogs provide Persian labels/units.
+Custom `ReportProvider` implementations must provide Persian clarification and
+unsupported text themselves. To choose English explicitly, pass `language="en"`
+to both the engine and interpreter and register English business labels.
+
+The reference browser uses RTL and displays Persian digits without changing JSON
+keys, concept IDs, typed numbers, decimal strings, ISO dates or result values.
+Dates remain **Gregorian**, including relative periods and Monday weeks. Asking
+in Persian does not enable Solar Hijri conversion; ambiguous calendar requests
+must clarify and confirmed Solar Hijri requests require Gregorian bounds.
+Previously saved replies/reports keep their original text while their catalog
+and access rules still match. Changing catalog labels changes its fingerprint;
+older report/retry access still undergoes the existing compatibility checks.
+Start a new session after upgrading the shipped catalogs or changing language.
+
 This example expects an existing `reporting.activity_hours` view with the declared columns. The host must review its grain and formulas; it must not duplicate activity rows through joins.
 
 ```python
@@ -32,21 +62,21 @@ from sageql import Column, LLMConfig, SageQL, Table
 from sageql.sdk import (
     AccessScope, ActorContext, DatasetAccess, DatasetDefinition,
     DimensionDefinition, FilterDefinition, MetricDefinition,
-    OpenAIReportInterpreter, ReportingCatalog, RowPolicy, SDKError,
+    OpenAIReportAgent, ReportingCatalog, RowPolicy, SDKError,
     SQLServerAdapter, SQLiteSessionStore, TimeDefinition,
 )
 
 table = Table("activity_hours", "reporting", kind="VIEW")
 catalog = ReportingCatalog((DatasetDefinition(
-    id="activities", label="Activities", table=table,
+    id="activities", label="فعالیت‌ها", table=table,
     columns=tuple(Column(table.key, name, kind) for name, kind in (
         ("tenant_id", "int"), ("employee", "nvarchar(200)"),
         ("activity_date", "date"), ("hours", "decimal(18,2)"),
         ("is_deleted", "bit"),
     )),
-    metrics=(MetricDefinition("activity_hours", "Activity hours", "sum", "hours", "hours"),),
-    dimensions=(DimensionDefinition("employee", "Employee", "employee"),),
-    filters=(FilterDefinition("employee_filter", "Employee", "employee"),),
+    metrics=(MetricDefinition("activity_hours", "ساعات فعالیت", "sum", "hours", "ساعت"),),
+    dimensions=(DimensionDefinition("employee", "کارمند", "employee"),),
+    filters=(FilterDefinition("employee_filter", "کارمند", "employee"),),
     time=TimeDefinition("activity_date"),
 )),))
 
@@ -64,7 +94,7 @@ def connect():
 
 engine = SageQL(
     catalog=catalog, database=SQLServerAdapter(connect),
-    provider=OpenAIReportInterpreter(LLMConfig(
+    provider=OpenAIReportAgent(LLMConfig(
         api_key=os.environ["LLM_API_KEY"], base_url=os.environ["LLM_BASE_URL"],
         model=os.environ["LLM_MODEL"],
     )),
@@ -77,6 +107,22 @@ Reporting IDs are simple identifiers, unique across metrics, dimensions, and fil
 
 Use a dedicated reporting credential. The connection factory must bound login time and return a handle the adapter may roll back and close. The adapter verifies registered columns, compatible types and object kind before each report. It executes only its own deterministic parameterized SELECT. See the [execution scope](SDK_SQL_SERVER.md) for lifecycle, cancellation and database workload limits.
 
+`OpenAIReportAgent` implements the existing `ReportProvider` interface with
+planning, local specification checks and semantic review. Rejected business
+interpretations can be revised once by default (`max_revisions=1`); all calls
+share `timeout_seconds=30`. Both agents use the configured endpoint and model.
+Each normal turn uses two model requests, so allow for the extra latency and
+usage in host configuration. Invalid output and unknown concepts fail closed;
+agents never execute a query or see lookup identities/results. The engine still
+validates the accepted specification against current host policy.
+
+Use `AgentReportInterpreter` with a custom `ReportAgentBackend` for another
+model transport or offline fake. `OpenAIReportInterpreter` remains available
+for existing integrations; its earlier scenario-specific clarification repair
+is not used by the agent path. Scripted offline demos and historical stage APIs
+retain their existing behavior. See [the agent design](SDK_AGENTS.md) for the
+complete contract and verification commands.
+
 ## Connect your frontend
 
 Your authenticated endpoint obtains an `ActorContext` from trusted server identity, then calls these methods. Never construct the actor from browser-submitted tenant or user fields.
@@ -88,7 +134,7 @@ payload = created.to_dict()
 
 reply = engine.submit(
     session_id=created.session_id,
-    message="Daily activity hours for September", actor=actor,
+    message="ساعات فعالیت روزانه در سپتامبر", actor=actor,
     request_id="client-generated-unique-id", expected_revision=created.revision,
 )
 payload = reply.to_dict()  # JSON-safe HTTP response, contract_version=1.
@@ -112,13 +158,49 @@ Metrics support `sum`, `count_rows`, `count_distinct`, `average`, `minimum`, and
 
 For a names/category list, use empty `metric_ids` with nonempty registered `dimension_ids`, `chart="table"`, `time_grain="none"`, and no comparison. The result contains distinct dimension combinations and still applies all current access policies, user filters and result bounds. Timeless sources use period `all`. The real model interpreter understands this listing shape; the offline keyword demo remains deliberately scripted. The [Rahtal frontend](../sageql_rahtal/README.md#local-frontend-on-the-real-database) connects existing approved sources and the existing model configuration.
 
+For name-based activity requests, the host can register an `EntityLookupDefinition`
+in `ReportingCatalog.lookups`, a `FullNameFilterDefinition` on the profile source,
+and optional `LookupQualifier` filters such as job position. The model then selects
+the named virtual filter in an ordinary `UserFilter` with the entire literal full
+name. The SDK resolves one permitted identity locally and executes the activity
+report with its registered target filter. It does not ask the user to know an
+internal ID. Missing names ask for spelling/correction; duplicate names ask for
+a qualifier. The [lookup design](SDK_ENTITY_LOOKUPS.md) includes the exact scope.
+Rahtal already registers this mapping between its existing sources.
+
+```python
+from sageql.sdk import EntityLookupDefinition, FullNameFilterDefinition, LookupQualifier
+
+name_filter = FullNameFilterDefinition(
+    "employee_full_name_filter", "نام کامل کارمند", "first_name",
+    operators=("eq",), name_columns=("first_name", "last_name"),
+)  # Include in the profile dataset's filters; register both text columns.
+lookup = EntityLookupDefinition(
+    "employee_name_filter", "نام کامل کارمند", "activities", "employee_id_filter",
+    "employees", "employee_id", "employee_full_name_filter",
+    qualifiers=(LookupQualifier("employee_job_filter", "سمت شغلی", "job_position_filter"),),
+)  # Include in ReportingCatalog(..., lookups=(lookup,)).
+```
+
+The mapping is exposed only when the actor may use the target filter, source
+identity dimension and name filter. Qualifiers need their own source filter
+permission. Ordinary scalar filters keep their exact values; only explicitly
+registered full-name filters normalize spaces/ZWNJ and ي/ی, ك/ک for matching.
+Successful refinements retain names and frozen dates, then resolve them again
+under current scope. Lookup results and derived identity binds are excluded from
+provider specifications. Start a new chat after upgrading Rahtal's catalog;
+old reports/receipts still require matching catalog and access fingerprints.
+
 Each report queries one registered table/view. Model-selected joins, arbitrary formulas, timestamp timezone conversion, fiscal/Persian calendars, calculated comparison deltas, exports and production HTTP authentication remain future work. The SQLite reference uses ISO date storage and SQLite numeric affinity; it does not guarantee SQL Server fixed-point arithmetic. SQL Server cancellation is cooperative and driver-dependent; row caps do not bound source aggregation work.
 
 ## Verify
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -q
-.\.venv\Scripts\python.exe -m build --no-isolation
+.\.venv\Scripts\python.exe -m build
 ```
 
 Ordinary tests are offline. The optional SQL Server golden test is described in [the adapter tests](../tests/test_sdk_adapters.py); it requires an explicitly marked synthetic database and known seeded rows. It performs only reads and does not run the model. Rahtal remains a separate local real-data pilot with ignored credentials/config/reports. Offline success does not establish live provider or driver compatibility.
+
+The normal build installs its declared backend into an isolated build environment.
+Using `--no-isolation` requires `hatchling` to be installed in your active environment.

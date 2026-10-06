@@ -4,6 +4,22 @@ SageQL is a Python SDK that a developer embeds in their backend to let authorize
 
 The new `sageql.sdk` API includes persistent conversations, clarification, report refinement, revision checks and idempotent retries. SQL Server is the production adapter target; SQLite supplies an offline reference. The [embedding guide](docs/SDK.md) documents installation, configuration, the JSON contract and limits. The [architecture](docs/ARCHITECTURE.md) records the broader design. The existing staged CLI/API and Rahtal real-data pilot remain available.
 
+Live reference hosts use `OpenAIReportAgent`: a planner interprets the request
+from permitted business concepts, a reviewer checks its meaning, and bounded
+feedback can revise the plan or clarification. This path uses no question-specific
+keyword or regex routing. Register another catalog to reuse the same agents.
+Authorization, lookup uniqueness and parameterized SQL execution remain enforced
+by the SDK. See the [agent contract](docs/SDK_AGENTS.md) for configuration, call
+budgets, limitations and custom backends.
+
+Persian is the default conversation and report presentation language. The
+reference frontend uses RTL, Persian labels and display digits. Ask naturally,
+for example «نام کارکنان را نشان بده» or «ساعات فعالیت روزانه در سپتامبر ۲۰۲۶».
+English input remains supported; hosts can explicitly select English output.
+Register Persian business labels for your own datasets; see the
+[language contract](docs/SDK.md#persian-by-default). Dates still use the approved
+Gregorian calendar; Solar Hijri conversion is outside the current scope.
+
 ## Try the embedded report flow
 
 To use the **existing Rahtal SQL Server database and real model**, run:
@@ -23,9 +39,14 @@ python -m venv .venv
 .\.venv\Scripts\python.exe examples/web/server.py --demo
 ```
 
-Open `http://127.0.0.1:8765`, ask “Daily activity hours for September,” answer “2026,” then request “Group it by employee instead.” This uses synthetic data and a deterministic interpreter without credentials or remote calls. The [frontend guide](examples/web/README.md) also covers SQL Server mode. The first SDK slice queries one registered table/view per dataset; reviewed reporting views can contain business joins. Model-selected joins, arbitrary formulas, timestamp/calendar conversion and production authentication are outside this slice.
+Open `http://127.0.0.1:8765`, ask «ساعات فعالیت روزانه در سپتامبر», answer «۲۰۲۶», then request «به تفکیک کارمند نمایش بده». English versions of these requests also work. This uses synthetic data and a deterministic interpreter without credentials or remote calls. The [frontend guide](examples/web/README.md) also covers SQL Server mode. The first SDK slice queries one registered table/view per dataset; reviewed reporting views can contain business joins. Model-selected joins, arbitrary formulas, timestamp/calendar conversion and production authentication are outside this slice.
 
 Registered dimension-only reports can list employee names without adding an aggregate. The sections below document the earlier staged workflow. Its experimental model-written SQL API is separate from the SDK engine.
+
+Rahtal also resolves a supplied employee full name before filtering daily
+activity reports. The host registers this lookup explicitly; users do not need
+an employee ID. Duplicate names ask for job position, and each policy-bound read
+still queries one source without joins. See the [lookup scope](docs/SDK_ENTITY_LOOKUPS.md).
 
 ## Inspect planning, SQL, validation, and execution without an API key
 

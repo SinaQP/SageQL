@@ -6,7 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from sageql.sdk import ActorContext, Interpretation, PeriodSelection, ReportSpec, SDKError
+from sageql.sdk import ActorContext, Interpretation, PeriodSelection, ReportSpec, SDKError, UserFilter
 from sageql.sdk.provider import _metadata
 from sageql.sdk.semantics import permitted_catalog, validate_catalog
 from sageql.sdk.sessions import SQLiteSessionStore
@@ -139,7 +139,7 @@ class Provider:
         return next(self.responses)
 
 
-def configured_engine(tmp_path, monkeypatch, responses=(), *, extra="", sessions=None):
+def configured_engine(tmp_path, monkeypatch, responses=(), *, extra="", sessions=None, diagnostics=False):
     provider = Provider(responses)
     configs = []
 
@@ -147,8 +147,10 @@ def configured_engine(tmp_path, monkeypatch, responses=(), *, extra="", sessions
         configs.append((config, options))
         return provider
 
-    monkeypatch.setattr(sdk, "OpenAIReportInterpreter", make_provider)
-    engine, actor, token = sdk.create_rahtal_engine(settings_file(tmp_path, extra=extra), sessions=sessions)
+    monkeypatch.setattr(sdk, "OpenAIReportAgent", make_provider)
+    engine, actor, token = sdk.create_rahtal_engine(
+        settings_file(tmp_path, extra=extra), sessions=sessions,
+        diagnostics_directory=tmp_path / "diagnostics" if diagnostics else None)
     return engine, actor, token, provider, configs
 
 
@@ -232,8 +234,8 @@ def test_unreachable_rahtal_reports_connection_failure_without_claiming_query_fa
     reply = engine.submit(session.session_id, "Send me employee names", actor, "names", 0)
     assert reply.status == "failed"
     assert reply.error == {"code": "database_unavailable", "retryable": True}
-    assert "couldn't connect" in reply.text
-    assert "VPN/database connection" in reply.text
+    assert "اتصال به پایگاه داده برقرار نشد" in reply.text
+    assert "VPN" in reply.text
     assert "SQL Server report execution failed" not in reply.text
     assert "private-host" not in reply.text and "secret" not in reply.text
     assert reply.report is None and reply.revision == 0
@@ -242,7 +244,7 @@ def test_unreachable_rahtal_reports_connection_failure_without_claiming_query_fa
     assert repeated.to_dict() == reply.to_dict() and len(attempts) == 1
     recovered = engine.submit(session.session_id, "Send me employee names", actor, "names-retry", 0)
     assert recovered.status == "report_ready"
-    assert [field.label for field in recovered.report.fields] == ["First name", "Last name"]
+    assert [field.label for field in recovered.report.fields] == ["نام", "نام خانوادگی"]
     assert len(connection.statements) == 2  # Metadata check, then the bounded report.
     assert connection.closed and connection.rolled_back
 
@@ -305,6 +307,49 @@ def test_employee_names_use_existing_profiles_with_mandatory_soft_delete(tmp_pat
     assert provider.calls[0][1] is None
 
 
+@pytest.mark.parametrize("diagnostics", [False, True])
+def test_activity_report_resolves_full_name_with_two_bounded_sqlserver_reads(tmp_path, monkeypatch, diagnostics):
+    name = "کارمند نمونه پور"
+    daily = ReportSpec("activities", ("activity_hours", "activity_count", "average_activity_hours"),
+                       filters=(UserFilter("employee_name_filter", "eq", (name,)),),
+                       period=PeriodSelection("last_month"), time_grain="day")
+    engine, actor, _, provider, _ = configured_engine(tmp_path, monkeypatch,
+        (Interpretation("ready", daily),), diagnostics=diagnostics)
+    engine._clock = lambda: date(2026, 10, 6)
+    profiles = FakeConnection(engine.catalog.datasets[1], ("employee_id",), ((27,),))
+    activities = FakeConnection(engine.catalog.datasets[0],
+                                ("time_bucket", "activity_hours", "activity_count", "average_activity_hours"),
+                                ((date(2026, 9, 2), 6.5, 2, 3.25),))
+    connections = iter((profiles, activities))
+    monkeypatch.setattr(sdk, "_connect", lambda settings: next(connections))
+    session = engine.create_session(actor)
+    message = f"تمام اطلاعات فعالیت‌های روزانه {name} در ماه گذشته"
+    if diagnostics:
+        payload = engine.submit_with_diagnostics(session.session_id, message, actor, "named", 0)
+        assert payload["status"] == "report_ready"
+        import json
+        trace = payload["diagnostics"]
+        serialized = json.dumps(trace, ensure_ascii=False)
+        assert name not in serialized and name.replace(" ", "") not in serialized
+        query_events = [item for item in trace["events"] if item["stage"] == "sql_execution" and item["status"] == "started"]
+        assert len(query_events) == 2
+        assert all(item["parameters"][2]["value"] == "[redacted]" for item in query_events)
+    else:
+        reply = engine.submit(session.session_id, message, actor, "named", 0)
+        assert reply.status == "report_ready", reply.to_dict()
+        assert reply.report.rows == ((date(2026, 9, 2), 6.5, 2, 3.25),)
+    name_sql, name_binds = profiles.statements[1]
+    final_sql, final_binds = activities.statements[1]
+    assert "SELECT DISTINCT" in name_sql and "[dbo].[persons_person]" in name_sql
+    assert "REPLACE" in name_sql and "COLLATE Latin1_General_100_BIN2" in name_sql
+    assert name_binds == (3, False, "کارمندنمونهپور")
+    assert final_binds == (101, False, 27, date(2026, 9, 1), date(2026, 10, 1))
+    assert "[dbo].[functionality_activities]" in final_sql and "JOIN" not in final_sql
+    assert "t.[is_deleted] = ?" in name_sql and "t.[is_deleted] = ?" in final_sql
+    assert profiles.closed and profiles.rolled_back and activities.closed and activities.rolled_back
+    assert len(provider.calls) == 1
+
+
 def test_name_listing_can_be_followed_by_activity_period_clarification(tmp_path, monkeypatch):
     listing = ReportSpec("employees", (), dimension_ids=("first_name", "last_name"))
     daily = ReportSpec("activities", ("activity_hours",),
@@ -337,3 +382,103 @@ def test_name_listing_can_be_followed_by_activity_period_clarification(tmp_path,
     assert len(provider.calls) == 3
     assert provider.calls[-1][1].dataset_id == "employees"
     assert any("September" in message.content for message in provider.calls[-1][0])
+
+
+@pytest.mark.parametrize("rows", [(), (("PrivateFirst", "PrivateLast"),)])
+def test_local_diagnostics_capture_actual_sql_without_personal_data(tmp_path, monkeypatch, rows):
+    import json
+    from sageql.sdk.models import UserFilter
+    listing = ReportSpec("employees", (), dimension_ids=("first_name", "last_name"),
+                         filters=(UserFilter("first_name_filter", "eq", ("PrivateFilter",)),))
+    engine, actor, _, provider, _ = configured_engine(tmp_path, monkeypatch,
+        (Interpretation("ready", listing),), diagnostics=True)
+    connection = FakeConnection(engine.catalog.datasets[1], ("first_name", "last_name"), rows)
+    monkeypatch.setattr(sdk, "_connect", lambda settings: connection)
+    session = engine.create_session(actor)
+    payload = engine.submit_with_diagnostics(session.session_id, "PrivateQuestion", actor, "names", 0)
+    assert payload["status"] == "report_ready"
+    trace = payload["diagnostics"]
+    stages = {item["stage"]: item for item in trace["events"]}
+    assert stages["validation"]["filters"][0]["values"] == "[redacted]"
+    assert stages["validation"]["policies"][0]["values"] == [False]
+    execution = next(item for item in trace["events"] if item["stage"] == "sql_execution" and item["status"] == "started")
+    assert execution["sql"] == connection.statements[1][0]
+    assert execution["parameters"][-1]["value"] == "[redacted]"
+    assert len(connection.statements) == 2  # No additional diagnostics/probe query.
+    assert stages["database"]["row_count"] == len(rows)
+    assert stages["request"]["row_count"] == len(rows)
+    if not rows:
+        assert "zero rows" in stages["request"]["note"]
+        assert "cannot determine" in stages["request"]["note"]
+    saved = json.loads((tmp_path / "diagnostics" / (trace["id"] + ".json")).read_text(encoding="utf-8"))
+    assert saved == trace and trace["saved"]
+    for secret in ("PrivateQuestion", "PrivateFirst", "PrivateLast", "PrivateFilter", "fake-password", "fake-api-key", "test-server"):
+        assert secret not in json.dumps(trace)
+    assert connection.closed and connection.rolled_back
+    cached = engine.submit_with_diagnostics(session.session_id, "PrivateQuestion", actor, "names", 0)
+    assert cached["report"] == payload["report"]
+    assert any(item["status"] == "cached" for item in cached["diagnostics"]["events"])
+    assert len(provider.calls) == 1 and len(connection.statements) == 2
+
+
+def test_diagnostics_clarification_and_invalid_spec_never_claim_sql_execution(tmp_path, monkeypatch):
+    engine, actor, _, _, _ = configured_engine(tmp_path, monkeypatch, (
+        Interpretation("needs_clarification", question="Which year?"),
+        Interpretation("ready", ReportSpec("unregistered", ("unknown",))),
+    ), diagnostics=True)
+    monkeypatch.setattr(sdk, "_connect", lambda settings: pytest.fail("must not connect"))
+    session = engine.create_session(actor)
+    first = engine.submit_with_diagnostics(session.session_id, "September", actor, "period", 0)
+    assert first["status"] == "needs_clarification"
+    assert "no report SQL" in first["diagnostics"]["events"][-1]["note"]
+    second = engine.submit_with_diagnostics(session.session_id, "2026", actor, "year", 1)
+    assert second["error"]["code"] == "access_denied"
+    assert second["diagnostics"]["events"][-1]["status"] == "failed"
+    assert not any(item["stage"] == "sql_execution" for item in second["diagnostics"]["events"])
+
+
+def test_diagnostics_connection_failure_and_unwritable_log_are_safe(tmp_path, monkeypatch):
+    listing = ReportSpec("employees", (), dimension_ids=("first_name",))
+    engine, actor, _, _, _ = configured_engine(tmp_path, monkeypatch,
+        (Interpretation("ready", listing),), diagnostics=True)
+    def broken_connect(settings):
+        raise RuntimeError("password=PrivatePassword;server=PrivateServer")
+    monkeypatch.setattr(sdk, "_connect", broken_connect)
+    # A file cannot be used as a log directory. Reporting must still return its safe failure.
+    engine.diagnostics_directory.write_text("blocked", encoding="utf-8")
+    session = engine.create_session(actor)
+    payload = engine.submit_with_diagnostics(session.session_id, "Names", actor, "names", 0)
+    assert payload["error"]["code"] == "database_unavailable"
+    assert payload["diagnostics"]["saved"] is False
+    assert any(item["stage"] == "connection" and item["status"] == "started" for item in payload["diagnostics"]["events"])
+    assert not any(item["stage"] == "sql_execution" for item in payload["diagnostics"]["events"])
+    assert "PrivatePassword" not in str(payload) and "PrivateServer" not in str(payload)
+
+
+def test_diagnostics_metadata_failure_shows_lookup_but_no_executed_report(tmp_path, monkeypatch):
+    listing = ReportSpec("employees", (), dimension_ids=("first_name",))
+    engine, actor, _, _, _ = configured_engine(tmp_path, monkeypatch,
+        (Interpretation("ready", listing),), diagnostics=True)
+    connection = FakeConnection(engine.catalog.datasets[1], ("first_name",), ())
+    connection.metadata = []
+    monkeypatch.setattr(sdk, "_connect", lambda settings: connection)
+    session = engine.create_session(actor)
+    payload = engine.submit_with_diagnostics(session.session_id, "Names", actor, "names", 0)
+    assert payload["error"]["code"] == "schema_drift"
+    events = payload["diagnostics"]["events"]
+    assert any(item["stage"] == "metadata_sql" and item.get("sql") == connection.statements[0][0] for item in events)
+    assert any(item["stage"] == "compilation" and item["status"] == "complete" for item in events)
+    assert not any(item["stage"] == "sql_execution" for item in events)
+    assert connection.closed and connection.rolled_back
+
+
+def test_diagnostics_provider_failure_excludes_raw_error(tmp_path, monkeypatch):
+    engine, actor, _, provider, _ = configured_engine(tmp_path, monkeypatch, diagnostics=True)
+    def broken_provider(*args):
+        raise RuntimeError("PrivateKey and private request text")
+    monkeypatch.setattr(provider, "interpret", broken_provider)
+    session = engine.create_session(actor)
+    payload = engine.submit_with_diagnostics(session.session_id, "Names", actor, "names", 0)
+    assert payload["error"]["code"] == "provider_failed"
+    assert any(item["stage"] == "interpretation" and item["status"] == "failed" for item in payload["diagnostics"]["events"])
+    assert "PrivateKey" not in str(payload)

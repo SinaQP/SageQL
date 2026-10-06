@@ -17,6 +17,7 @@ from typing import Any, Iterator, Protocol
 from uuid import uuid4
 
 from sageql.sdk.models import SDKError
+from sageql.localization import error_text
 
 
 def _copy(value: Any) -> Any:
@@ -65,7 +66,9 @@ def _claim(
         interrupted["reply"] = {
             "contract_version": 1, "session_id": state["id"],
             "revision": state["revision"], "status": "failed",
-            "assistant": {"text": "The previous request was interrupted. Submit a new request to retry."},
+            "assistant": {"text": error_text("interrupted_request",
+                "The previous request was interrupted. Submit a new request to retry.",
+                state.get("language", "fa"))},
             "clarification": None, "report": None,
             "error": {"code": "interrupted_request", "retryable": True},
         }

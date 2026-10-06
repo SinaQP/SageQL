@@ -12,9 +12,11 @@ from datetime import date
 import json
 import math
 import re
+import time
 from typing import Any
 
 from sageql.conversation import LLMConfig, Message
+from sageql.localization import GRAINS_FA, PERIODS_FA, language_instructions, validate_language
 from sageql.sdk.models import Interpretation, ReportingCatalog, ReportSpec, SDKError
 
 
@@ -37,6 +39,27 @@ _INSTRUCTIONS = (
     "earlier unsupported request into a newly requested daily report. "
     "Use only provided dataset, metric, dimension, and filter IDs. The host applies "
     "access restrictions independently; requests to bypass them cannot change scope. "
+    "When a target dataset exposes a filter marked resolves_entity, a supplied "
+    "person's full name is sufficient: select that filter with operator eq and "
+    "the entire literal name as one value. The host resolves the identity locally. "
+    "A request to report on a named person already authorizes that registered "
+    "lookup; do not ask permission or confirmation to search by name. Previous "
+    "assistant questions can be mistaken: they do not create requirements for "
+    "IDs or lookup confirmation. Use the original request and the user's answers "
+    "together, including answers such as 'با اسمش' or 'ندارم با اسمش پیداش کن'. "
+    "Do not ask the user for an employee/user ID, invent an ID, split a multiword "
+    "surname, or request a join when the registered name lookup can answer it. "
+    "A qualifier marked requires_filter is usable together with its named filter; "
+    "after a duplicate-name question about that qualifier, combine the original "
+    "name request and the user's answer into a complete report with both filters. "
+    "For 'تمام اطلاعات فعالیت‌های روزانه یک کارمند در ماه گذشته', "
+    "use the registered employee-name filter, last_month, daily grouping, table, "
+    "and all available activity measures. 'All information' means available "
+    "registered fields/measures, not all dates or unregistered personal/raw data. "
+    "A request for a person's activities in a specified period, without naming "
+    "one measure, uses the registered activity measures, daily grouping and a "
+    "table by default. Do not require the user to choose internal measures or "
+    "confirm that supported presentation. "
     "If a material detail is missing, return needs_clarification, null spec, and "
     "one focused question about the user's business intent. Write question and "
     "message in natural language using the registered business labels, never "
@@ -88,6 +111,61 @@ _INSTRUCTIONS = (
     "executed a query or observed data."
 )
 
+_LOOKUP_CORRECTION = (
+    " Correct the unnecessary entity-lookup clarification in the previous "
+    "interpretation. Re-read the original report request and all user answers. "
+    "A registered resolves_entity full-name filter needs neither an internal "
+    "employee ID nor permission to search by name. If a full name and the report "
+    "details are supplied, return ready with the complete supported ReportSpec "
+    "using that literal name. Ignore earlier mistaken assistant requests for IDs "
+    "or lookup confirmation. If a real business detail is missing, ask only for "
+    "that detail, such as a full name or the year of an explicit month. Do not "
+    "invent names, IDs, dates or concepts, and do not claim the lookup ran."
+)
+
+
+def _unnecessary_lookup_question(decision: Interpretation, catalog: ReportingCatalog) -> bool:
+    """Recognize implementation questions, never database-match ambiguity.
+
+    This is a UX repair trigger, not authorization or specification validation.
+    Host-generated lookup questions never pass through this interpreter.
+    """
+    if decision.status != "needs_clarification" or not catalog.lookups:
+        return False
+    question = decision.question.casefold().replace("\u200c", "").replace("ي", "ی").replace("ك", "ک")
+    identity = r"(?:شناسه|آیدی|ایدی|کد)\s*(?:کارمند|کاربر|پرسنل|کارکنان)"
+    request = r"(?:ارائه|وارد|بفرست|بگوی|بگو|بده|دارید|داری|می\s*دانید|می\s*دانی|مشخص|ارسال)"
+    gap = r"(?:(?!\b(?:سال|ماه|نام|تاریخ|بازه)\b)[^؛.!؟?\n]){0,100}"
+    # Require a request for the identity, rather than merely mentioning an ID
+    # in a genuine question about another business detail.
+    for clause in re.split(r"[؛.!؟?\n]", question):
+        if re.search(identity + r".{0,60}(?:لازم نیست|نیازی نیست)", clause):
+            continue
+        if re.search(identity + gap + request + "|" + request + gap + identity, clause):
+            return True
+        if re.search(r"(?:کدام|چیست|چیه)\s*" + identity + "|" + identity + gap + r"(?:چیست|چیه)", clause):
+            return True
+    if re.search(r"\b(?:provide|supply|enter|share|specify|give|tell|have|know)\b\s+"
+                 r"(?:(?:me|us)\s+)?(?:(?:the|a|an|their|his|her|your)\s+)?"
+                 r"(?:(?:exact|internal|specific)\s+)?(?:(?:employee|user|personnel)(?:'s)?[ _-]+)?"
+                 r"(?:id|identifier)\b"
+                 r"|\b(?:which|what)\s+(?:is\s+)?(?:the\s+)?"
+                 r"(?:(?:employee|user|personnel)[ _-]+)?(?:id|identifier)\b", question):
+        return True
+    # Asking the user for a missing full name can mention the later search;
+    # that is different from asking permission to run an already specified lookup.
+    if re.search(r"(?:نام کامل|نام و نام\s*خانوادگی)[^؛.!؟?\n]{0,60}"
+                 r"(?:ارائه|بگوی|بگو|می\s*گوی|بنویس|بفرست|دارید|ارسال|بده)", question):
+        return False
+    if re.search(r"\b(?:provide|share|supply|enter|give|tell|have|know)\b.{0,60}"
+                 r"\b(?:full|complete)\s+name\b", question):
+        return False
+    name_search = bool(re.search(r"(?:جستجو|جستوجو|پیدا|بیاب|سرچ|search|look\s*up|find|resolve)", question)
+                       and re.search(r"(?:نام|اسم|\bname\b)", question))
+    confirmation = bool(re.search(r"(?:می\s*خواهید|می\s*خوای|مایل|اجازه|تأیید|تایید|ترجیح|آیا)|"
+                                  r"\b(?:shall|should|may|want|would|prefer|confirm|permission)\b", question))
+    return name_search and confirmation
+
 
 def _record(properties: dict[str, Any]) -> dict[str, Any]:
     return {"type": "object", "properties": properties,
@@ -99,7 +177,8 @@ def _format(catalog: ReportingCatalog) -> dict[str, Any]:
     nullable_text = {"type": ["string", "null"]}
     metric_ids = sorted({item.id for dataset in catalog.datasets for item in dataset.metrics})
     dimension_ids = sorted({item.id for dataset in catalog.datasets for item in dataset.dimensions})
-    filter_ids = sorted({item.id for dataset in catalog.datasets for item in dataset.filters})
+    filter_ids = sorted({item.id for dataset in catalog.datasets for item in dataset.filters} |
+                        {item["id"] for dataset in catalog.datasets for item in _lookup_filters(catalog, dataset.id)})
 
     def identifiers(values: list[str]) -> dict[str, Any]:
         if values:
@@ -145,6 +224,19 @@ def _format(catalog: ReportingCatalog) -> dict[str, Any]:
     }}
 
 
+def _lookup_filters(catalog: ReportingCatalog, dataset_id: str) -> list[dict[str, Any]]:
+    result = []
+    for lookup in catalog.lookups:
+        if lookup.dataset_id != dataset_id:
+            continue
+        result.append({"id": lookup.id, "label": lookup.label, "type": "text",
+                       "operators": ["eq"], "resolves_entity": True})
+        result.extend({"id": item.id, "label": item.label, "type": "text",
+                       "operators": ["eq"], "requires_filter": lookup.id}
+                      for item in lookup.qualifiers)
+    return result
+
+
 def _metadata(catalog: ReportingCatalog) -> dict[str, Any]:
     # Deliberately do not serialize dataclasses: the physical catalog includes
     # compiler-only columns which are not part of the model's vocabulary.
@@ -154,7 +246,8 @@ def _metadata(catalog: ReportingCatalog) -> dict[str, Any]:
     concepts = 0
     for dataset in catalog.datasets:
         column_types = {column.name: column.data_type for column in dataset.columns}
-        concepts += len(dataset.metrics) + len(dataset.dimensions) + len(dataset.filters)
+        lookup_filters = _lookup_filters(catalog, dataset.id)
+        concepts += len(dataset.metrics) + len(dataset.dimensions) + len(dataset.filters) + len(lookup_filters)
         datasets.append({
             "id": dataset.id, "label": dataset.label,
             "metrics": [{"id": item.id, "label": item.label,
@@ -165,7 +258,7 @@ def _metadata(catalog: ReportingCatalog) -> dict[str, Any]:
                            for item in dataset.dimensions],
             "filters": [{"id": item.id, "label": item.label,
                          "type": column_types.get(item.column, ""),
-                         "operators": list(item.operators)} for item in dataset.filters],
+                         "operators": list(item.operators)} for item in dataset.filters] + lookup_filters,
             "time": ({"timezone": dataset.time.timezone,
                       "calendar": dataset.time.calendar,
                       "week_start": dataset.time.week_start}
@@ -209,7 +302,8 @@ def _reject_constant(value: str) -> None:
     raise ValueError("non-finite JSON number")
 
 
-def _display_text(text: str, catalog: ReportingCatalog, spec: ReportSpec | None) -> str:
+def _display_text(text: str, catalog: ReportingCatalog, spec: ReportSpec | None,
+                  language: str = "fa") -> str:
     """Translate accidental interpreter vocabulary in assistant prose only."""
     options = {
         "period": {kind: "all available dates" if kind == "all" else
@@ -221,6 +315,14 @@ def _display_text(text: str, catalog: ReportingCatalog, spec: ReportSpec | None)
         "chart": {"table": "a table", "line": "a line chart",
                   "bar": "a bar chart", "kpi": "one total"},
     }
+    if language == "fa":
+        options = {
+            "period": PERIODS_FA,
+            "time_grain": {key: value if key == "none" else "گروه‌بندی بر اساس " + value
+                           for key, value in GRAINS_FA.items()},
+            "chart": {"table": "جدول", "line": "نمودار خطی",
+                      "bar": "نمودار میله‌ای", "kpi": "مقدار کل"},
+        }
     for field, labels in options.items():
         pattern = (r"(?<![A-Za-z0-9_-])[`\"']?" + field +
                    r"[`\"']?\s*(?:[:=]\s*|\s+)[`\"']?(" +
@@ -243,6 +345,8 @@ def _display_text(text: str, catalog: ReportingCatalog, spec: ReportSpec | None)
         register(dataset.id, dataset.label)
         for item in (*dataset.metrics, *dataset.dimensions, *dataset.filters):
             register(item.id, item.label)
+        for item in _lookup_filters(catalog, dataset.id):
+            register(item["id"], item["label"])
     for key, label in {
         "dataset_id": "data source", "metric_ids": "measures",
         "metric_id": "measure", "dimension_ids": "fields",
@@ -250,6 +354,12 @@ def _display_text(text: str, catalog: ReportingCatalog, spec: ReportSpec | None)
         "time_grain": "date grouping", "order_by": "sort by",
         "time_bucket": "date", "period_label": "comparison period",
     }.items():
+        if language == "fa":
+            label = {"dataset_id": "منبع داده", "metric_ids": "شاخص‌ها",
+                     "metric_id": "شاخص", "dimension_ids": "فیلدها",
+                     "dimension_id": "فیلد", "filter_id": "فیلتر",
+                     "time_grain": "گروه‌بندی زمانی", "order_by": "مرتب‌سازی",
+                     "time_bucket": "تاریخ", "period_label": "دوره مقایسه"}[key]
         register(key, label)
     marked = "|".join(re.escape(key) for key in sorted(labels, key=len, reverse=True))
     technical = "|".join(re.escape(key) for key in sorted(technical_ids, key=len, reverse=True))
@@ -288,9 +398,10 @@ def _check_spec(spec: ReportSpec, catalog: ReportingCatalog) -> None:
     ):
         if len(set(supplied)) != len(supplied) or any(item not in approved for item in supplied):
             raise ValueError("unknown or duplicated concept")
-    filters = {item.id: item for item in dataset.filters}
+    filters = {item.id: item.operators for item in dataset.filters}
+    filters.update({item["id"]: ("eq",) for item in _lookup_filters(catalog, dataset.id)})
     for item in spec.filters:
-        if item.filter_id not in filters or item.operator not in filters[item.filter_id].operators:
+        if item.filter_id not in filters or item.operator not in filters[item.filter_id]:
             raise ValueError("unknown filter")
         if len(item.values) > 100:
             raise ValueError("filter bounds")
@@ -330,12 +441,15 @@ class OpenAIReportInterpreter:
 
     Injected clients are useful for tests. Real clients must support with_options
     so timeout and no-retry settings cannot depend on ambient SDK defaults.
+    Persian prose is requested by default; language="en" selects English.
     """
 
     def __init__(
         self, config: LLMConfig, client: Any = None, *, timeout_seconds: float = 30,
         max_output_tokens: int = 4096,
+        language: str = "fa",
     ) -> None:
+        self.language = validate_language(language)
         if (type(timeout_seconds) not in (int, float) or not math.isfinite(timeout_seconds)
                 or not 0 < timeout_seconds <= 180):
             raise ValueError("timeout_seconds must be finite and from 0 to 180")
@@ -384,13 +498,37 @@ class OpenAIReportInterpreter:
             raise SDKError("provider_input_limit", "Report request exceeds provider limits.")
         response_format = _format(catalog)
         _check_schema_limits(response_format["json_schema"]["schema"])
+        instructions = _INSTRUCTIONS + language_instructions(self.language)
+        deadline = time.monotonic() + self._timeout_seconds
+        decision = self._request(content, response_format, instructions, self._timeout_seconds,
+                                 catalog, current_spec)
+        if _unnecessary_lookup_question(decision, catalog):
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise SDKError("request_timeout", "Report interpretation exceeded its time limit.",
+                               retryable=True)
+            # One semantic correction, with identical permitted input and the
+            # remaining original deadline. Malformed output/transport failures
+            # still fail immediately; this never retries a database query.
+            decision = self._request(content, response_format, instructions + _LOOKUP_CORRECTION,
+                                     remaining, catalog, current_spec)
+            if _unnecessary_lookup_question(decision, catalog):
+                raise SDKError("clarification_stalled",
+                               "I couldn't interpret the name-based report. Please retry the report request.",
+                               retryable=True)
+        return decision
+
+    def _request(
+        self, content: str, response_format: dict[str, Any], instructions: str,
+        timeout_seconds: float, catalog: ReportingCatalog, current_spec: ReportSpec | None,
+    ) -> Interpretation:
         try:
             response = self._client.chat.completions.create(
                 model=self._model,
-                messages=[{"role": "system", "content": _INSTRUCTIONS},
+                messages=[{"role": "system", "content": instructions},
                           {"role": "user", "content": content}],
                 response_format=response_format, max_completion_tokens=self._max_output_tokens,
-                timeout=self._timeout_seconds,
+                timeout=timeout_seconds,
             )
             raw = response.choices[0].message.content
         except Exception:
@@ -420,8 +558,8 @@ class OpenAIReportInterpreter:
                 if status == "unsupported" and not message:
                     raise ValueError("missing unsupported explanation")
                 spec = None
-            question = _display_text(question, catalog, spec or current_spec)
-            message = _display_text(message, catalog, spec or current_spec)
+            question = _display_text(question, catalog, spec or current_spec, self.language)
+            message = _display_text(message, catalog, spec or current_spec, self.language)
             return Interpretation(status, spec, question, message)
         except (ValueError, TypeError, KeyError, SDKError, RecursionError):
             raise SDKError("invalid_interpretation", "Report provider returned an invalid interpretation.") from None

@@ -182,6 +182,154 @@ The user has not specified Step 5. Do not assume its purpose or claim it has bee
 - Add declared-grain safe joins, timestamp/calendar semantics and report export only as separately scoped slices.
 - Define the historical Step 5 if the staged CLI needs it. SDK table/chart JSON already exists independently.
 
+## Persian conversation and report defaults
+
+Outcome: the embedded SDK and local reporting frontend default to Persian.
+Acceptance: Persian model instructions cover greetings, clarification, refinements,
+digits and letter variants; deterministic greetings/errors/titles and built-in
+date headers use Persian; shipped catalogs use Persian business labels/units;
+the browser uses RTL and Persian display digits without changing JSON values.
+Hosts can explicitly select English for SDK/provider presentation. Offline tests
+cover Persian multi-turn reports, literal Unicode filters, persistence/retries,
+and unchanged authorization/SQL boundaries. No calendar conversion, translation
+of arbitrary host labels or row values, new model endpoint, or broader SQL scope.
+
+Verification (2026-10-06): 480 Python tests passed, 1 opt-in SQL Server test
+skipped. Offline Chrome/Playwright checks passed for Persian RTL, exact decimal
+display, Gregorian dates, tabs/history, retries and mobile width. The Persian
+SDK embedding smoke test, isolated package build and fresh-wheel import passed.
+The active development environment lacks `hatchling`, so `--no-isolation` is
+unavailable there; the normal isolated build succeeds. Live configured model/
+SQL Server Persian understanding had not yet been verified at that stage;
+the employee-name check below records the subsequent live verification.
+
+## Employee-name activity requests
+
+Outcome: resolve a supplied employee name using the permitted profile source,
+then run the approved activity report without asking for an internal employee ID.
+The [scoped lookup design](SDK_ENTITY_LOOKUPS.md) defines registration, exact
+normalized full-name matching, ambiguity, data boundaries and verification.
+Acceptance includes unique/duplicate names, job qualifiers, Persian spacing and
+letter variants, current source/target policies, bounded lookup reads, offline
+regression tests and persistent name-based refinements/retries. No model-selected
+join, new database object, fuzzy identity selection or broader activity columns.
+
+Live verification (2026-10-06): the configured interpreter correctly selected
+the employee-name filter, all three registered activity measures, `last_month`,
+daily grouping and table for the user's Persian request. A first interpretation
+returned invalid output and failed closed; a separate manual attempt succeeded.
+Executing that validated specification against the configured SQL Server resolved
+the name and returned 27 daily rows through separate profile/activity SELECTs,
+without asking for an ID. No rows or derived identities were sent to the model;
+production names and responses remain only in ignored local smoke-test files.
+
+Offline verification (2026-10-06): 514 tests passed and 1 opt-in synthetic SQL
+Server test was skipped. Lookup regressions cover actual SQLite totals, SQL
+Server parameter/cleanup and diagnostic redaction boundaries, persistent
+refinements, ambiguity, source/target policy changes and malformed adapter output.
+The isolated sdist/wheel build and fresh-wheel import/public-contract/name
+normalization smoke check passed.
+
+## Name-lookup clarification progress
+
+Outcome: a named employee activity request proceeds to the registered lookup
+without asking for an internal ID or repeated permission to search by name.
+Acceptance: interpret the original request and follow-up answers together;
+correct an invalid ID/search-confirmation question once within the existing
+provider deadline; validate the corrected specification through the ordinary
+engine; stop safely if correction still stalls. Genuine missing dates/names and
+host-generated missing/ambiguous-match questions remain available. Regression
+checks use a fake model transport and policy-bound synthetic data. No new
+lookup matching, SQL scope, identity exposure or external service is introduced.
+
+Verification (2026-10-06): the focused provider/lookup regressions and full
+offline suite pass; isolated sdist/wheel builds and the synthetic SDK embedding
+smoke pass. The configured Rahtal model returned the expected complete daily
+activity specifications for both a direct synthetic full-name request and a
+conversation containing the prior mistaken ID/lookup questions followed by
+«با اسمش». A request without a name asked for the missing name. These live
+interpretation checks executed no database queries and do not establish live
+report totals or universal model correctness. The running loopback host was
+restarted with its existing configuration, workspace token and session store.
+
 ## Data boundaries
 
 The historical chat provider receives conversation messages and model configuration. In Step 4 it also receives bounded table/column/relation metadata and definitions; Step 6 receives understanding, context and selected metadata. It does not receive database connection fields or row values. Historical CLI sessions are in memory. The SDK interpreter receives only permitted business metadata, messages and current report specifications; it omits physical names, policies and result rows. SDK session stores explicitly persist messages and report rows under host control.
+
+## Rahtal local execution diagnostics
+
+Frontend follow-up: put the existing trace in a separate **Steps & logs** tab
+beside the report result. Keep each completed attempt available within the current
+chat, with a readable stage timeline, durations, raw event details and a local JSON
+download. Switching tabs or attempts must not submit a message or query data.
+New chat clears the trace history; failures retain the latest successful result.
+This slice consumes the existing redacted diagnostics only, adds no new backend
+logging or telemetry, and does not implement historical Step 5 or live progress.
+
+Verification (2026-10-06): offline Chrome/Playwright check passed for tabs,
+keyboard navigation, attempt history, failure result retention, cached retries,
+JSON download, text-only trace rendering, mobile width and other host modes.
+The isolated package build passed. Full Python suite: 468 passed, 1 skipped,
+5 failed on English-text expectations affected by concurrent Persian-language
+changes outside this frontend slice. No live Rahtal/model query was run.
+
+User outcome: inspect the test frontend's interpretation, validated report
+conditions, deterministic SQL, execution stages, counts and safe failures.
+Acceptance: authenticated Rahtal responses show an attempt trace; ignored local
+JSON files record stage progress; empty results and cached replies are explained;
+no credentials, personal filters or rows enter diagnostics, and no extra SQL is
+executed. Other SDK/HTTP modes retain their contracts. This does not infer the
+root cause of empty data or add policy-bypassing diagnostic queries.
+
+## Bounded agent report interpretation
+
+**Outcome:** Interpret user requests, clarification answers and refinements
+through a planner and semantic reviewer over the permitted registered catalog.
+The planner can reconsider a rejected proposal without a separate keyword or
+regular-expression branch for every phrasing. The scoped contract and public
+interfaces are documented in [SDK_AGENTS.md](SDK_AGENTS.md).
+
+**Acceptance:** `AgentReportInterpreter` implements the existing `ReportProvider`
+interface over a replaceable `ReportAgentBackend`; `AgentReview` carries a bounded
+semantic judgment and `OpenAIReportAgent` uses the existing configured endpoint.
+Each proposal passes strict shape/vocabulary checks and a local ready-report
+preview before semantic review. A review rejection can produce a complete
+revision; local semantic-validation feedback contains only fixed error codes.
+Malformed output, extra SQL/code fields and unknown concepts fail closed rather
+than being repaired. `max_revisions` is 0 through 3, default 1; at most eight model
+requests share one deadline, default 30 seconds and bounded to 180 seconds.
+Unapproved attempts end with safe `agent_exhausted` feedback. Fake transports and
+synthetic fixtures cover budgets, context, data exclusion, count-only preview,
+policy enforcement, persistent refinements and idempotent receipts.
+
+**Boundaries:** The preview uses a policy-free synthetic scope only to check
+permitted vocabulary and operations. Empty-column count-only projections use
+private preview scaffolding that is neither serialized nor executed. The engine
+still authorizes against the full trusted catalog/current actor policies,
+resolves registered names locally, compiles deterministic SQL, and requires
+explicit execution opt-in. No physical names, policies, credentials, rows or
+resolved identities enter planner/reviewer requests. No model-selected joins,
+arbitrary formulas, new objects, broader calendars, unrestricted database tools,
+production authentication or historical Step 5 is introduced.
+
+The live generic SQL Server web host and Rahtal SDK frontend select the new agent
+provider. `OpenAIReportInterpreter` remains available for explicit compatibility;
+the historical staged flow, isolated pilot runner and scripted demos retain their
+existing behavior. Planning and review are separate requests to the same
+configured model, so correlated mistakes remain possible. Extra requests add
+latency and usage cost; neither semantic approval nor this scope promises that
+every natural-language request is understood.
+
+**Verification (2026-10-06):** All 79 focused agent tests passed; the full offline
+suite passed with 642 tests and one opt-in synthetic SQL Server test skipped.
+The isolated sdist/wheel build, fresh-wheel install/public agent imports and
+documented synthetic SDK embedding smoke passed. Independent review found and
+fixed typed Decimal/date filter compatibility; regressions cover custom agent
+outputs and persistent switching from an existing provider.
+
+The existing configured model completed two interpretation-only checks: a daily
+request with a synthetic full name selected all three registered activity
+measures, `last_month` and daily grouping; a greeting returned clarification.
+Both used the new planning/review flow. These checks made no database calls and
+transmitted no lookup results or production rows. Live SQL Server execution with
+this flow and universal language correctness remain unverified.

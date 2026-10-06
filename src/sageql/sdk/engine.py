@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import fields, is_dataclass
+from dataclasses import fields, is_dataclass, replace
 from datetime import date, datetime, timezone
 from decimal import Decimal
 import hashlib
@@ -13,6 +13,7 @@ from typing import Any, Callable
 from uuid import uuid4
 
 from sageql.conversation import Message
+from sageql.localization import GRAINS_FA, error_text, validate_language
 from sageql.sdk.models import (
     AccessScope, ActorContext, AdapterResult, DatabaseAdapter, ExecutionLimits,
     Interpretation, PeriodSelection, Reply, ReportArtifact, ReportField, ReportingCatalog,
@@ -20,6 +21,7 @@ from sageql.sdk.models import (
 )
 from sageql.sdk.semantics import permitted_catalog, validate_catalog, validate_report, validate_scope
 from sageql.sdk.sessions import InMemorySessionStore, SessionStore
+from sageql.sdk.lookups import prepare_request, resolve_request
 
 
 def _typed(value: Any) -> Any:
@@ -89,6 +91,8 @@ class SageQL:
     The policy callback is required and is re-evaluated for every operation. The
     default clock is today's UTC business date; supply a business-date clock for
     another timezone. A provider should independently cap its transport timeout.
+    Presentation defaults to Persian; register Persian labels/units and use a
+    Persian-speaking provider. Hosts may explicitly choose language="en".
     """
 
     def __init__(
@@ -96,7 +100,9 @@ class SageQL:
         provider: ReportProvider, policy: ReportPolicy,
         sessions: SessionStore | None = None, clock: Callable[[], date] | None = None,
         limits: ExecutionLimits | None = None, execution: str = "disabled",
+        language: str = "fa",
     ) -> None:
+        self.language = validate_language(language)
         validate_catalog(catalog)
         if execution not in {"disabled", "validated"}:
             raise ValueError("execution must be disabled or validated")
@@ -138,12 +144,13 @@ class SageQL:
         self._scope(actor)
         session_id = uuid4().hex
         self.sessions.create({
-            "schema_version": 1, "id": session_id,
+            "schema_version": 1, "id": session_id, "language": self.language,
             "owner": [actor.subject, actor.tenant_id], "revision": 0,
             "messages": [], "current_spec": None, "pending_question": None, "pending_origin": None,
             "last_report_id": None, "reports": {}, "receipts": {}, "inflight": None,
         })
-        return Reply(session_id, 0, "session_ready", "What report would you like to create?")
+        return Reply(session_id, 0, "session_ready", "چه گزارشی می‌خواهید تهیه کنید؟"
+                     if self.language == "fa" else "What report would you like to create?")
 
     def get_session(self, session_id: str, actor: ActorContext) -> dict[str, Any]:
         """Return safe resume metadata, never the store's receipts or internal state."""
@@ -168,12 +175,11 @@ class SageQL:
         validate_report(dataset, spec, access, today=date.fromisoformat(saved["as_of"]))
         return _artifact(saved["artifact"])
 
-    @staticmethod
-    def _error(session_id: str, revision: int, error: SDKError) -> Reply:
+    def _error(self, session_id: str, revision: int, error: SDKError) -> Reply:
         status = "unsupported" if error.code == "unsupported" else (
             "failed" if error.retryable or error.code.endswith("failed") else "blocked"
         )
-        return Reply(session_id, revision, status, str(error),
+        return Reply(session_id, revision, status, error_text(error.code, str(error), self.language),
                      error={"code": error.code, "retryable": error.retryable})
 
     def submit(
@@ -253,7 +259,7 @@ class SageQL:
                 try:
                     if old_dataset is None or old_access is None:
                         raise SDKError("access_denied", "Previous report access changed.")
-                    validate_report(old_dataset, current, old_access, today=today)
+                    prepare_request(self.catalog, current, scope, today)
                 except SDKError:
                     current = None
             history = tuple(Message(**item) for item in state["messages"])
@@ -275,6 +281,24 @@ class SageQL:
                 raise SDKError("access_denied", "Report access changed during this request.")
             if not isinstance(decision, Interpretation):
                 raise SDKError("invalid_interpretation", "Provider returned an invalid interpretation.")
+            prepared = None
+            if decision.status == "ready":
+                if not isinstance(decision.spec, ReportSpec) or decision.question:
+                    raise SDKError("invalid_interpretation", "Provider returned an invalid report specification.")
+                prepared, lookup = prepare_request(self.catalog, decision.spec, scope, today)
+                if self.execution != "validated":
+                    raise SDKError("execution_disabled", "The developer has not enabled report execution.")
+                if lookup is not None:
+                    def check_lookup_access() -> None:
+                        active()
+                        if _digest(self._scope(actor)) != scope_key:
+                            raise SDKError("access_denied", "Report access changed during this request.")
+                    prepared, question = resolve_request(
+                        prepared, lookup, self.database, self.limits,
+                        cancel=cancelled, check_access=check_lookup_access, language=self.language,
+                    )
+                    if question:
+                        decision = Interpretation("needs_clarification", question=question)
             if decision.status == "needs_clarification":
                 if (decision.spec is not None or not isinstance(decision.question, str)
                         or not decision.question.strip() or len(decision.question) > 4_000):
@@ -292,20 +316,14 @@ class SageQL:
                 if decision.spec is not None or decision.question or not isinstance(decision.message, str):
                     raise SDKError("invalid_interpretation", "Provider returned an invalid unsupported result.")
                 reply = Reply(session_id, revision + 1, "unsupported",
-                              decision.message[:4_000] or "The registered data cannot support this report.")
+                              decision.message[:4_000] or ("اطلاعات ثبت‌شده برای این گزارش کافی نیست."
+                              if self.language == "fa" else "The registered data cannot support this report."))
                 state["pending_question"] = None
                 state["pending_origin"] = None
             elif decision.status == "ready":
-                if not isinstance(decision.spec, ReportSpec) or decision.question:
+                if not isinstance(decision.spec, ReportSpec) or decision.question or prepared is None:
                     raise SDKError("invalid_interpretation", "Provider returned an invalid report specification.")
                 spec = decision.spec
-                dataset = next((item for item in self.catalog.datasets if item.id == spec.dataset_id), None)
-                access = next((item for item in scope.datasets if item.dataset_id == spec.dataset_id), None)
-                if dataset is None or access is None:
-                    raise SDKError("access_denied", "Report dataset is unavailable for this caller.")
-                prepared = validate_report(dataset, spec, access, today=today)
-                if self.execution != "validated":
-                    raise SDKError("execution_disabled", "The developer has not enabled report execution.")
                 active()
                 # Re-evaluate immediately before executing, including changes that
                 # occurred during a remote model request.
@@ -316,10 +334,15 @@ class SageQL:
                 if _digest(self._scope(actor)) != scope_key:
                     raise SDKError("access_denied", "Report access changed during this request.")
                 artifact = self._make_report(session_id, revision + 1, prepared, result, scope)
+                if prepared.spec.filters != spec.filters:
+                    # Name/qualifier inputs belong in the public report context.
+                    # The resolved identity stays out of provider specifications.
+                    artifact = replace(artifact, provenance={**artifact.provenance,
+                                                            "filters": json_value(spec.filters)})
                 # Verify the public JSON contract before accepting session mutation.
                 artifact_json = artifact.to_dict()
                 state["reports"][artifact.id] = {
-                    "artifact": artifact_json, "spec": _typed(spec),
+                    "artifact": artifact_json, "spec": _typed(prepared.spec),
                     "scope_key": scope_key, "catalog_key": _digest(self.catalog),
                     "as_of": today.isoformat(),
                 }
@@ -328,7 +351,6 @@ class SageQL:
                 state["last_report_id"] = artifact.id
                 # Refinements preserve effective dates across a day/month change.
                 # The saved report still records the original period selection.
-                from dataclasses import replace
                 frozen_period = (PeriodSelection("range", prepared.period.start.isoformat(),
                                                  prepared.period.end.isoformat())
                                  if prepared.period.start is not None else spec.period)
@@ -382,13 +404,20 @@ class SageQL:
             raise SDKError("adapter_failed", "Database adapter returned invalid report columns.")
         metric_defs = {item.id: item for item in dataset.metrics}
         dimension_defs = {item.id: item for item in dataset.dimensions}
-        title = ", ".join(metric_defs[key].label for key in spec.metric_ids)
-        labels = ([spec.time_grain] if spec.time_grain != "none" else []) + [
+        separator = "، " if self.language == "fa" else ", "
+        title = separator.join(metric_defs[key].label for key in spec.metric_ids)
+        grain = GRAINS_FA.get(spec.time_grain, spec.time_grain) if self.language == "fa" else spec.time_grain
+        labels = ([grain] if spec.time_grain != "none" else []) + [
             dimension_defs[key].label for key in spec.dimension_ids]
         if not spec.metric_ids:
-            title = dataset.label + ": " + ", ".join(labels)
+            title = dataset.label + ": " + separator.join(labels)
         elif labels:
-            title += " by " + ", ".join(labels)
+            title += (" به تفکیک " if self.language == "fa" else " by ") + separator.join(labels)
+        report_fields = tuple(
+            replace(item, label={"time_bucket": "تاریخ", "period_label": "دوره"}[item.id])
+            if self.language == "fa" and item.id in {"time_bucket", "period_label"} else item
+            for item in result.fields
+        )
         visualization: dict[str, Any] = {"kind": spec.chart}
         if spec.chart in {"bar", "line"}:
             visualization.update(x="time_bucket" if spec.time_grain != "none" else spec.dimension_ids[0],
@@ -411,5 +440,5 @@ class SageQL:
             "filters": json_value(spec.filters),
             "completeness": "truncated" if result.truncated else ("empty" if not result.rows else "complete"),
         }
-        return ReportArtifact(uuid4().hex, session_id, revision, title, result.fields, result.rows,
+        return ReportArtifact(uuid4().hex, session_id, revision, title, report_fields, result.rows,
                               visualization, provenance, result.truncated)

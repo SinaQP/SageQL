@@ -21,11 +21,12 @@ from sageql.conversation import LLMConfig
 from sageql.schema import Column, Table
 from sageql.sdk import (
     AccessScope, ActorContext, DatasetAccess, DatasetDefinition,
-    DimensionDefinition, ExecutionLimits, FilterDefinition, MetricDefinition,
+    DimensionDefinition, EntityLookupDefinition, ExecutionLimits, FilterDefinition,
+    FullNameFilterDefinition, LookupQualifier, MetricDefinition,
     ReportingCatalog, RowPolicy, SDKError, SQLServerAdapter, SageQL,
     SessionStore, TimeDefinition,
 )
-from sageql.sdk.provider import OpenAIReportInterpreter
+from sageql.sdk.agents import OpenAIReportAgent
 
 
 HERE = Path(__file__).resolve().parent
@@ -45,8 +46,8 @@ def rahtal_reporting_catalog(schema: str = "dbo") -> ReportingCatalog:
     """Register existing pilot sources; no join or custom view is required.
 
     Activity durations are Rahtal's floating-point hours. Employee names are
-    listed separately from employee profiles. The SDK cannot infer a join from
-    an activity employee ID to a name or assume profile uniqueness.
+    resolved through a registered profile name lookup before activity reports.
+    Each query still uses one source; profile duplicates cannot multiply totals.
     """
     if not isinstance(schema, str) or not _IDENTIFIER.fullmatch(schema):
         raise ValueError("RAHTAL_DB_SCHEMA must be a simple schema name.")
@@ -65,37 +66,43 @@ def rahtal_reporting_catalog(schema: str = "dbo") -> ReportingCatalog:
     ))
     return ReportingCatalog((
         DatasetDefinition(
-            "activities", "Employee work activities",
+            "activities", "فعالیت‌های کاری کارکنان",
             activity, activity_columns,
             metrics=(
-                MetricDefinition("activity_hours", "Activity hours", "sum", "time", "hours"),
-                MetricDefinition("average_activity_hours", "Average hours per activity", "average", "time", "hours"),
-                MetricDefinition("activity_count", "Number of registered activities", "count_rows"),
+                MetricDefinition("activity_hours", "ساعات فعالیت", "sum", "time", "ساعت"),
+                MetricDefinition("average_activity_hours", "میانگین ساعات هر فعالیت", "average", "time", "ساعت"),
+                MetricDefinition("activity_count", "تعداد فعالیت‌های ثبت‌شده", "count_rows"),
             ),
-            dimensions=(DimensionDefinition("employee_id", "Employee ID", "user_id"),),
-            filters=(FilterDefinition("employee_id_filter", "Employee ID", "user_id"),),
+            dimensions=(DimensionDefinition("employee_id", "شناسه کارمند", "user_id"),),
+            filters=(FilterDefinition("employee_id_filter", "شناسه کارمند", "user_id"),),
             time=TimeDefinition("date", timezone="Asia/Tehran"),
             row_key=("id",), version="rahtal-activities-v1",
         ),
         DatasetDefinition(
-            "employees", "Employee profiles",
+            "employees", "مشخصات کارکنان",
             person, person_columns,
-            metrics=(MetricDefinition("employee_count", "Number of employee profiles", "count_rows"),),
+            metrics=(MetricDefinition("employee_count", "تعداد پروفایل کارکنان", "count_rows"),),
             dimensions=(
-                DimensionDefinition("first_name", "First name", "first_name"),
-                DimensionDefinition("last_name", "Last name", "last_name"),
-                DimensionDefinition("job_position", "Job position", "job_position"),
-                DimensionDefinition("employee_id", "Employee ID", "user_id"),
+                DimensionDefinition("first_name", "نام", "first_name"),
+                DimensionDefinition("last_name", "نام خانوادگی", "last_name"),
+                DimensionDefinition("job_position", "سمت شغلی", "job_position"),
+                DimensionDefinition("employee_id", "شناسه کارمند", "user_id"),
             ),
             filters=(
-                FilterDefinition("first_name_filter", "First name", "first_name"),
-                FilterDefinition("last_name_filter", "Last name", "last_name"),
-                FilterDefinition("job_position_filter", "Job position", "job_position"),
-                FilterDefinition("employee_id_filter", "Employee ID", "user_id"),
+                FilterDefinition("first_name_filter", "نام", "first_name"),
+                FilterDefinition("last_name_filter", "نام خانوادگی", "last_name"),
+                FilterDefinition("job_position_filter", "سمت شغلی", "job_position"),
+                FilterDefinition("employee_id_filter", "شناسه کارمند", "user_id"),
+                FullNameFilterDefinition("employee_full_name_filter", "نام کامل کارمند", "first_name",
+                                         ("eq",), ("first_name", "last_name")),
             ),
-            version="rahtal-employees-v1",
+            version="rahtal-employees-v2",
         ),
-    ), version="rahtal-local-v1")
+    ), version="rahtal-local-v2", lookups=(EntityLookupDefinition(
+        "employee_name_filter", "نام کامل کارمند", "activities", "employee_id_filter",
+        "employees", "employee_id", "employee_full_name_filter",
+        qualifiers=(LookupQualifier("employee_job_filter", "سمت شغلی", "job_position_filter"),),
+    ),))
 
 
 def find_rahtal_env(env_path: str | Path | None = None) -> Path | None:
@@ -183,6 +190,7 @@ def _connect(settings: dict[str, str]) -> Any:
 
 def create_rahtal_engine(
     env_path: str | Path | None = None, *, sessions: SessionStore | None = None,
+    diagnostics_directory: Path | None = None,
 ) -> tuple[SageQL, ActorContext, str]:
     """Build the explicitly opted-in local SQL Server/model integration.
 
@@ -211,10 +219,18 @@ def create_rahtal_engine(
 
     config = LLMConfig(settings["RAHTAL_LLM_API_KEY"], settings["RAHTAL_LLM_BASE_URL"],
                        settings["RAHTAL_LLM_MODEL"])
-    engine = SageQL(
+    engine_type, adapter_type = SageQL, SQLServerAdapter
+    provider = OpenAIReportAgent(config, timeout_seconds=45)
+    if diagnostics_directory is not None:
+        from sageql_rahtal.diagnostics import (
+            DiagnosticSageQL, DiagnosticSQLServerAdapter, DiagnosticInterpreter,
+        )
+        engine_type, adapter_type = DiagnosticSageQL, DiagnosticSQLServerAdapter
+        provider = DiagnosticInterpreter(provider)
+    engine = engine_type(
         catalog=rahtal_reporting_catalog(settings["RAHTAL_DB_SCHEMA"]),
-        database=SQLServerAdapter(lambda: _connect(settings), max_concurrent_queries=2),
-        provider=OpenAIReportInterpreter(config, timeout_seconds=45),
+        database=adapter_type(lambda: _connect(settings), max_concurrent_queries=2),
+        provider=provider,
         policy=policy, sessions=sessions, execution="validated",
         # Iranian business dates currently use UTC+03:30; these are date-only
         # columns. This clock does not convert persisted timestamps/calendars.
@@ -222,4 +238,6 @@ def create_rahtal_engine(
         limits=ExecutionLimits(max_rows=100, query_timeout_seconds=10,
                                request_timeout_seconds=65),
     )
+    if diagnostics_directory is not None:
+        engine.diagnostics_directory = Path(diagnostics_directory)
     return engine, actor, token

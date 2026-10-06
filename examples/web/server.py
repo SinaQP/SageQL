@@ -29,6 +29,7 @@ from typing import Any
 from urllib.parse import urlsplit
 
 from sageql.conversation import LLMConfig, Message
+from sageql.localization import error_text
 from sageql.schema import Column, Table
 from sageql.sdk import (
     AccessScope, ActorContext, DatasetAccess, DatasetDefinition, DimensionDefinition,
@@ -37,7 +38,7 @@ from sageql.sdk import (
 )
 from sageql.sdk.adapters import SQLServerAdapter, SQLiteAdapter
 from sageql.sdk.engine import SageQL
-from sageql.sdk.provider import OpenAIReportInterpreter
+from sageql.sdk.agents import OpenAIReportAgent
 
 
 _MONTHS = {name: index for index, name in enumerate((
@@ -70,10 +71,10 @@ def reporting_catalog(*, schema: str = "", table_name: str = "activities",
         ("activity_date", "date"), ("hours", "decimal"), ("is_deleted", "int"),
     ))
     return ReportingCatalog((DatasetDefinition(
-        "activities", "Activity reporting", table, columns,
-        metrics=(MetricDefinition("activity_hours", "Activity hours", "sum", "hours", "hours"),),
-        dimensions=(DimensionDefinition("employee", "Employee", "employee"),),
-        filters=(FilterDefinition("employee_filter", "Employee", "employee"),),
+        "activities", "گزارش فعالیت‌ها", table, columns,
+        metrics=(MetricDefinition("activity_hours", "ساعات فعالیت", "sum", "hours", "ساعت"),),
+        dimensions=(DimensionDefinition("employee", "کارمند", "employee"),),
+        filters=(FilterDefinition("employee_filter", "کارمند", "employee"),),
         time=TimeDefinition("activity_date"), row_key=("id",),
     ),))
 
@@ -88,6 +89,33 @@ def activity_policy(actor: ActorContext) -> AccessScope:
     )),), version="activity-policy-v1")
 
 
+def _demo_text(text: str) -> str:
+    """Normalize only the offline keyword search copy, never bound filter values."""
+    text = text.strip().lower().translate(str.maketrans(
+        "۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩يك", "01234567890123456789یک"))
+    text = text.replace("\u200c", " ")
+    phrases = {
+        "ژانویه": "january", "فوریه": "february", "مارس": "march",
+        "آوریل": "april", "مه": "may", "ژوئن": "june", "ژوئیه": "july",
+        "اوت": "august", "آگوست": "august", "سپتامبر": "september",
+        "اکتبر": "october", "نوامبر": "november", "دسامبر": "december",
+        "ساعات فعالیت": "activity hours", "ساعت فعالیت": "activity hours",
+        "ساعات کار": "activity hours", "روزانه": "daily", "به تفکیک روز": "daily",
+        "ماهانه": "monthly", "به تفکیک ماه": "monthly",
+        "به تفکیک کارکنان": "by employee", "به تفکیک کارمند": "by employee",
+        "بر اساس کارمند": "by employee", "همه داده ها": "all data",
+        "همه داده‌های موجود": "all data", "همه داده های موجود": "all data",
+        "ماه قبل": "last month", "ماه گذشته": "last month", "این ماه": "this month",
+        "سال قبل": "last year", "سال گذشته": "last year", "امسال": "this year",
+        "هفته قبل": "last week", "هفته گذشته": "last week", "این هفته": "this week",
+        "دیروز": "yesterday", "امروز": "today", "مجموع": "total",
+        "نمودار خطی": "line chart", "جدول": "table", "فقط": "only",
+    }
+    for phrase in sorted(phrases, key=len, reverse=True):
+        text = re.sub(r"(?<!\w)" + re.escape(phrase) + r"(?!\w)", phrases[phrase], text)
+    return text
+
+
 class DemoInterpreter:
     """A deliberately small deterministic interpreter for the offline example.
 
@@ -98,30 +126,36 @@ class DemoInterpreter:
 
     def interpret(self, messages: tuple[Message, ...], current_spec: ReportSpec | None,
                   catalog: ReportingCatalog, today: date) -> Interpretation:
-        latest = messages[-1].content.strip().lower()
-        history = " ".join(item.content.lower() for item in messages if item.role == "user")
+        latest = _demo_text(messages[-1].content)
+        history = " ".join(_demo_text(item.content) for item in messages if item.role == "user")
+        if re.search(r"شمسی|جلالی|فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی\b|بهمن|اسفند", latest):
+            return Interpretation("unsupported", message="این گزارش از تاریخ میلادی پشتیبانی می‌کند. لطفاً بازه را با تاریخ میلادی مشخص کنید.")
+        if current_spec is None and latest in {"سلام", "درود", "hi", "hello"}:
+            return Interpretation("needs_clarification", question="چه گزارشی از ساعات فعالیت می‌خواهید؟")
         if re.search(r"\b(sql|delete|drop|password|credential|tenant|bypass|ignore restrictions|profit|sales|average|median|percentage|compare)\b", latest):
-            return Interpretation("unsupported", message="This workspace supports approved activity-hour reports only.")
+            return Interpretation("unsupported", message="این فضای نمونه فقط از گزارش‌های ثبت‌شده ساعات فعالیت پشتیبانی می‌کند.")
         if current_spec is None and not re.search(r"\b(hour|hours|activity|activities)\b", history):
-            return Interpretation("unsupported", message="Try asking for daily activity hours for September 2026.")
+            return Interpretation("unsupported", message="برای نمونه بنویسید: ساعات فعالیت روزانه در سپتامبر ۲۰۲۶.")
         spec = current_spec or ReportSpec("activities", ("activity_hours",))
         # The original question remains available while a clarification answer
         # supplies only the missing year or period.
         context = latest if current_spec is not None else history
         if (current_spec is not None and len(messages) > 2 and messages[-2].role == "assistant"
-                and "which year" in messages[-2].content.lower()):
-            previous = next((item.content.lower() for item in reversed(messages[:-1])
+                and ("which year" in messages[-2].content.lower() or "کدام سال" in messages[-2].content)):
+            previous = next((_demo_text(item.content) for item in reversed(messages[:-1])
                              if item.role == "user"), "")
             context = previous + " " + latest
         month_matches = list(re.finditer(r"\b(" + "|".join(_MONTHS) + r")\b", context))
         month = _MONTHS[month_matches[-1].group(1)] if month_matches else None
         year_match = re.search(r"\b(20\d{2}|19\d{2})\b", context)
         year = int(year_match.group(1)) if year_match else None
+        if re.search(r"\b1[34]\d{2}\b", context):
+            return Interpretation("needs_clarification", question="منظورتان کدام تقویم است؟ این گزارش از تاریخ میلادی پشتیبانی می‌کند.")
         period = None
         if month is not None:
             if year is None:
-                return Interpretation("needs_clarification", question="Which year should September cover?" if month == 9
-                                      else "Which year should that month cover?")
+                return Interpretation("needs_clarification", question="سپتامبر کدام سال میلادی را می‌خواهید؟" if month == 9
+                                      else "این ماه از کدام سال میلادی را می‌خواهید؟")
             period = PeriodSelection("month", year=year, month=month)
         elif re.search(r"\ball (available )?(data|dates|time)|all time\b", context):
             period = PeriodSelection("all")
@@ -136,7 +170,7 @@ class DemoInterpreter:
             if period is None and year is not None:
                 period = PeriodSelection("year", year=year)
         if period is None and current_spec is None:
-            return Interpretation("needs_clarification", question="Which period should the report cover? You can also ask for all available data.")
+            return Interpretation("needs_clarification", question="گزارش چه بازه زمانی را پوشش دهد؟ می‌توانید همه داده‌های موجود را هم درخواست کنید.")
         if period is not None:
             spec = replace(spec, period=period)
         if re.search(r"\b(by|group.*by) employee\b", context):
@@ -151,15 +185,15 @@ class DemoInterpreter:
             spec = replace(spec, chart="table")
         if "line chart" in latest:
             if spec.time_grain == "none":
-                return Interpretation("needs_clarification", question="Should the line chart group activity hours by day or month?")
+                return Interpretation("needs_clarification", question="نمودار خطی ساعات فعالیت را به تفکیک روز می‌خواهید یا ماه؟")
             spec = replace(spec, chart="line")
         if re.search(r"\b(only|filter|where|excluding|except)\b", latest):
-            return Interpretation("unsupported", message="The offline demo supports period and grouping refinements. Use the configured model for employee filters.")
+            return Interpretation("unsupported", message="نمونه آفلاین از تغییر بازه و گروه‌بندی پشتیبانی می‌کند. برای فیلتر کارکنان از مفسر مدل تنظیم‌شده استفاده کنید.")
         if current_spec is not None and not re.search(
             r"\b(employee|daily|day|monthly|month|year|today|yesterday|week|total|table|chart|hours|activity)\b", latest,
         ) and month is None:
-            return Interpretation("unsupported", message="Try grouping the report by employee or asking for a different month.")
-        return Interpretation("ready", spec, message="Approved activity-hour report.")
+            return Interpretation("unsupported", message="گزارش را به تفکیک کارمند بخواهید یا ماه دیگری را مشخص کنید.")
+        return Interpretation("ready", spec, message="گزارش ساعات فعالیت.")
 
 
 def seed_demo(path: Path) -> None:
@@ -224,7 +258,7 @@ def create_sqlserver_engine() -> tuple[SageQL, ActorContext, str]:
 
     engine = SageQL(catalog=reporting_catalog(schema=schema, table_name=table_name, table_kind=table_kind),
                     database=SQLServerAdapter(connect),
-                    provider=OpenAIReportInterpreter(config, timeout_seconds=25),
+                    provider=OpenAIReportAgent(config, timeout_seconds=25),
                     policy=activity_policy, execution="validated",
                     limits=ExecutionLimits(max_rows=100, query_timeout_seconds=10,
                                            request_timeout_seconds=40))
@@ -280,7 +314,8 @@ def handler_for(engine: SageQL, actor: ActorContext, *, mode: str, token: str = 
             self.wfile.write(raw)
 
         def _error(self, code: int, machine_code: str, message: str):
-            self._write(code, {"error": {"code": machine_code, "message": message}})
+            self._write(code, {"error": {"code": machine_code,
+                         "message": error_text(machine_code, message, engine.language)}})
 
         def _trusted_origin(self) -> bool:
             port = self.server.server_port
@@ -398,9 +433,13 @@ def handler_for(engine: SageQL, actor: ActorContext, *, mode: str, token: str = 
                 if match:
                     if set(data) != {"message", "request_id", "expected_revision"}:
                         raise SDKError("invalid_request", "Send only message, request_id, and expected_revision.")
-                    reply = engine.submit(match.group(1), data["message"], actor,
-                                          data["request_id"], data["expected_revision"])
-                    self._write(200, reply.to_dict())
+                    arguments = (match.group(1), data["message"], actor,
+                                 data["request_id"], data["expected_revision"])
+                    if mode == "rahtal" and callable(getattr(engine, "submit_with_diagnostics", None)):
+                        payload = engine.submit_with_diagnostics(*arguments)
+                    else:
+                        payload = engine.submit(*arguments).to_dict()
+                    self._write(200, payload)
                     return
                 self._error(404, "not_found", "Resource is unavailable.")
             except SDKError as exc:
@@ -449,7 +488,8 @@ def main(argv: list[str] | None = None) -> int:
                 private_state.mkdir(parents=True, exist_ok=True)
                 from sageql.sdk import SQLiteSessionStore
                 engine, actor, token = create_rahtal_engine(
-                    args.env_file, sessions=SQLiteSessionStore(private_state / "sessions.sqlite"))
+                    args.env_file, sessions=SQLiteSessionStore(private_state / "sessions.sqlite"),
+                    diagnostics_directory=private_state / "diagnostics")
                 token_file = private_state / "host-token.txt"
                 selected = "rahtal"
             else:

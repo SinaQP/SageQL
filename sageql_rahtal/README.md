@@ -1,5 +1,13 @@
 # SageQL test app for Rahtal daily performance
 
+The local SDK frontend defaults to Persian conversation, report labels/units and
+RTL layout. Try «نام کارکنان را نشان بده» or «ساعات فعالیت روزانه در سپتامبر ۲۰۲۶».
+The configured model receives Persian understanding/refinement instructions;
+literal names and filter values remain exact. Dates stay Gregorian; Solar Hijri
+calendar conversion is not part of this integration. The SDK and historical
+model providers default to Persian prose; developer CLI/diagnostic machine
+fields remain stable. See the [SDK language contract](../docs/SDK.md#persian-by-default).
+
 This is a local test harness for the Rahtal `Activities`, `User`, and `Person` models. It uses only the approved columns of `dbo.functionality_activities`, `dbo.authentication_user`, and `dbo.persons_person`; the live SQL Server catalog is checked before the model sees metadata. The model receives the question and bounded catalog metadata, never the database connection or result rows.
 
 ## Run a question
@@ -49,14 +57,77 @@ Supported questions include:
 - “Daily activity hours for September.” Answer the model's year clarification with a Gregorian year.
 - “Show activity hours by employee ID for all available data.”
 - “Now show the total instead.”
+- «تمام اطلاعات فعالیت‌های روزانه کارمند موردنظر در ماه گذشته» with their full
+  name. The host resolves the name and returns the registered daily measures
+  (hours, count and average) without asking for an internal ID.
+- If that full name matches multiple identities, answer the job-position
+  clarification; the engine combines that qualifier with the original name.
 
-Names and hours come from separate approved sources. Hours grouped by employee name require a separately reviewed relationship/view design; this demo currently groups hours by employee ID. Profiles are not assumed to be unique per user or equivalent to active authenticated users. Listing outputs are bounded distinct registered fields, not arbitrary row access. Both datasets independently enforce `is_deleted = 0`.
+Names and hours come from separate approved sources. A registered name lookup
+performs a bounded profile SELECT first, then applies the unique employee ID to
+the activity SELECT. Multiword surnames, spaces/ZWNJ and Arabic/Persian ي/ی, ك/ک
+variants are handled by fixed exact normalized matching. Missing names ask for
+correction; ambiguous matches ask for job position and never pick the first row.
+Profiles are not assumed unique per user; DISTINCT identity lookup prevents
+duplicate profiles from multiplying hours. Both reads independently enforce
+`is_deleted = 0`, deadlines, metadata verification and result bounds. Names/IDs
+returned by the lookup are not sent to the model. See the
+[scope](../docs/SDK_ENTITY_LOOKUPS.md). Grouping all employees' hours by name still
+needs a reviewed relationship/view design; this extension filters one employee.
+Listing outputs and 'all information' remain limited to registered fields and
+daily measures, not arbitrary source rows or unregistered activity descriptions.
 
 Chat uses readable field labels such as “first name” and “last name.” If the host cannot connect to Rahtal, it explains the database/VPN connection failure and offers a retry; it does not claim a report query ran. Restore connectivity before retrying. Real database reports cannot be verified while the SQL Server endpoint is unreachable.
 
 The host uses one fixed local administrator reporting principal with access to the approved Rahtal datasets. It binds only `127.0.0.1`, requires its workspace token, checks request origins, and cannot serve as production employee authorization. Private session state and report rows are saved under ignored `.venv/rahtal-web/`; protect and delete them according to local retention needs. The model receives permitted business metadata and conversation/specifications, never database credentials, physical table names, mandatory policy values or returned names/rows.
 
+The live chat now uses `OpenAIReportAgent`. A planning request is followed by
+semantic review on the same configured model; one revision is allowed within
+the existing shared 45-second interpretation budget. Clarification review uses
+the registered capabilities and conversation, rather than recognizing particular
+employee-question phrases. Normal turns use two model calls; engine validation,
+bounded name lookup and deterministic execution remain unchanged. See the
+[agent scope](../docs/SDK_AGENTS.md). The historical pilot runner keeps its
+separate staged provider.
+
 The connection requires access to the configured SQL Server network. A VPN that only proxies browser traffic may not route this private database endpoint. A SQL login timeout is a connectivity failure; this mode never substitutes sample data. Gregorian date-only reporting is supported; ambiguous years such as 1403 require calendar clarification, and confirmed Jalali dates need Gregorian bounds until explicit conversion support is implemented.
+
+### Local execution diagnostics
+
+In the right-hand report panel, switch between **Report result** and
+**Steps & logs**. After each chat turn, the logs tab shows the
+interpreter outcome, validated dataset/concepts, redacted user filters,
+mandatory soft-delete policy, resolved dates, deterministic compiled SQL,
+connection/metadata checks, actual report SQL and ordered parameter types,
+fetch counts, cleanup, errors, and stage durations. Expand a step to see its raw
+events. Incomplete stages say “No completion recorded”; they are not shown as
+successful. The **Attempt** selector retains clarification, refinement, failure
+and retry traces for the current chat. **Download logs** saves the selected
+redacted trace as JSON. A retry of a completed request is identified as a cached
+reply and does not claim that SQL ran again. Logs appear after the response;
+switching tabs, selecting attempts and downloading logs do not query the database.
+The latest successful table/chart stays in the result tab after a failed turn.
+New chat clears the browser's attempt list, and a reload starts a new conversation;
+the private saved trace files remain available locally.
+
+Each HTTP attempt also saves a unique JSON trace under
+`.venv/rahtal-web/diagnostics/`, updated as stages progress. The trace ID shown
+in the browser matches the filename. Logging is limited to the authenticated
+local Rahtal test host; SDK reply/storage contracts and other host modes are
+unchanged. Restart the server and reload the page after updating the checkout.
+
+These explicitly requested local diagnostics include the deterministic report
+SQL's physical identifiers. They exclude connection settings, credentials,
+question/model text, personal filter values and returned rows. Ordered binds
+show the result cap, booleans and date bounds; other scalar values are redacted.
+Keep this ignored directory local and delete traces according to your retention
+needs. Traces are never sent to the model or an external logging service. If
+trace storage fails, the browser still receives diagnostics and reporting keeps
+its normal behavior.
+
+An empty result means the SELECT returned zero rows. The trace makes its source
+and conditions inspectable; it cannot prove which condition caused the empty
+result. No extra query removes policies or probes unrestricted data.
 
 Offline verification:
 
