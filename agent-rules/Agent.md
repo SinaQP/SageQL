@@ -10,6 +10,8 @@ The historical staged API/CLI still begins with a report question and Database/L
 
 The local Rahtal frontend explicitly reuses its existing approved activity and employee-profile tables and configured model endpoint. A fixed local reporting principal and separate workspace token protect this loopback demo; it is not production per-employee authorization. Registered dimension-only DISTINCT listings are approved under the same policies and execution bounds. Do not create database objects, add implicit source joins, copy credentials into tracked files, or substitute synthetic data when Rahtal is unreachable.
 
+The registered entity-name lookup extension has its own [scope](../docs/SDK_ENTITY_LOOKUPS.md): one bounded profile SELECT finds a unique identity from a full name and optional registered qualifier; a separate single-source report binds that identity. Fixed name concatenation/normalization is allowed only over host-declared text columns. Both source and target access/policies remain mandatory. Do not pick the first ambiguous match or forward lookup rows/resolved identities to the model. This is a report filter, never caller identity or production authorization.
+
 ## Working rules
 
 1. Inspect the current tree, Git state, public API, and tests before editing. Preserve user changes.

@@ -30,8 +30,9 @@ from typing import Any, Callable
 
 from sageql.errors import InvalidSQL
 from sageql.sdk.models import (
-    AdapterResult, ExecutionLimits, ReportField, SDKError, ValidatedReport,
+    AdapterResult, ExecutionLimits, FullNameFilterDefinition, ReportField, SDKError, ValidatedReport,
 )
+from sageql.sdk.names import NAME_REPLACEMENTS, normalize_name
 from sageql.sdk.semantics import column_type, validate_report
 from sageql.validation import validate_sql
 
@@ -191,7 +192,22 @@ def compile_report(
 
     def branch(label: str, period: Any) -> str:
         predicates = [condition(item.column, item.operator, item.values) for item in report.access.policies]
-        predicates += [condition(filters[item.filter_id].column, item.operator, item.values) for item in spec.filters]
+        for item in spec.filters:
+            definition = filters[item.filter_id]
+            if isinstance(definition, FullNameFilterDefinition):
+                # Host-declared columns and fixed operations only. No names or
+                # model expressions enter SQL text; the normalized name is bound.
+                prefix = "N" if dialect == "tsql" else ""
+                parts = [f"COALESCE({col(name)}, {prefix}'')" for name in definition.name_columns]
+                if dialect == "tsql":
+                    parts = [part + " COLLATE Latin1_General_100_BIN2" for part in parts]
+                expression = "(" + (" + " if dialect == "tsql" else " || ").join(parts) + ")"
+                for original, replacement in NAME_REPLACEMENTS:
+                    expression = f"REPLACE({expression}, {prefix}'{original}', {prefix}'{replacement}')"
+                expression += " COLLATE " + ("Latin1_General_100_BIN2" if dialect == "tsql" else "BINARY")
+                predicates.append(expression + " = " + bind(normalize_name(item.values[0]), "text"))
+            else:
+                predicates.append(condition(definition.column, item.operator, item.values))
         if period.start is not None:
             expression = col(dataset.time.column)
             predicates += [expression + " >= " + bind(period.start, "date"),
@@ -461,7 +477,7 @@ class SQLiteAdapter:
                         and (not arg2 or arg2 in allowed) else sqlite3.SQLITE_DENY)
             if action == sqlite3.SQLITE_FUNCTION:
                 return (sqlite3.SQLITE_OK if (arg2 or "").casefold() in
-                        {"sum", "avg", "min", "max", "count", "date", "strftime", "printf"}
+                        {"sum", "avg", "min", "max", "count", "date", "strftime", "printf", "replace", "coalesce"}
                         else sqlite3.SQLITE_DENY)
             return sqlite3.SQLITE_DENY
 

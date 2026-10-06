@@ -14,9 +14,11 @@ import math
 import re
 
 from sageql.schema import Column, Table
+from sageql.sdk.names import normalize_name
 from sageql.sdk.models import (
     AccessScope, DatasetAccess, DatasetDefinition, DimensionDefinition,
-    FilterDefinition, MetricDefinition, PeriodSelection, ReportSpec,
+    EntityLookupDefinition, FilterDefinition, FullNameFilterDefinition, LookupQualifier,
+    MetricDefinition, PeriodSelection, ReportSpec,
     ReportingCatalog, ResolvedPeriod, RowPolicy, SDKError, TimeDefinition,
     UserFilter, ValidatedReport,
 )
@@ -154,6 +156,16 @@ def _validate_dataset(dataset: DatasetDefinition) -> None:
                 _tuple(definition.operators, code, "Filter operators must be a tuple.", maximum=9)
                 if not definition.operators or any(not isinstance(operator, str) or operator not in _OPERATORS for operator in definition.operators) or len(set(definition.operators)) != len(definition.operators):
                     _fail(code, "A filter has unsupported operators.")
+                if isinstance(definition, FullNameFilterDefinition):
+                    _tuple(definition.name_columns, code, "Name columns must be a bounded tuple.", maximum=4)
+                    if (not 2 <= len(definition.name_columns) <= 4
+                            or definition.operators != ("eq",)
+                            or definition.column != definition.name_columns[0]
+                            or any(not isinstance(name, str) or name not in columns
+                                   or column_type(columns[name].data_type) != "text"
+                                   for name in definition.name_columns)
+                            or len(set(definition.name_columns)) != len(definition.name_columns)):
+                        _fail(code, "Full-name filters require two to four distinct text columns and equality only.")
     if not dataset.metrics and not dataset.dimensions:
         _fail(code, "A dataset must register at least one metric or dimension.")
     if dataset.time is not None:
@@ -181,6 +193,52 @@ def validate_catalog(catalog: ReportingCatalog) -> None:
         if dataset.id.casefold() in ids:
             _fail("invalid_catalog", "Dataset IDs must be unique.")
         ids.add(dataset.id.casefold())
+    _validate_lookups(catalog)
+
+
+def _validate_lookups(catalog: ReportingCatalog) -> None:
+    code = "invalid_catalog"
+    _tuple(catalog.lookups, code, "Entity lookups must be a bounded tuple.", maximum=16)
+    datasets = {item.id: item for item in catalog.datasets}
+    used = {item.id: {definition.id.casefold() for definition in
+                     (*item.metrics, *item.dimensions, *item.filters)} for item in catalog.datasets}
+    for lookup in catalog.lookups:
+        if not isinstance(lookup, EntityLookupDefinition):
+            _fail(code, "A registered entity lookup is required.")
+        for identifier in (lookup.id, lookup.dataset_id, lookup.target_filter_id,
+                           lookup.source_dataset_id, lookup.source_id_dimension_id,
+                           lookup.source_name_filter_id):
+            _id(identifier, code)
+        _text(lookup.label, code, "An entity lookup label is required.")
+        target, source = datasets.get(lookup.dataset_id), datasets.get(lookup.source_dataset_id)
+        if target is None or source is None or target.id == source.id:
+            _fail(code, "An entity lookup must register distinct source and target datasets.")
+        target_filter = next((item for item in target.filters if item.id == lookup.target_filter_id), None)
+        source_id = next((item for item in source.dimensions if item.id == lookup.source_id_dimension_id), None)
+        source_name = next((item for item in source.filters if item.id == lookup.source_name_filter_id), None)
+        if (target_filter is None or isinstance(target_filter, FullNameFilterDefinition)
+                or "eq" not in target_filter.operators or source_id is None
+                or not isinstance(source_name, FullNameFilterDefinition)):
+            _fail(code, "An entity lookup needs registered identity and full-name concepts.")
+        family = column_type(_columns(target)[target_filter.column].data_type)
+        if (family not in {"integer", "text"}
+                or column_type(_columns(source)[source_id.column].data_type) != family):
+            _fail(code, "Lookup identity and target filter must use the same integer/text type.")
+        _tuple(lookup.qualifiers, code, "Lookup qualifiers must be a bounded tuple.", maximum=4)
+        for definition in (lookup, *lookup.qualifiers):
+            if definition is not lookup and not isinstance(definition, LookupQualifier):
+                _fail(code, "A registered lookup qualifier is required.")
+            _id(definition.id, code)
+            _text(definition.label, code, "A lookup filter label is required.")
+            if definition.id.casefold() in used[target.id] or definition.id.casefold() in _RESERVED_IDS:
+                _fail(code, "Lookup filter IDs must be unique within the target dataset.")
+            used[target.id].add(definition.id.casefold())
+            if definition is not lookup:
+                qualifier = next((item for item in source.filters if item.id == definition.source_filter_id), None)
+                if (qualifier is None or isinstance(qualifier, FullNameFilterDefinition)
+                        or "eq" not in qualifier.operators
+                        or column_type(_columns(source)[qualifier.column].data_type) != "text"):
+                    _fail(code, "Lookup qualifiers must reference registered text equality filters.")
 
 
 def _selected_ids(selected: tuple[str, ...] | None, definitions: tuple, *, code: str) -> None:
@@ -296,10 +354,24 @@ def permitted_catalog(catalog: ReportingCatalog, scope: AccessScope) -> Reportin
             continue
         filters = tuple(item for item in dataset.filters if access.filter_ids is None or item.id in access.filter_ids)
         needed = {item.column for item in (*metrics, *dimensions, *filters) if item.column is not None}
+        needed.update(name for item in filters if isinstance(item, FullNameFilterDefinition)
+                      for name in item.name_columns)
         if dataset.time:
             needed.add(dataset.time.column)
         permitted.append(replace(dataset, metrics=metrics, dimensions=dimensions, filters=filters, columns=tuple(column for column in dataset.columns if column.name in needed), row_key=()))
-    return ReportingCatalog(tuple(permitted), catalog.version)
+    by_id = {item.id: item for item in permitted}
+    lookups = []
+    for lookup in catalog.lookups:
+        target, source = by_id.get(lookup.dataset_id), by_id.get(lookup.source_dataset_id)
+        if (target is None or source is None
+                or lookup.target_filter_id not in {item.id for item in target.filters}
+                or lookup.source_id_dimension_id not in {item.id for item in source.dimensions}
+                or lookup.source_name_filter_id not in {item.id for item in source.filters}):
+            continue
+        qualifiers = tuple(item for item in lookup.qualifiers
+                           if item.source_filter_id in {definition.id for definition in source.filters})
+        lookups.append(replace(lookup, qualifiers=qualifiers))
+    return ReportingCatalog(tuple(permitted), catalog.version, tuple(lookups))
 
 
 def _month(year: int, month: int) -> ResolvedPeriod:
@@ -391,6 +463,10 @@ def validate_report(dataset: DatasetDefinition, spec: ReportSpec, access: Datase
         if condition.operator not in definition.operators:
             _fail("invalid_spec", "A report filter uses an unregistered operator.")
         _predicate(columns[definition.column], condition.operator, condition.values, "invalid_spec")
+        if isinstance(definition, FullNameFilterDefinition):
+            value = condition.values[0]
+            if not isinstance(value, str) or len(value) > 256 or not normalize_name(value):
+                _fail("invalid_spec", "A full-name selection requires a bounded nonempty name.")
     if not isinstance(spec.time_grain, str) or spec.time_grain not in _GRAINS or not isinstance(spec.chart, str) or spec.chart not in {"table", "line", "bar", "kpi"}:
         _fail("unsupported", "The requested time grain or presentation is unsupported.")
     if not spec.metric_ids and (spec.chart != "table" or spec.time_grain != "none" or spec.comparison is not None):

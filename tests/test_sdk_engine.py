@@ -116,6 +116,63 @@ def test_first_report_enforces_scope_and_lossless_frontend_contract(database):
     assert "Private other tenant" not in json.dumps(payload)
 
 
+def test_persian_clarification_unicode_filter_persistence_and_retry(database, tmp_path):
+    name = "علي‌۱۲"
+    with sqlite3.connect(database) as connection:
+        connection.executemany("INSERT INTO activities VALUES (?, ?, ?, ?, ?, ?)", [
+            (7, 1, name, "2026-09-01", 2.5, 0),
+            (8, 1, "علی‌۱۲", "2026-09-01", 20, 0),
+            (9, 2, name, "2026-09-01", 999, 0),
+        ])
+    dataset = replace(catalog().datasets[0], label="فعالیت‌ها",
+                      metrics=(MetricDefinition("activity_hours", "ساعات فعالیت", "sum", "hours", "ساعت"),),
+                      dimensions=(DimensionDefinition("employee", "کارمند", "employee"),))
+    fa_catalog = ReportingCatalog((dataset,))
+    filtered = spec(dimension_ids=("employee",), time_grain="none", chart="table",
+                    filters=(UserFilter("employee_filter", "eq", (name,)),))
+    provider = Provider(Interpretation("needs_clarification", question="کدام سال میلادی را می‌خواهید؟"),
+                        Interpretation("ready", spec()), Interpretation("ready", filtered))
+    store = SQLiteSessionStore(tmp_path / "persian-sessions.sqlite")
+    def configured(provider):
+        return SageQL(catalog=fa_catalog, database=SQLiteAdapter(database), provider=provider,
+                      policy=policy, sessions=store, execution="validated", clock=lambda: date(2026, 10, 5))
+    sdk = configured(provider)
+    session = sdk.create_session(ACTOR)
+    assert session.text == "چه گزارشی می‌خواهید تهیه کنید؟"
+    question = sdk.submit(session.session_id, "ساعات فعالیت روزانه در سپتامبر", ACTOR, "question", 0)
+    assert question.clarification == "کدام سال میلادی را می‌خواهید؟"
+    daily = sdk.submit(session.session_id, "۲۰۲۶", ACTOR, "year", 1)
+    assert daily.report.title == "ساعات فعالیت به تفکیک روز"
+    assert daily.report.fields[0].label == "تاریخ"
+    request = f"فقط {name} را به تفکیک کارمند نشان بده"
+    reply = sdk.submit(session.session_id, request, ACTOR, "refine", 2)
+    assert reply.report.title == "ساعات فعالیت به تفکیک کارمند"
+    assert reply.report.rows == ((name, Decimal("2.5")),)
+    assert reply.to_dict()["report"]["rows"] == [[name, "2.5"]]
+    resumed_provider = Provider()
+    resumed = configured(resumed_provider)
+    assert resumed.get_report(session.session_id, reply.report.id, ACTOR) == reply.report
+    assert resumed.submit(session.session_id, request, ACTOR, "refine", 2).to_dict() == reply.to_dict()
+    assert resumed_provider.calls == []
+
+
+def test_english_opt_in_keeps_titles_headers_and_errors(database):
+    sdk = engine(database, Provider(Interpretation("ready", spec())), language="en")
+    session = sdk.create_session(ACTOR)
+    assert session.text == "What report would you like to create?"
+    reply = sdk.submit(session.session_id, "daily hours", ACTOR, "r1", 0)
+    assert reply.report.title == "Activity hours by day"
+    assert reply.report.fields[0].label == "Date"
+    denied = sdk.submit(session.session_id, "", ACTOR, "r2", 1)
+    assert denied.error["code"] == "invalid_input"
+    assert denied.text == "Provide a bounded message, request ID and session revision."
+    persian = engine(database, Provider())
+    fa_session = persian.create_session(ACTOR)
+    assert "متن پرسش" in persian.submit(fa_session.session_id, "", ACTOR, "r1", 0).text
+    with pytest.raises(ValueError, match="language"):
+        engine(database, Provider(), language="unknown")
+
+
 def test_distinct_employee_listing_and_activity_followup_use_same_authorized_session(database):
     requested = ReportSpec("activities", (), dimension_ids=("employee",))
     provider = Provider(Interpretation("ready", requested), Interpretation("ready", spec()))

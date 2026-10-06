@@ -99,6 +99,34 @@ class FilterDefinition:
 
 
 @dataclass(frozen=True)
+class FullNameFilterDefinition(FilterDefinition):
+    """Exact normalized name equality over host-declared text columns only."""
+
+    name_columns: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class LookupQualifier:
+    id: str
+    label: str
+    source_filter_id: str
+
+
+@dataclass(frozen=True)
+class EntityLookupDefinition:
+    """Host-registered name-to-identity mapping; never model-selected joins."""
+
+    id: str
+    label: str
+    dataset_id: str
+    target_filter_id: str
+    source_dataset_id: str
+    source_id_dimension_id: str
+    source_name_filter_id: str
+    qualifiers: tuple[LookupQualifier, ...] = ()
+
+
+@dataclass(frozen=True)
 class TimeDefinition:
     column: str
     timezone: str = "UTC"
@@ -124,6 +152,7 @@ class DatasetDefinition:
 class ReportingCatalog:
     datasets: tuple[DatasetDefinition, ...]
     version: str = "1"
+    lookups: tuple[EntityLookupDefinition, ...] = ()
 
 
 @dataclass(frozen=True)

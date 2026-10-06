@@ -5,6 +5,7 @@ from copy import deepcopy
 from typing import Any, Sequence
 
 from sageql.conversation import ChatError, LLMConfig, Message
+from sageql.localization import language_instructions, validate_language
 from sageql.context import ContextResolution, ResolvedContext
 from sageql.discovery import DiscoveryCandidates, DiscoveryError, DiscoverySelection
 from sageql.planning import (
@@ -220,7 +221,8 @@ _PLANNING_FORMAT = {
 class OpenAIChatProvider:
     """Use a configurable OpenAI-compatible Chat Completions endpoint."""
 
-    def __init__(self, config: LLMConfig, client: Any = None) -> None:
+    def __init__(self, config: LLMConfig, client: Any = None, *, language: str = "fa") -> None:
+        self.language = validate_language(language)
         if client is None:
             try:
                 from openai import OpenAI
@@ -236,7 +238,7 @@ class OpenAIChatProvider:
         self._model = config.model
 
     def reply(self, messages: Sequence[Message]) -> str:
-        request_messages = [{"role": "system", "content": _INSTRUCTIONS}]
+        request_messages = [{"role": "system", "content": _INSTRUCTIONS + language_instructions(self.language)}]
         request_messages.extend(
             {"role": message.role, "content": message.content} for message in messages
         )
@@ -253,7 +255,7 @@ class OpenAIChatProvider:
         return answer
 
     def assess(self, messages: Sequence[Message]) -> RequestAssessment:
-        request_messages = [{"role": "system", "content": _UNDERSTANDING_INSTRUCTIONS}]
+        request_messages = [{"role": "system", "content": _UNDERSTANDING_INSTRUCTIONS + language_instructions(self.language)}]
         request_messages.extend(
             {"role": message.role, "content": message.content} for message in messages
         )
@@ -289,7 +291,7 @@ class OpenAIChatProvider:
         self, messages: Sequence[Message], understanding: str
     ) -> ContextResolution:
         request_messages = [
-            {"role": "system", "content": _CONTEXT_INSTRUCTIONS},
+            {"role": "system", "content": _CONTEXT_INSTRUCTIONS + language_instructions(self.language)},
             {"role": "user", "content": "Request understanding:\n" + understanding},
         ]
         request_messages.extend(
@@ -327,6 +329,8 @@ class OpenAIChatProvider:
                 elif isinstance(result["time_period"], str) and not result["time_period"].strip():
                     result["ready"] = False
                     result["clarification_question"] = (
+                        "این گزارش چه بازه زمانی را پوشش دهد؟ یا همه داده‌های موجود را می‌خواهید؟"
+                        if self.language == "fa" else
                         "What time period should this report cover, or should it use all available data?"
                     )
             context = ResolvedContext(
@@ -382,7 +386,7 @@ class OpenAIChatProvider:
             response = self._client.chat.completions.create(
                 model=self._model,
                 messages=[
-                    {"role": "system", "content": _DISCOVERY_INSTRUCTIONS},
+                    {"role": "system", "content": _DISCOVERY_INSTRUCTIONS + language_instructions(self.language)},
                     {"role": "user", "content": encoded},
                 ],
                 response_format=_DISCOVERY_FORMAT,
@@ -467,7 +471,7 @@ class OpenAIChatProvider:
         try:
             response = self._client.chat.completions.create(
                 model=self._model,
-                messages=[{"role": "system", "content": _PLANNING_INSTRUCTIONS},
+                messages=[{"role": "system", "content": _PLANNING_INSTRUCTIONS + language_instructions(self.language)},
                           {"role": "user", "content": encoded}]
                 + ([{"role": "system", "content": "Correct the plan. " + feedback}]
                    if feedback else []),

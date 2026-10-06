@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>SageQL · Reporting workspace</title>
+  <title>SageQL · فضای گزارش‌گیری</title>
   <style>
-    :root{color-scheme:light;font-family:Inter,Segoe UI,Arial,sans-serif;color:#17312b;background:#f3f5ef;font-synthesis:none}
+    :root{color-scheme:light;font-family:Tahoma,Segoe UI,Arial,sans-serif;color:#17312b;background:#f3f5ef;font-synthesis:none}
     *{box-sizing:border-box}body{margin:0}button,textarea,input{font:inherit}button{cursor:pointer}button:disabled{cursor:wait;opacity:.55}
     header{height:80px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #d7dfd4;background:#fafcf7}
     .brand{font-size:24px;letter-spacing:-1px;font-weight:750}.brand span{color:#568174}.badge{font-size:12px;color:#4b685e;border:1px solid #c7d8cc;background:#edf4e9;padding:7px 11px;border-radius:20px}
@@ -15,41 +15,84 @@
     h1,h2,p{margin:0}h1{font-size:20px;letter-spacing:-.4px}h2{font-size:18px}.subtitle{font-size:13px;color:#6c8077;margin-top:7px;line-height:1.6}
     #new-chat{background:none;border:1px solid #d5dfd3;border-radius:9px;color:#416455;padding:8px 12px;font-size:12px}
     .chat-panel{display:flex;flex-direction:column;min-height:660px}.messages{height:390px;overflow:auto;padding:24px;display:flex;flex-direction:column;gap:17px}
-    .message{max-width:95%;border-radius:13px;padding:13px 15px;font-size:14px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}.assistant{background:#f0f4ed;align-self:flex-start}.user{background:#204c3e;color:#fff;align-self:flex-end}.role{font-size:10px;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:5px;opacity:.65}
+    .message{max-width:95%;border-radius:13px;padding:13px 15px;font-size:14px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}.assistant{background:#f0f4ed;align-self:flex-start}.user{background:#204c3e;color:#fff;align-self:flex-end}.role{font-size:10px;letter-spacing:0;display:block;margin-bottom:5px;opacity:.65}
     .suggestions{padding:0 24px 17px;display:flex;flex-wrap:wrap;gap:8px}.suggestions button{border:1px solid #d9e4d7;background:#fff;color:#506a5e;padding:7px 10px;border-radius:8px;font-size:11px}
     .compose{padding:18px 24px 24px;margin-top:auto;border-top:1px solid #e9ede5}textarea{resize:vertical;min-height:86px;width:100%;border:1px solid #cbd9c9;border-radius:11px;padding:12px;color:#17312b;background:#fbfcf9;line-height:1.5}textarea:focus,input:focus{outline:2px solid #87ad94;outline-offset:2px}.send-row{display:flex;justify-content:space-between;align-items:center;margin-top:12px}.hint{font-size:11px;color:#75847b}.primary{background:#204c3e;color:#fff;border:0;border-radius:9px;padding:10px 18px;font-size:13px}.retry{display:none;border:1px solid #b0c3ae;border-radius:8px;background:#fff;color:#204c3e;padding:8px}
     .report-panel{min-height:660px}.report-body{padding:26px}.empty{min-height:480px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#6e8275}.empty svg{margin-bottom:22px}.empty h2{color:#45644f;margin-bottom:8px}.empty p{max-width:300px;font-size:14px;line-height:1.7}
-    #report-title{font-size:23px;letter-spacing:-.5px;margin-bottom:10px}.meta{font-size:12px;color:#6e8275;line-height:1.8;margin-bottom:22px}.warning{padding:11px 13px;border-radius:9px;background:#fff4d9;color:#785a17;font-size:13px;margin-bottom:16px}.table-wrap{overflow:auto;border:1px solid #e3e9de;border-radius:11px}table{border-collapse:collapse;width:100%;font-size:13px}th{text-align:left;background:#f0f4ec;font-weight:600;color:#506c57}td,th{padding:13px 16px;border-bottom:1px solid #e9ede5;white-space:nowrap}tbody tr:last-child td{border-bottom:0}.chart{margin-bottom:24px;overflow:hidden;border:1px solid #e3e9de;border-radius:12px;padding:18px}.chart svg{display:block;width:100%;height:auto}.metric-card{font-size:42px;letter-spacing:-2px;padding:20px 0;color:#204c3e}.metric-card small{font-size:15px;letter-spacing:0;color:#718273;margin-left:9px}
+    #report-title{font-size:23px;letter-spacing:-.5px;margin-bottom:10px}.meta{font-size:12px;color:#6e8275;line-height:1.8;margin-bottom:22px}.warning{padding:11px 13px;border-radius:9px;background:#fff4d9;color:#785a17;font-size:13px;margin-bottom:16px}.table-wrap{overflow:auto;border:1px solid #e3e9de;border-radius:11px}table{border-collapse:collapse;width:100%;font-size:13px}th{text-align:start;background:#f0f4ec;font-weight:600;color:#506c57}td,th{padding:13px 16px;border-bottom:1px solid #e9ede5;white-space:nowrap}tbody tr:last-child td{border-bottom:0}.chart{margin-bottom:24px;overflow:hidden;border:1px solid #e3e9de;border-radius:12px;padding:18px}.chart svg{display:block;width:100%;height:auto}.metric-card{font-size:42px;letter-spacing:-2px;padding:20px 0;color:#204c3e}.metric-card small{font-size:15px;letter-spacing:0;color:#718273;margin-inline-start:9px}
     .status{font-size:12px;color:#75847b;min-height:18px;padding:0 24px 10px}.status.error{color:#a04b34}.footer{font-size:11px;color:#80907f;max-width:1420px;margin:0 auto;padding:0 4% 30px;line-height:1.7}
     dialog{border:1px solid #cbd9c9;border-radius:18px;max-width:420px;padding:28px;background:#fff;color:#17312b}dialog::backdrop{background:#17312b55}dialog p{font-size:14px;line-height:1.7;margin:12px 0 20px}dialog input{width:100%;padding:11px;border:1px solid #cbd9c9;border-radius:8px;margin-bottom:16px}dialog .error{color:#a04b34;font-size:13px}
     @media(max-width:900px){main{grid-template-columns:1fr;margin-top:22px}.chat-panel{min-height:560px}.messages{height:280px}.report-panel{min-height:460px}header{height:68px}.empty{min-height:330px}}
   </style>
+  <style>
+    [hidden]{display:none!important}
+    .workspace-tabs{display:flex;gap:24px;padding:0 26px;border-bottom:1px solid #e9ede5}
+    .workspace-tabs button{border:0;border-bottom:3px solid transparent;padding:15px 0;background:none;color:#6c8077;font-size:13px}
+    .workspace-tabs button[aria-selected="true"]{color:#204c3e;border-bottom-color:#204c3e;font-weight:650}
+    button:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid #87ad94;outline-offset:3px}
+    #diagnostics{padding:26px;font-size:13px}
+    .trace-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .trace-toolbar label{color:#506a5e}.trace-toolbar select{min-width:0;max-width:100%;flex:1;border:1px solid #cbd9c9;border-radius:8px;background:#fbfcf9;color:#17312b;padding:9px;font:inherit}
+    .trace-toolbar button{border:1px solid #d5dfd3;border-radius:8px;background:#fff;color:#416455;padding:9px 12px;font-size:12px}
+    #diagnostics summary{cursor:pointer;font-weight:600;line-height:1.6}
+    #diagnostics pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f5ef;padding:12px;border-radius:8px;max-height:480px;overflow:auto;font-size:12px}
+    #diagnostics-note{margin-bottom:22px;line-height:1.7;white-space:pre-line;overflow-wrap:anywhere;color:#6c8077}
+    #diagnostics-summary{font-size:19px;margin-bottom:8px}
+    .trace-step{border-inline-start:2px solid #d7dfd4;padding-block-end:22px;padding-inline-start:18px;margin-inline-start:5px}
+    .trace-step:last-child{padding-bottom:0}.trace-step[data-status="failed"]{border-color:#b56a4d}
+    .trace-step p{margin:8px 0;color:#6c8077;line-height:1.6;overflow-wrap:anywhere}
+    .trace-step .step-state{font-size:11px;font-weight:400;color:#6c8077}
+    #diagnostics-empty{min-height:380px}
+  </style>
 </head>
 <body>
-  <header><div class="brand">Sage<span>QL</span></div><div id="mode" class="badge">Reporting workspace</div></header>
+  <header><div class="brand" dir="ltr">Sage<span>QL</span></div><div id="mode" class="badge">فضای گزارش‌گیری</div></header>
   <main>
-    <section class="panel chat-panel" aria-label="Report conversation">
-      <div class="panel-head"><div><h1>Your reporting assistant</h1><p class="subtitle">Ask a question, then refine your report.</p></div><button id="new-chat" type="button">New chat</button></div>
+    <section class="panel chat-panel" aria-label="گفت‌وگوی گزارش">
+      <div class="panel-head"><div><h1>دستیار گزارش‌گیری شما</h1><p class="subtitle">پرسش خود را بنویسید و گزارش را در ادامه دقیق‌تر کنید.</p></div><button id="new-chat" type="button">گفت‌وگوی تازه</button></div>
       <div id="messages" class="messages" aria-live="polite"></div>
-      <div class="suggestions"><button type="button">Daily activity hours for September</button><button type="button">Group it by employee instead</button></div>
+      <div class="suggestions"><button type="button">ساعات فعالیت روزانه در سپتامبر</button><button type="button">به تفکیک کارمند نمایش بده</button></div>
       <div id="status" class="status" role="status"></div>
-      <form id="chat-form" class="compose"><label for="message" class="hint">Your question</label><textarea id="message" maxlength="8000" placeholder="What would you like to know?" required></textarea><div class="send-row"><span class="hint">Enter to send · Shift + Enter for a new line</span><button id="retry" class="retry" type="button">Retry</button><button id="send" class="primary" type="submit">Send →</button></div></form>
+      <form id="chat-form" class="compose"><label for="message" class="hint">پرسش شما</label><textarea id="message" maxlength="8000" placeholder="چه چیزی می‌خواهید بدانید؟" required></textarea><div class="send-row"><span class="hint">Enter برای ارسال · Shift + Enter برای خط جدید</span><button id="retry" class="retry" type="button">تلاش دوباره</button><button id="send" class="primary" type="submit">ارسال ←</button></div></form>
     </section>
-    <section class="panel report-panel" aria-label="Report result">
-      <div class="panel-head"><div><h2>Report</h2><p class="subtitle">Your latest successful report stays here.</p></div><span id="revision" class="badge">No report yet</span></div>
-      <div class="report-body"><div id="empty" class="empty"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><rect x="5" y="5" width="54" height="54" rx="13" fill="#edf4e9"/><path d="M18 43V31M31 43V20M44 43V26" stroke="#6e9277" stroke-width="6" stroke-linecap="round"/></svg><h2>A clear view of your data</h2><p>Start with a question. Your report will appear here as a table and, when requested, a chart.</p></div><div id="report" hidden><h2 id="report-title"></h2><p id="provenance" class="meta"></p><div id="warning" class="warning" hidden></div><div id="chart" class="chart" hidden></div><div id="table" class="table-wrap"></div></div></div>
+    <section class="panel report-panel" aria-label="نتیجه گزارش">
+      <div class="panel-head"><div><h2>گزارش</h2><p class="subtitle">آخرین گزارش موفق شما اینجا نمایش داده می‌شود.</p></div><span id="revision" class="badge">هنوز گزارشی ندارید</span></div>
+      <div id="workspace-tabs" class="workspace-tabs" role="tablist" aria-label="نمای گزارش" hidden><button id="result-tab" type="button" role="tab" aria-controls="result-view" aria-selected="true">نتیجه گزارش</button><button id="logs-tab" type="button" role="tab" aria-controls="diagnostics" aria-selected="false" tabindex="-1">مراحل و جزئیات اجرا</button></div>
+      <div id="result-view" class="report-body" role="tabpanel" aria-labelledby="result-tab"><div id="empty" class="empty"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><rect x="5" y="5" width="54" height="54" rx="13" fill="#edf4e9"/><path d="M18 43V31M31 43V20M44 43V26" stroke="#6e9277" stroke-width="6" stroke-linecap="round"/></svg><h2>تصویری روشن از داده‌های شما</h2><p>با یک پرسش شروع کنید. گزارش شما به صورت جدول و در صورت درخواست، نمودار نمایش داده می‌شود.</p></div><div id="report" hidden><h2 id="report-title"></h2><p id="provenance" class="meta"></p><div id="warning" class="warning" hidden></div><div id="chart" class="chart" hidden></div><div id="table" class="table-wrap"></div></div></div>
+      <section id="diagnostics" role="tabpanel" aria-labelledby="logs-tab" hidden>
+        <div id="diagnostics-empty" class="empty"><h2>مراحل تهیه گزارش را ببینید</h2><p>پرسش خود را ارسال کنید. پس از هر پاسخ، مراحل، SQL، زمان‌ها و جزئیات ثبت‌شده اینجا نمایش داده می‌شوند.</p></div>
+        <div id="diagnostics-content" hidden><div class="trace-toolbar"><label for="trace-select">نوبت اجرا</label><select id="trace-select"></select><button id="download-trace" type="button">دریافت جزئیات اجرا</button></div><h2 id="diagnostics-summary"></h2><p id="diagnostics-note" dir="auto"></p><div id="diagnostics-events"></div></div>
+      </section>
     </section>
   </main>
-  <p id="footer" class="footer">SageQL reference application. Your host application controls authentication and permitted reporting data.</p>
-  <dialog id="login"><form id="login-form"><h2>Sign in to the reporting workspace</h2><p>Use the access token supplied by the host application.</p><label class="hint" for="token">Workspace access token</label><input id="token" type="password" autocomplete="off" required><p id="login-error" class="error"></p><button class="primary" type="submit">Sign in</button></form></dialog>
+  <p id="footer" class="footer">برنامه نمونه SageQL؛ میزبان برنامه، ورود و دسترسی به اطلاعات گزارش را کنترل می‌کند.</p>
+  <dialog id="login"><form id="login-form"><h2>ورود به فضای گزارش‌گیری</h2><p>از توکن دسترسی که میزبان برنامه در اختیار شما گذاشته است استفاده کنید.</p><label class="hint" for="token">توکن دسترسی فضای گزارش‌گیری</label><input id="token" dir="ltr" type="password" autocomplete="off" required><p id="login-error" class="error"></p><button class="primary" type="submit">ورود</button></form></dialog>
   <script>
     'use strict';
     const el = id => document.getElementById(id);
     let session = null, busy = false, pending = null;
+    const persianDigits = value => String(value).replace(/[0-9]/g, digit => '۰۱۲۳۴۵۶۷۸۹'[Number(digit)]);
+    function displayValue(value, field) {
+      if (value === null) return '—';
+      if (field.id === 'period_label') return {base: 'دوره اصلی', comparison: 'دوره مقایسه'}[value] || String(value);
+      return ['integer', 'decimal', 'number', 'date'].includes(field.type) ? persianDigits(value) : String(value);
+    }
+    let traces = [], selectedTrace = -1;
+    const traceStatuses = {report_ready: 'گزارش آماده است', needs_clarification: 'نیاز به پاسخ تکمیلی', failed: 'ناموفق', blocked: 'مسدود', unsupported: 'پشتیبانی نمی‌شود'};
+    const stepStatuses = {started: 'شروع شد', complete: 'تکمیل شد', failed: 'ناموفق', cached: 'پاسخ ذخیره‌شده'};
+    const stageLabels = {request: 'بررسی درخواست و پاسخ', interpretation: 'تفسیر پرسش', validation: 'اعتبارسنجی مفاهیم، تاریخ‌ها و سیاست‌ها', compilation: 'تولید قطعی SQL', database: 'اجرای پایگاه داده', connection: 'اتصال به SQL Server', metadata: 'بررسی منبع ثبت‌شده', metadata_sql: 'خواندن ساختار منبع', sql_execution: 'اجرای SQL گزارش', fetch: 'دریافت نتایج محدود', rollback: 'بازگردانی تراکنش خواندن', connection_close: 'بستن اتصال', retry: 'استفاده از پاسخ ذخیره‌شده'};
+    function selectReportTab(id, focus = false) {
+      for (const tabId of ['result-tab', 'logs-tab']) {
+        const active = tabId === id, tab = el(tabId);
+        tab.setAttribute('aria-selected', String(active)); tab.tabIndex = active ? 0 : -1;
+        el(tab.getAttribute('aria-controls')).hidden = !active;
+      }
+      if (focus) el(id).focus();
+    }
     function addMessage(role, text) {
       const node = document.createElement('div'); node.className = 'message ' + role;
-      const label = document.createElement('span'); label.className = 'role'; label.textContent = role === 'user' ? 'You' : 'SageQL';
-      const body = document.createElement('span'); body.textContent = text;
+      const label = document.createElement('span'); label.className = 'role'; label.textContent = role === 'user' ? 'شما' : 'SageQL';
+      const body = document.createElement('span'); body.dir = 'auto'; body.textContent = text;
       node.append(label, body); el('messages').append(node); el('messages').scrollTop = el('messages').scrollHeight;
     }
     function setBusy(value) { busy = value; el('send').disabled = value; el('new-chat').disabled = value; el('retry').disabled = value; el('message').disabled = value; document.querySelectorAll('.suggestions button').forEach(button => button.disabled = value); }
@@ -57,22 +100,65 @@
     async function api(path, body) {
       const response = await fetch(path, {method: body === undefined ? 'GET' : 'POST', credentials: 'same-origin', headers: body === undefined ? {} : {'Content-Type': 'application/json'}, body: body === undefined ? undefined : JSON.stringify(body)});
       const result = await response.json();
-      if (!response.ok) { const error = new Error(result.error?.message || 'The request could not complete.'); error.code = result.error?.code; throw error; }
+      if (!response.ok) { const error = new Error(result.error?.message || 'درخواست انجام نشد.'); error.code = result.error?.code; throw error; }
       return result;
     }
     async function newSession() {
-      setBusy(true); status('Starting conversation…');
-      try { const reply = await api('/report-sessions', {}); session = {id: reply.session_id, revision: reply.revision}; pending = null; el('retry').style.display = 'none'; el('messages').replaceChildren(); el('report').hidden = true; el('empty').hidden = false; el('revision').textContent = 'No report yet'; addMessage('assistant', reply.assistant?.text || 'What report would you like to create?'); status(''); }
+      setBusy(true); status('در حال شروع گفت‌وگو…');
+      try { const reply = await api('/report-sessions', {}); session = {id: reply.session_id, revision: reply.revision}; pending = null; renderDiagnostics(null); selectReportTab('result-tab'); el('retry').style.display = 'none'; el('messages').replaceChildren(); el('report').hidden = true; el('empty').hidden = false; el('revision').textContent = 'هنوز گزارشی ندارید'; addMessage('assistant', reply.assistant?.text || 'چه گزارشی می‌خواهید تهیه کنید؟'); status(''); }
       catch (error) { status(error.message, true); }
       finally { setBusy(false); el('message').focus(); }
     }
     function svgNode(name, attributes, text) { const node = document.createElementNS('http://www.w3.org/2000/svg', name); for (const [key, value] of Object.entries(attributes || {})) node.setAttribute(key, String(value)); if (text !== undefined) node.textContent = text; return node; }
+    function renderDiagnostics(trace) {
+      if (!trace) { traces = []; selectedTrace = -1; el('trace-select').replaceChildren(); el('diagnostics-events').replaceChildren(); el('diagnostics-content').hidden = true; el('diagnostics-empty').hidden = false; el('logs-tab').textContent = 'مراحل و جزئیات اجرا'; return; }
+      traces.push(trace); selectedTrace = traces.length - 1;
+      const option = document.createElement('option'), last = trace.events?.[trace.events.length - 1];
+      option.value = String(selectedTrace); option.textContent = `نوبت ${persianDigits(selectedTrace + 1)} · ${traceStatuses[last?.reply_status] || stepStatuses[last?.status] || 'ثبت‌شده'}`;
+      el('trace-select').append(option); el('trace-select').value = String(selectedTrace);
+      el('logs-tab').textContent = `مراحل و جزئیات اجرا (${persianDigits(traces.length)})`;
+      showTrace(trace);
+    }
+    function showTrace(trace) {
+      el('diagnostics-empty').hidden = true; el('diagnostics-content').hidden = false; el('diagnostics-events').replaceChildren();
+      const events = Array.isArray(trace.events) ? trace.events : [];
+      const last = events[events.length - 1];
+      el('diagnostics-summary').textContent = traceStatuses[last?.reply_status] || 'نوبت ثبت‌شده';
+      const summary = [last?.note, `شناسه اجرا: ${trace.id}`, `شروع: ${trace.started_at || 'در دسترس نیست'} · زمان کل: ${persianDigits(last?.elapsed_ms ?? 0)} میلی‌ثانیه`];
+      if (last?.row_count !== undefined) summary.push(`${persianDigits(last.row_count)} ردیف نتیجه${last.truncated ? ' · سقف تعداد نتیجه رسیده است' : ''}`);
+      summary.push(trace.saved ? 'در پوشه محلی .venv/rahtal-web/diagnostics/ ذخیره شد' : 'ذخیره فایل محلی انجام نشد.');
+      summary.push('اطلاعات ورود، متن پرسش، مقدار فیلترهای شخصی و ردیف‌های نتیجه ثبت نمی‌شوند. جزئیات پس از پاسخ ظاهر می‌شوند؛ تغییر نما SQL را اجرا نمی‌کند.');
+      el('diagnostics-note').textContent = summary.filter(Boolean).join('\n');
+      // Pair each start with its completion while keeping every raw event.
+      const steps = [];
+      for (const event of events) {
+        const start = event.status !== 'started' ? [...steps].reverse().find(step => step.stage === event.stage && step.events[step.events.length - 1].status === 'started') : null;
+        if (start) start.events.push(event); else steps.push({stage: event.stage, events: [event]});
+      }
+      steps.forEach((step, index) => {
+        const first = step.events[0], end = step.events[step.events.length - 1];
+        const unfinished = end.status === 'started';
+        const state = unfinished ? 'پایان مرحله ثبت نشده است' : stepStatuses[end.status] || end.status;
+        const item = document.createElement('details'), label = document.createElement('summary'), timing = document.createElement('span');
+        item.className = 'trace-step'; item.dataset.status = end.status;
+        label.textContent = `${persianDigits(index + 1)}. ${stageLabels[step.stage] || step.stage} · ${state} `;
+        timing.className = 'step-state'; timing.textContent = end.duration_ms !== undefined ? `(${persianDigits(end.duration_ms)} میلی‌ثانیه)` : `(در ${persianDigits(end.elapsed_ms)} میلی‌ثانیه)`;
+        label.append(timing); item.append(label);
+        const note = end.note || first.note;
+        if (note) { const text = document.createElement('p'); text.textContent = note; item.append(text); }
+        for (const event of step.events) { const body = document.createElement('pre'); body.dir = 'ltr'; body.textContent = JSON.stringify(event, null, 2); item.append(body); }
+        item.open = end.status === 'failed' || unfinished; el('diagnostics-events').append(item);
+      });
+      if (!events.length) {
+        const note = document.createElement('p'); note.textContent = 'مرحله‌ای برای این نوبت ثبت نشده است.'; el('diagnostics-events').append(note);
+      }
+    }
     function renderChart(report) {
       const target = el('chart'); target.replaceChildren(); target.hidden = true;
       const chart = report.visualization || {}; if (chart.kind === 'table' || !chart.kind || !report.rows.length) return;
       const yIndex = report.fields.findIndex(field => field.id === (chart.kind === 'kpi' ? chart.value : chart.y));
       if (yIndex < 0) return;
-      if (chart.kind === 'kpi') { const card = document.createElement('div'); card.className = 'metric-card'; card.textContent = String(report.rows[0][yIndex] ?? '—'); const unit = document.createElement('small'); unit.textContent = report.fields[yIndex].unit || report.fields[yIndex].label; card.append(unit); target.append(card); target.hidden = false; return; }
+      if (chart.kind === 'kpi') { const card = document.createElement('div'); card.className = 'metric-card'; card.dir = 'ltr'; card.textContent = displayValue(report.rows[0][yIndex], report.fields[yIndex]); const unit = document.createElement('small'); unit.dir = 'auto'; unit.textContent = report.fields[yIndex].unit || report.fields[yIndex].label; card.append(unit); target.append(card); target.hidden = false; return; }
       const xIndex = report.fields.findIndex(field => field.id === chart.x); if (xIndex < 0 || !['line', 'bar'].includes(chart.kind)) return;
       const rows = report.rows.slice(0, 60), values = rows.map(row => row[yIndex] === null ? NaN : Number(row[yIndex])); if (values.some(value => !Number.isFinite(value))) return;
       const width = 760, height = 270, left = 58, right = 18, top = 22, bottom = 62;
@@ -80,34 +166,40 @@
       const plotWidth = width - left - right, plotHeight = height - top - bottom;
       const y = value => top + (high - value) / (high - low) * plotHeight;
       const x = i => left + (i + .5) * plotWidth / rows.length;
-      const svg = svgNode('svg', {viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-label': report.title});
-      for (let i = 0; i <= 4; i++) { const value = low + (high - low) * i / 4, yy = y(value); svg.append(svgNode('line', {x1: left, x2: width - right, y1: yy, y2: yy, stroke: '#e6ece1'})); svg.append(svgNode('text', {x: left - 9, y: yy + 4, 'text-anchor': 'end', fill: '#738575', 'font-size': 10}, Number(value.toPrecision(4)).toLocaleString())); }
-      if (chart.kind === 'bar') { values.forEach((value, i) => { const bar = svgNode('rect', {x: x(i) - plotWidth / rows.length * .3, y: Math.min(y(value), y(0)), width: plotWidth / rows.length * .6, height: Math.max(1, Math.abs(y(0) - y(value))), fill: '#5f8f6d', rx: 3}); bar.append(svgNode('title', {}, `${rows[i][xIndex]}: ${rows[i][yIndex]}`)); svg.append(bar); }); }
-      else { svg.append(svgNode('polyline', {points: values.map((value, i) => `${x(i)},${y(value)}`).join(' '), fill: 'none', stroke: '#427b59', 'stroke-width': 2.5})); values.forEach((value, i) => { const dot = svgNode('circle', {cx: x(i), cy: y(value), r: 3, fill: '#427b59'}); dot.append(svgNode('title', {}, `${rows[i][xIndex]}: ${rows[i][yIndex]}`)); svg.append(dot); }); }
-      rows.forEach((row, i) => { if (rows.length > 8 && i % Math.ceil(rows.length / 8) !== 0 && i !== rows.length - 1) return; const label = String(row[xIndex] ?? '—'); svg.append(svgNode('text', {x: x(i), y: height - bottom + 23, 'text-anchor': 'middle', fill: '#738575', 'font-size': 10}, label.length > 18 ? label.slice(0, 16) + '…' : label)); });
+      const svg = svgNode('svg', {viewBox: `0 0 ${width} ${height}`, role: 'img', direction: 'ltr', 'aria-label': report.title});
+      for (let i = 0; i <= 4; i++) { const value = low + (high - low) * i / 4, yy = y(value); svg.append(svgNode('line', {x1: left, x2: width - right, y1: yy, y2: yy, stroke: '#e6ece1'})); svg.append(svgNode('text', {x: left - 9, y: yy + 4, 'text-anchor': 'end', fill: '#738575', 'font-size': 10}, Number(value.toPrecision(4)).toLocaleString('fa-IR'))); }
+      if (chart.kind === 'bar') { values.forEach((value, i) => { const bar = svgNode('rect', {x: x(i) - plotWidth / rows.length * .3, y: Math.min(y(value), y(0)), width: plotWidth / rows.length * .6, height: Math.max(1, Math.abs(y(0) - y(value))), fill: '#5f8f6d', rx: 3}); bar.append(svgNode('title', {}, `${displayValue(rows[i][xIndex], report.fields[xIndex])}: ${displayValue(rows[i][yIndex], report.fields[yIndex])}`)); svg.append(bar); }); }
+      else { svg.append(svgNode('polyline', {points: values.map((value, i) => `${x(i)},${y(value)}`).join(' '), fill: 'none', stroke: '#427b59', 'stroke-width': 2.5})); values.forEach((value, i) => { const dot = svgNode('circle', {cx: x(i), cy: y(value), r: 3, fill: '#427b59'}); dot.append(svgNode('title', {}, `${displayValue(rows[i][xIndex], report.fields[xIndex])}: ${displayValue(rows[i][yIndex], report.fields[yIndex])}`)); svg.append(dot); }); }
+      rows.forEach((row, i) => { if (rows.length > 8 && i % Math.ceil(rows.length / 8) !== 0 && i !== rows.length - 1) return; const label = displayValue(row[xIndex], report.fields[xIndex]); svg.append(svgNode('text', {x: x(i), y: height - bottom + 23, 'text-anchor': 'middle', fill: '#738575', 'font-size': 10}, label.length > 18 ? label.slice(0, 16) + '…' : label)); });
       svg.append(svgNode('text', {x: left, y: height - 12, fill: '#738575', 'font-size': 11}, report.fields[yIndex].label + (report.fields[yIndex].unit ? ` (${report.fields[yIndex].unit})` : '')));
-      target.append(svg); if (report.rows.length > rows.length) { const note = document.createElement('p'); note.className = 'subtitle'; note.textContent = 'Chart shows the first 60 rows. The table contains the full returned result.'; target.append(note); } target.hidden = false;
+      target.append(svg); if (report.rows.length > rows.length) { const note = document.createElement('p'); note.className = 'subtitle'; note.textContent = 'نمودار ۶۰ ردیف نخست را نشان می‌دهد. جدول شامل همه ردیف‌های نتیجه است.'; target.append(note); } target.hidden = false;
     }
     function renderReport(report) {
-      el('empty').hidden = true; el('report').hidden = false; el('report-title').textContent = report.title; el('revision').textContent = `Revision ${report.revision}`;
+      el('empty').hidden = true; el('report').hidden = false; el('report-title').textContent = report.title; el('revision').textContent = `نسخه ${persianDigits(report.revision)}`;
       const provenance = report.provenance || {}, period = provenance.period || {};
       const start = provenance.period_start ?? period.start, end = provenance.period_end_exclusive ?? period.end;
-      el('provenance').textContent = start && end ? `Period: ${start} to ${end} (end exclusive)` : 'All available dates';
+      el('provenance').replaceChildren();
+      if (start && end) {
+        const from = document.createElement('bdi'), until = document.createElement('bdi');
+        from.dir = until.dir = 'ltr'; from.textContent = persianDigits(start); until.textContent = persianDigits(end);
+        el('provenance').append('بازه میلادی: ', from, ' تا پیش از ', until);
+      } else el('provenance').textContent = 'همه تاریخ‌های موجود';
       el('warning').hidden = !report.truncated && report.rows.length > 0;
-      el('warning').textContent = report.truncated ? 'Result limit reached. This report is incomplete; narrow the period or filters.' : 'No matching data for this report.';
+      el('warning').textContent = report.truncated ? 'سقف تعداد نتیجه رسیده است. گزارش کامل نیست؛ بازه یا فیلترها را محدود کنید.' : 'داده‌ای مطابق این گزارش یافت نشد.';
       const table = document.createElement('table'), head = document.createElement('thead'), headRow = document.createElement('tr');
       report.fields.forEach(field => { const cell = document.createElement('th'); cell.scope = 'col'; cell.textContent = field.label + (field.unit ? ` (${field.unit})` : ''); headRow.append(cell); }); head.append(headRow);
-      const body = document.createElement('tbody'); report.rows.forEach(row => { const tr = document.createElement('tr'); row.forEach(value => { const cell = document.createElement('td'); cell.textContent = value === null ? '—' : String(value); tr.append(cell); }); body.append(tr); });
+      const body = document.createElement('tbody'); report.rows.forEach(row => { const tr = document.createElement('tr'); row.forEach((value, index) => { const cell = document.createElement('td'); cell.dir = ['integer', 'decimal', 'number', 'date'].includes(report.fields[index].type) ? 'ltr' : 'auto'; cell.textContent = displayValue(value, report.fields[index]); tr.append(cell); }); body.append(tr); });
       table.append(head, body); el('table').replaceChildren(table); renderChart(report);
     }
     async function sendPending() {
-      if (!pending || !session || busy) return; setBusy(true); el('retry').style.display = 'none'; status('Creating your report…');
+      if (!pending || !session || busy) return; setBusy(true); el('retry').style.display = 'none'; status('در حال تهیه گزارش شما…');
       try {
         const reply = await api(`/report-sessions/${encodeURIComponent(session.id)}/messages`, pending);
         session.revision = reply.revision;
-        addMessage('assistant', reply.assistant?.text || reply.clarification || 'Request complete.');
+        renderDiagnostics(reply.diagnostics);
+        addMessage('assistant', reply.assistant?.text || reply.clarification || 'درخواست انجام شد.');
         if (reply.report) renderReport(reply.report);
-        status(reply.error ? reply.assistant?.text || 'Request could not complete.' : '', Boolean(reply.error));
+        status(reply.error ? reply.assistant?.text || 'درخواست انجام نشد.' : '', Boolean(reply.error));
         if (reply.error?.retryable) {
           if (reply.error.code === 'revision_conflict') {
             const resumed = await api(`/report-sessions/${encodeURIComponent(session.id)}`);
@@ -125,18 +217,34 @@
     el('chat-form').addEventListener('submit', event => { event.preventDefault(); if (busy || !session || pending) return; const text = el('message').value.trim(); if (!text) return; addMessage('user', text); el('message').value = ''; pending = {message: text, request_id: crypto.randomUUID(), expected_revision: session.revision}; sendPending(); });
     el('message').addEventListener('keydown', event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); el('chat-form').requestSubmit(); } });
     el('retry').addEventListener('click', sendPending); el('new-chat').addEventListener('click', newSession);
+    for (const id of ['result-tab', 'logs-tab']) {
+      el(id).addEventListener('click', () => selectReportTab(id));
+      el(id).addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        selectReportTab(event.key === 'Home' ? 'result-tab' : event.key === 'End' ? 'logs-tab' : id === 'result-tab' ? 'logs-tab' : 'result-tab', true);
+      });
+    }
+    el('trace-select').addEventListener('change', () => { selectedTrace = Number(el('trace-select').value); if (traces[selectedTrace]) showTrace(traces[selectedTrace]); });
+    el('download-trace').addEventListener('click', () => {
+      const trace = traces[selectedTrace]; if (!trace) return;
+      const url = URL.createObjectURL(new Blob([JSON.stringify(trace, null, 2)], {type: 'application/json'}));
+      const link = document.createElement('a'); link.href = url; link.download = `rahtal-trace-${trace.id}.json`; link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
     document.querySelectorAll('.suggestions button').forEach(button => button.addEventListener('click', () => { el('message').value = button.textContent; el('message').focus(); }));
     el('login-form').addEventListener('submit', async event => { event.preventDefault(); try { await api('/auth', {token: el('token').value}); el('token').value = ''; el('login').close(); await newSession(); } catch (error) { el('login-error').textContent = error.message; } });
     (async () => {
       try {
         const config = await api('/config');
-        el('mode').textContent = config.mode === 'demo' ? 'Synthetic demo' : config.mode === 'rahtal' ? 'Rahtal workspace' : 'SQL Server workspace';
-        if (config.mode === 'demo') el('footer').textContent = 'Synthetic demo · activity hours for September 2026 · demo tenant only · no remote model or production data';
+        el('mode').textContent = config.mode === 'demo' ? 'نمونه با داده آزمایشی' : config.mode === 'rahtal' ? 'فضای رهتال' : 'فضای SQL Server';
+        if (config.mode === 'demo') el('footer').textContent = 'نمونه آزمایشی · ساعات فعالیت سپتامبر ۲۰۲۶ میلادی · داده آزمایشی همان فضای نمونه · بدون اتصال به مدل یا داده واقعی';
         if (config.mode === 'rahtal') {
-          el('footer').textContent = 'Rahtal · employees and activity hours · local reporting workspace';
+          el('workspace-tabs').hidden = false;
+          el('footer').textContent = 'رهتال · کارکنان و ساعات فعالیت · فضای گزارش‌گیری محلی';
           const suggestions = document.querySelectorAll('.suggestions button');
-          suggestions[0].textContent = "Show my employees' names";
-          suggestions[1].textContent = 'Daily activity hours for September';
+          suggestions[0].textContent = "نام کارکنان را نشان بده";
+          suggestions[1].textContent = 'ساعات فعالیت روزانه در سپتامبر';
         }
         if (config.requires_auth) { await newSession(); if (!session) el('login').showModal(); }
         else await newSession();

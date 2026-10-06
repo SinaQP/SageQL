@@ -7,6 +7,21 @@ The server supplies the catalog, authenticated actor, policies, provider, and
 database adapter. Browser requests never configure database/model infrastructure
 or tenant identity.
 
+The workspace defaults to Persian and RTL. The shipped catalog labels, SDK
+greetings, clarifications, titles and safe HTTP errors are Persian; numeric/date
+display uses Persian digits while retaining exact JSON values and Gregorian
+dates. The real model receives instructions for Persian conversation and
+refinements. The offline demo understands only its documented keyword examples;
+use the configured interpreter for arbitrary questions and literal name filters.
+See the [SDK language contract](../../docs/SDK.md#persian-by-default).
+
+Live SQL Server and Rahtal modes use `OpenAIReportAgent` with planner/reviewer
+requests to the same configured model. Interpretations and clarifications can
+be revised once within the original total timeout, without phrase-specific
+routing. The offline demo stays scripted. See the
+[agent contract](../../docs/SDK_AGENTS.md); full SDK validation and explicit host
+execution opt-in still apply.
+
 ## Offline demonstration
 
 For the actual Rahtal database with a real model, run:
@@ -16,6 +31,12 @@ For the actual Rahtal database with a real model, run:
 ```
 
 Open `http://127.0.0.1:8766` and sign in using the local token saved to `.venv/rahtal-web/host-token.txt`. This registers the existing approved Rahtal profile/activity sources, not the generic sample view. See the [Rahtal guide](../../sageql_rahtal/README.md#local-frontend-on-the-real-database) for its configuration, scope and network requirements. `python examples/web/server.py --rahtal --env-file ...` is equivalent.
+
+In Rahtal mode the report panel has **نتیجه گزارش** and **مراحل و جزئیات اجرا**
+tabs. Logs show each completed attempt's recorded stages, timings, redacted SQL
+details and safe errors. Select an earlier attempt or download its JSON trace;
+these actions do not submit another request. New chat clears the browser history
+of attempts. Traces are available after each response, not as live progress.
 
 The `--demo` mode below is explicitly synthetic and scripted:
 
@@ -32,10 +53,14 @@ the temporary database is removed.
 
 Try this conversation:
 
-1. `Daily activity hours for September`
-2. Answer the year clarification with `2026`.
-3. `Group it by employee instead`
-4. `Show the total as one number`
+1. `ساعات فعالیت روزانه در سپتامبر`
+2. Answer the year clarification with `۲۰۲۶` (Gregorian).
+3. `به تفکیک کارمند نمایش بده`
+4. `مجموع را نشان بده`
+
+English versions of these requests remain supported. Solar Hijri month names or
+confirmed Solar Hijri dates receive an unsupported explanation; this demo does
+not convert calendars.
 
 The first report contains September 1–15, 2026. The refined employee totals are
 Alex: `81` hours and Sam: `52.5` hours. A separate tenant's `9999` hours and a
@@ -174,3 +199,14 @@ JSON contract, clarification/refinement, duplicate requests, synthetic totals,
 token authentication, origin controls, and request bounds. They do not connect
 to SQL Server or call a remote model. SQL Server integration and Rahtal real-data
 verification are separate checks.
+
+For the tab/history/download browser regression check, use Node with Playwright
+available and a local Chrome installation (or select another Playwright browser
+channel with `SAGEQL_TEST_BROWSER`):
+
+```powershell
+node tests/web_tabs.cjs
+```
+
+This check intercepts all application requests with synthetic local fixtures;
+it makes no model or database calls and is separate from the Python test suite.

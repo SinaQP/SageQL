@@ -153,7 +153,7 @@ def test_missing_time_period_triggers_clarification():
     result = provider.resolve_context([Message("user", "Sales by region")], "Sales by region")
 
     assert not result.ready
-    assert "time period" in result.clarification_question.lower()
+    assert "بازه زمانی" in result.clarification_question
 
 
 @pytest.mark.parametrize(

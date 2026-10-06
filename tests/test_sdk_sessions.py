@@ -57,6 +57,7 @@ def test_expired_uncertain_request_is_not_executed_again(store, monkeypatch):
     replay = store.claim("s1", ("u1", "t1"), "r1", "input", "scope", 0, 60)
     assert replay.token is None
     assert replay.cached_reply["error"]["code"] == "interrupted_request"
+    assert "درخواست قبلی متوقف شد" in replay.cached_reply["assistant"]["text"]
     with pytest.raises(SDKError) as error:
         store.complete(first, first.state, {"status": "report_ready"})
     assert error.value.code == "request_expired"

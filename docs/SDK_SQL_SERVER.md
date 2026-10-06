@@ -8,6 +8,15 @@ The host registers a single physical table or trusted reporting view for each da
 
 A report may also select only registered dimensions: the compiler returns bounded `SELECT DISTINCT` combinations with the same typed filters and mandatory policies. Such listings require table presentation, no time grouping, and no comparison. A dimension-only dataset is allowed; an entirely fieldless dataset or report is rejected. This supports employee-name lists without inventing an aggregate or allowing arbitrary columns.
 
+The separately scoped [registered entity lookup](SDK_ENTITY_LOOKUPS.md) supports
+name-based activity requests. A host-declared full-name equality filter uses fixed
+concatenation and normalization over two to four registered text columns. The
+engine reads up to two distinct candidate identities with current source policies,
+then binds a unique identity to the registered target equality filter. These are
+two separate single-source SELECTs with ordinary adapter bounds and cleanup;
+they are not a join or an atomic cross-source snapshot. Ambiguous/truncated matches
+never select the first row. Lookup rows/IDs do not enter model context.
+
 The first adapter has no joins, arbitrary expressions, user-supplied SQL, cross-database names, timestamp timezone conversion, fiscal/Persian calendar conversion, or write operations. A developer-provided view can encapsulate reviewed business joins; its aggregate grain is the developer's responsibility. The compiler cannot verify that a view's business formula is correct. This boundary prevents the prototype's aggregate fan-out issue from being introduced by model-planned joins.
 
 ## Inputs and enforcement

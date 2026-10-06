@@ -5,6 +5,7 @@ from typing import Any
 
 from sageql.core import Candidate
 from sageql.errors import GenerationError
+from sageql.localization import language_instructions, validate_language
 
 
 _RESPONSE_FORMAT: dict[str, Any] = {
@@ -34,7 +35,8 @@ _INSTRUCTIONS = (
 class OpenAIProvider:
     """Generate an untrusted SQL candidate using the OpenAI Responses API."""
 
-    def __init__(self, model: str = "gpt-5-nano", client: Any = None) -> None:
+    def __init__(self, model: str = "gpt-5-nano", client: Any = None, *, language: str = "fa") -> None:
+        self.language = validate_language(language)
         if not model.strip():
             raise ValueError("model must not be empty")
         if client is None:
@@ -57,7 +59,7 @@ class OpenAIProvider:
         try:
             response = self._client.responses.create(
                 model=self._model,
-                instructions=_INSTRUCTIONS,
+                instructions=_INSTRUCTIONS + language_instructions(self.language),
                 input=(
                     "SQLite schema:\n" + schema + "\n\nQuestion:\n" + question
                 ),

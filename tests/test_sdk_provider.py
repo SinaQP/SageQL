@@ -10,8 +10,9 @@ import pytest
 from sageql.conversation import LLMConfig, Message
 from sageql.schema import Column, Table
 from sageql.sdk.models import (
-    DatasetDefinition, DimensionDefinition, FilterDefinition, MetricDefinition,
-    PeriodSelection, ReportingCatalog, ReportSpec, SDKError, TimeDefinition,
+    DatasetDefinition, DimensionDefinition, EntityLookupDefinition, FilterDefinition,
+    FullNameFilterDefinition, LookupQualifier, MetricDefinition,
+    PeriodSelection, ReportingCatalog, ReportSpec, SDKError, TimeDefinition, UserFilter,
 )
 from sageql.sdk.provider import OpenAIReportInterpreter
 
@@ -29,10 +30,12 @@ class FakeClient:
 
     def create(self, **kwargs):
         self.calls.append(kwargs)
-        if isinstance(self.content, Exception):
-            raise self.content
+        content = (self.content[len(self.calls) - 1]
+                   if isinstance(self.content, (list, tuple)) else self.content)
+        if isinstance(content, Exception):
+            raise content
         return SimpleNamespace(choices=[SimpleNamespace(
-            message=SimpleNamespace(content=self.content))])
+            message=SimpleNamespace(content=content))])
 
 
 @pytest.fixture
@@ -57,11 +60,12 @@ def ready_output():
                                time_grain="day", chart="line").to_dict()}
 
 
-def interpret(content, catalog, *, current_spec=None, messages=None):
+def interpret(content, catalog, *, current_spec=None, messages=None, language="fa"):
     client = FakeClient(content)
     provider = OpenAIReportInterpreter(
         LLMConfig("private-api-key", "https://example.test/v1", "configured-model"),
         client=client, timeout_seconds=12, max_output_tokens=3072,
+        language=language,
     )
     result = provider.interpret(messages or (Message("user", "Daily hours for September 2026"),),
                                 current_spec, catalog, date(2026, 10, 5))
@@ -95,6 +99,223 @@ def test_structured_report_and_model_boundary(catalog):
     assert "private_tenant_key" not in payload
     assert "row_key" not in payload
     assert "policies" not in payload
+
+
+def test_persian_default_preserves_unicode_conversation_and_literal_filters(catalog):
+    name = "علي‌۱۲"
+    messages = (Message("user", "ساعات فعاليت سپتامبر را بده"),
+                Message("assistant", "کدام سال میلادی؟"), Message("user", "۲۰۲۶"),
+                Message("user", f"فقط برای {name} و به صورت جدول"))
+    output = ready_output()
+    output["message"] = "گزارش ساعات فعالیت به صورت chart table در period month."
+    output["spec"]["chart"] = "table"
+    output["spec"]["filters"] = [{"filter_id": "employee_filter", "operator": "eq", "values": [name]}]
+    result, client = interpret(json.dumps(output, ensure_ascii=False), catalog, messages=messages)
+    call = client.calls[0]
+    instructions = call["messages"][0]["content"]
+    assert "in Persian (fa), even when the user writes in English" in instructions
+    assert "۰۱۲۳۴۵۶۷۸۹" in instructions and "٠١٢٣٤٥٦٧٨٩" in instructions
+    assert "ي/ی" in instructions and "ك/ک" in instructions
+    assert "Never invent a calendar conversion" in instructions
+    payload = json.loads(call["messages"][1]["content"])
+    assert [item["text"] for item in payload["conversation"]] == [item.content for item in messages]
+    assert result.spec.filters[0].values == (name,)
+    assert result.spec.period.year == 2026
+    assert result.message == "گزارش ساعات فعالیت به صورت جدول در ماه."
+    assert "private_schema" not in call["messages"][1]["content"]
+
+
+def test_explicit_english_provider_and_invalid_language(catalog):
+    _, client = interpret(json.dumps(ready_output()), catalog, language="en")
+    assert "in English (en)" in client.calls[0]["messages"][0]["content"]
+    with pytest.raises(ValueError, match="language"):
+        OpenAIReportInterpreter(LLMConfig("secret"), client=FakeClient(""), language="ar")
+
+
+@pytest.fixture
+def lookup_catalog(catalog):
+    table = Table("private_profiles")
+    source = DatasetDefinition("people", "کارکنان", table, (
+        Column(table.key, "private_identity", "nvarchar"),
+        Column(table.key, "private_given", "nvarchar"),
+        Column(table.key, "private_surname", "nvarchar"),
+        Column(table.key, "private_job", "nvarchar"),
+    ), metrics=(), dimensions=(DimensionDefinition("person", "کارمند", "private_identity"),),
+        filters=(FullNameFilterDefinition("full_name", "نام کامل", "private_given", ("eq",),
+                                         ("private_given", "private_surname")),
+                 FilterDefinition("job", "سمت", "private_job")))
+    return replace(catalog, datasets=(*catalog.datasets, source), lookups=(
+        EntityLookupDefinition("person_name", "نام کامل کارمند", "activities", "employee_filter",
+                               "people", "person", "full_name",
+                               (LookupQualifier("person_job", "سمت شغلی", "job"),)),
+    ))
+
+
+@pytest.mark.parametrize("job", [None, "مهندس"])
+def test_registered_name_and_qualifier_decode_through_real_provider_boundary(lookup_catalog, job):
+    filters = (UserFilter("person_name", "eq", ("کیان نمونه پور",)),)
+    if job:
+        filters += (UserFilter("person_job", "eq", (job,)),)
+    spec = replace(ReportSpec.from_dict(ready_output()["spec"]), filters=filters)
+    output = {"status": "ready", "question": "", "message": "گزارش برای person_name.",
+              "spec": spec.to_dict()}
+    result, client = interpret(json.dumps(output, ensure_ascii=False), lookup_catalog)
+    assert result.spec == spec
+    assert result.message == "گزارش برای نام کامل کارمند."
+    call = client.calls[0]
+    payload = json.loads(call["messages"][1]["content"])
+    named = {item["id"]: item for item in payload["catalog"]["datasets"][0]["filters"]}
+    assert named["person_name"]["resolves_entity"] is True
+    assert named["person_job"]["requires_filter"] == "person_name"
+    assert "private_profiles" not in call["messages"][1]["content"]
+    assert "private_identity" not in call["messages"][1]["content"]
+    assert "private_given" not in call["messages"][1]["content"]
+    assert "source_dataset_id" not in call["messages"][1]["content"]
+    assert "entire literal name as one value" in call["messages"][0]["content"]
+
+
+def clarification_output(question):
+    return json.dumps({"status": "needs_clarification", "spec": None,
+                       "question": question, "message": ""}, ensure_ascii=False)
+
+
+def named_output():
+    output = ready_output()
+    output["spec"]["filters"] = [{"filter_id": "person_name", "operator": "eq",
+                                 "values": ["کیان نمونه پور"]}]
+    output["spec"]["period"]["kind"] = "last_month"
+    output["spec"]["period"]["year"] = output["spec"]["period"]["month"] = None
+    return json.dumps(output, ensure_ascii=False)
+
+
+@pytest.mark.parametrize("question", [
+    "لطفاً شناسه کارمند کیان نمونه پور را ارائه دهید تا گزارش را بسازم.",
+    "آیا شناسه کارمند مشخصی را دارید؟",
+    "برای ادامه، آیا می‌خواهید با جست‌وجو بر اساس نام کارمند را پیدا کنم یا شناسه دقیق را ارائه کنید؟",
+    "آیا می‌خواهید با اسمش جستجو کنم؟",
+    "آیا می خواهید با اسمش جستجو کنم؟",
+    "با نام کارمند جستجو کنم؛ تأیید می‌کنید؟",
+    "مایلید از طریق جست‌وجوی نام کارمند را پیدا کنم؟",
+    "کدام شناسه کارمند؟",
+    "شناسه کارمند چیست؟",
+    "لطفاً شناسه کارمند را مشخص کنید.",
+    "لطفاً شناسه کارمند را ارسال کنید.",
+    "Please provide the employee ID.",
+    "Please specify the exact employee ID.",
+    "Do you have their ID?",
+    "Which employee ID should I use?",
+    "What is the employee ID?",
+    "Shall I look up the employee by name?",
+    "Do you want me to search by name?",
+    "Would you like me to find the employee by name?",
+])
+def test_internal_identity_and_lookup_confirmation_corrected_once(lookup_catalog, question):
+    messages = (Message("user", "فعالیت‌های ماه قبل کیان نمونه پور را بفرست"),
+                Message("assistant", "شناسه کارمند را ارائه دهید."),
+                Message("user", "ندارم با اسمش پیداش کن"),
+                Message("assistant", "آیا می‌خواهید با اسمش جستجو کنم؟"),
+                Message("user", "با اسمش"))
+    result, client = interpret([clarification_output(question), named_output()],
+                               lookup_catalog, messages=messages)
+    assert result.status == "ready" and result.question == ""
+    assert result.spec.filters == (UserFilter("person_name", "eq", ("کیان نمونه پور",)),)
+    assert result.spec.period.kind == "last_month"
+    assert len(client.calls) == 2
+    first, corrected = client.calls
+    assert first["messages"][1] == corrected["messages"][1]
+    assert first["response_format"] == corrected["response_format"]
+    assert "Correct the unnecessary entity-lookup clarification" in corrected["messages"][0]["content"]
+    assert "assistant questions can be mistaken" in first["messages"][0]["content"]
+    payload = json.loads(corrected["messages"][1]["content"])
+    assert payload["conversation"] == [{"role": item.role, "text": item.content} for item in messages]
+    assert "private_identity" not in corrected["messages"][1]["content"]
+
+
+@pytest.mark.parametrize("question", [
+    "نام و نام خانوادگی کارمند چیست؟",
+    "کدام سال میلادی؟",
+    "برای شناسه کارمند ۴۲ کدام سال میلادی را مشخص می‌کنید؟",
+    "چند کارمند با این نام وجود دارد؛ سمت شغلی چیست؟",
+    "کدام گزارش را می‌خواهید؟",
+    "Which year should September cover for employee ID 42?",
+    "Please provide the year for employee ID 42.",
+    "What is the employee's full name?",
+    "Which job position distinguishes the employee?",
+    "نام کامل کارمند را بگویید؛ شناسه کارمند لازم نیست.",
+    "نام کامل کارمند را بگویید و شناسه کارمند لازم نیست.",
+    "برای شناسه کارمند ۴۲ کدام سال میلادی را بگویید؟",
+    "لطفاً شناسه سفارش را بفرستید.",
+    "Please provide the order ID.",
+    "آیا نام کامل کارمند را دارید تا جستجو کنم؟",
+    "آیا نام و نام خانوادگی را برای جست‌وجو می‌گویید؟",
+    "Would you provide the employee's full name so I can search?",
+])
+def test_real_business_clarifications_not_reinterpreted(lookup_catalog, question):
+    result, client = interpret(clarification_output(question), lookup_catalog)
+    assert result.status == "needs_clarification" and result.question == question
+    assert len(client.calls) == 1
+
+
+def test_identity_clarification_without_registered_lookup_not_reinterpreted(catalog):
+    question = "Please provide the employee ID."
+    result, client = interpret(clarification_output(question), catalog)
+    assert result.question == question and len(client.calls) == 1
+
+
+def test_correction_can_still_ask_for_a_real_missing_detail(lookup_catalog):
+    result, client = interpret([clarification_output("Please provide the employee ID."),
+                               clarification_output("Which year should September cover?")], lookup_catalog)
+    assert result.status == "needs_clarification"
+    assert result.question == "Which year should September cover?"
+    assert len(client.calls) == 2
+
+
+def test_repeated_identity_question_fails_without_a_third_call(lookup_catalog):
+    content = clarification_output("لطفاً شناسه کارمند را ارائه دهید.")
+    client = FakeClient(content)
+    provider = OpenAIReportInterpreter(LLMConfig("secret"), client=client)
+    with pytest.raises(SDKError) as error:
+        provider.interpret((Message("user", "فعالیت‌های ماه قبل کیان نمونه پور"),),
+                           None, lookup_catalog, date(2026, 10, 6))
+    assert error.value.code == "clarification_stalled" and error.value.retryable
+    assert "کیان" not in str(error.value) and "secret" not in str(error.value)
+    assert len(client.calls) == 2
+
+
+@pytest.mark.parametrize("second,code", [
+    ("not JSON", "invalid_interpretation"),
+    (RuntimeError("private secret"), "provider_failed"),
+    (json.dumps({"status": "ready", "question": "", "message": "",
+                 "spec": {**ready_output()["spec"], "dataset_id": "private_data"}}), "invalid_interpretation"),
+    (json.dumps({**ready_output(), "sql": "SELECT private_data"}), "invalid_interpretation"),
+])
+def test_corrected_output_and_transport_still_fail_closed(lookup_catalog, second, code):
+    with pytest.raises(SDKError) as error:
+        interpret([clarification_output("Please provide the employee ID."), second], lookup_catalog)
+    assert error.value.code == code
+    assert "private" not in str(error.value)
+
+
+def test_correction_uses_remaining_original_timeout(lookup_catalog, monkeypatch):
+    ticks = iter((100, 108))
+    monkeypatch.setattr("sageql.sdk.provider.time.monotonic", lambda: next(ticks))
+    result, client = interpret([clarification_output("Please provide the employee ID."),
+                               named_output()], lookup_catalog)
+    assert result.status == "ready"
+    assert [call["timeout"] for call in client.calls] == [12, 4]
+    assert client.options == {"timeout": 12, "max_retries": 0}
+
+
+def test_expired_correction_deadline_does_not_call_provider_again(lookup_catalog, monkeypatch):
+    ticks = iter((100, 112))
+    monkeypatch.setattr("sageql.sdk.provider.time.monotonic", lambda: next(ticks))
+    client = FakeClient(clarification_output("Please provide the employee ID."))
+    provider = OpenAIReportInterpreter(LLMConfig("secret"), client=client, timeout_seconds=12)
+    with pytest.raises(SDKError) as error:
+        provider.interpret((Message("user", "فعالیت‌های ماه قبل کیان نمونه پور"),),
+                           None, lookup_catalog, date(2026, 10, 6))
+    assert error.value.code == "request_timeout" and error.value.retryable
+    assert len(client.calls) == 1
 
 
 def test_refinement_keeps_complete_spec_and_clarification_history(catalog):
@@ -145,7 +366,7 @@ def test_clarification_uses_business_labels_instead_of_interpreter_options(emplo
         "message": "Use period all, time_grain none, and chart table for employees.",
     }
     result, _ = interpret(json.dumps(output), employee_catalog,
-                          messages=(Message("user", "Hey"), Message("user", "Profiles")))
+                          messages=(Message("user", "Hey"), Message("user", "Profiles")), language="en")
     assert result.question == "Do you want First name, Last name, Job position, Employee ID, or Number of employee profiles?"
     assert result.message == "Use all available dates, no date grouping, and a table for employees."
     for token in ("first_name", "last_name", "job_position", "employee_id", "employee_count",
@@ -159,7 +380,7 @@ def test_straightforward_name_listing_is_ready_without_implementation_confirmati
     output = {"status": "ready", "spec": spec.to_dict(), "question": "",
               "message": "List first_name and last_name with period=all and time_grain=none."}
     result, client = interpret(json.dumps(output), employee_catalog,
-                               messages=(Message("user", "Show my employees' names."),))
+                               messages=(Message("user", "Show my employees' names."),), language="en")
     assert result.status == "ready"
     assert result.question == ""
     assert result.spec == spec  # Display translations never alter registered IDs.

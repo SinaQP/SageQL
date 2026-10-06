@@ -24,8 +24,8 @@ _SPEC.loader.exec_module(web)
 
 
 @contextmanager
-def running_host(tmp_path, *, mode="demo", token=""):
-    engine = web.create_demo_engine(tmp_path / "demo.sqlite")
+def running_host(tmp_path, *, mode="demo", token="", engine=None):
+    engine = engine or web.create_demo_engine(tmp_path / "demo.sqlite")
     handler = web.handler_for(engine, ActorContext("demo", "1"), mode=mode, token=token)
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     thread = Thread(target=server.serve_forever, daemon=True)
@@ -58,7 +58,8 @@ def test_frontend_clarification_report_refinement_and_retry(tmp_path):
     with running_host(tmp_path) as request:
         code, page, headers = request("GET", "/")
         assert code == 200
-        assert "Reporting workspace" in page
+        assert 'lang="fa" dir="rtl"' in page
+        assert "فضای گزارش‌گیری" in page
         assert "textContent" in page
         assert "innerHTML" not in page
         assert headers["Cache-Control"] == "no-store"
@@ -71,7 +72,7 @@ def test_frontend_clarification_report_refinement_and_retry(tmp_path):
         })
         assert code == 200
         assert question["status"] == "needs_clarification"
-        assert "year" in question["clarification"].lower()
+        assert "سال میلادی" in question["clarification"]
         ready_request = {"message": "2026", "request_id": "year", "expected_revision": 1}
         _, daily, _ = request("POST", endpoint, ready_request)
         assert daily["status"] == "report_ready"
@@ -92,6 +93,45 @@ def test_frontend_clarification_report_refinement_and_retry(tmp_path):
         assert code == 200
         assert saved == daily["report"]
         assert "private" not in json.dumps(grouped).lower()
+
+
+@pytest.mark.parametrize("year", ["۲۰۲۶", "٢٠٢٦"])
+def test_persian_http_conversation_clarification_and_refinement(tmp_path, year):
+    with running_host(tmp_path) as request:
+        _, created, _ = request("POST", "/report-sessions", {})
+        assert created["assistant"]["text"] == "چه گزارشی می‌خواهید تهیه کنید؟"
+        endpoint = f"/report-sessions/{created['session_id']}/messages"
+        _, question, _ = request("POST", endpoint, {
+            "message": "ساعات فعاليت روزانه در سپتامبر", "request_id": "fa-question", "expected_revision": 0})
+        assert question["status"] == "needs_clarification"
+        _, daily, _ = request("POST", endpoint, {
+            "message": year, "request_id": "fa-year", "expected_revision": 1})
+        assert daily["status"] == "report_ready"
+        assert daily["report"]["title"] == "ساعات فعالیت به تفکیک روز"
+        assert [field["label"] for field in daily["report"]["fields"]] == ["تاریخ", "ساعات فعالیت"]
+        assert daily["report"]["rows"][0][0] == "2026-09-01"
+        refinement = {"message": "به تفکیک کارمند نمایش بده", "request_id": "fa-group", "expected_revision": 2}
+        _, grouped, _ = request("POST", endpoint, refinement)
+        assert grouped["status"] == "report_ready"
+        assert grouped["report"]["title"] == "ساعات فعالیت به تفکیک کارمند"
+        assert {row[0]: Decimal(str(row[1])) for row in grouped["report"]["rows"]} == {
+            "Alex": Decimal("81"), "Sam": Decimal("52.5")}
+        _, cached, _ = request("POST", endpoint, refinement)
+        assert cached == grouped
+
+
+def test_persian_demo_greeting_and_solar_hijri_do_not_execute(tmp_path):
+    with running_host(tmp_path) as request:
+        _, created, _ = request("POST", "/report-sessions", {})
+        endpoint = f"/report-sessions/{created['session_id']}/messages"
+        _, greeting, _ = request("POST", endpoint, {
+            "message": "سلام", "request_id": "hi", "expected_revision": 0})
+        assert greeting["status"] == "needs_clarification"
+        _, unsupported, _ = request("POST", endpoint, {
+            "message": "ساعات فعالیت در شهریور ۱۴۰۵ شمسی", "request_id": "jalali", "expected_revision": 1})
+        assert unsupported["status"] == "unsupported"
+        assert "تاریخ میلادی" in unsupported["assistant"]["text"]
+        assert unsupported["report"] is None
 
 
 def test_host_rejects_browser_configuration_and_cross_origin(tmp_path):
@@ -178,7 +218,7 @@ def test_sqlserver_configuration_accepts_existing_llm_alias_without_connecting(m
     }.items():
         monkeypatch.setenv(name, value)
     monkeypatch.setitem(sys.modules, "pyodbc", SimpleNamespace(connect=unexpected_connect))
-    monkeypatch.setattr(web, "OpenAIReportInterpreter", fake_interpreter)
+    monkeypatch.setattr(web, "OpenAIReportAgent", fake_interpreter)
     engine, actor, token = web.create_sqlserver_engine()
     assert captured["config"].api_key == "synthetic-model-key"
     assert captured["config"].base_url == "https://example.test/v1"
@@ -206,7 +246,8 @@ def simulated_rahtal_startup(tmp_path, monkeypatch):
     private_state.mkdir(parents=True)
     calls = []
 
-    def create_engine(env_path, *, sessions):
+    def create_engine(env_path, *, sessions, diagnostics_directory):
+        assert diagnostics_directory == private_state / "diagnostics"
         calls.append((env_path, sessions))
         return object(), ActorContext("test-operator"), "n" * 40
 
@@ -215,6 +256,31 @@ def simulated_rahtal_startup(tmp_path, monkeypatch):
     monkeypatch.setattr(sdk, "create_rahtal_engine", create_engine)
     monkeypatch.setattr(web, "handler_for", lambda *args, **kwargs: object())
     return private_state, calls
+
+
+def test_rahtal_diagnostics_require_auth_and_are_not_used_in_other_modes(tmp_path):
+    calls = []
+    engine = web.create_demo_engine(tmp_path / "trace-demo.sqlite")
+    def traced_submit(*args):
+        calls.append(args)
+        payload = engine.submit(*args).to_dict()
+        payload["diagnostics"] = {"id": "test-trace", "events": []}
+        return payload
+    engine.submit_with_diagnostics = traced_submit
+    token = "t" * 40
+    with running_host(tmp_path, mode="rahtal", token=token, engine=engine) as request:
+        headers = {"Authorization": "Bearer " + token}
+        _, created, _ = request("POST", "/report-sessions", {}, headers=headers)
+        path = f"/report-sessions/{created['session_id']}/messages"
+        data = {"message": "Daily activity hours for September", "request_id": "period", "expected_revision": 0}
+        code, denied, _ = request("POST", path, data)
+        assert code == 401 and not calls and "diagnostics" not in denied
+        _, reply, _ = request("POST", path, data, headers=headers)
+        assert reply["diagnostics"]["id"] == "test-trace" and len(calls) == 1
+    with running_host(tmp_path, mode="demo", engine=engine) as request:
+        _, created, _ = request("POST", "/report-sessions", {})
+        _, reply, _ = request("POST", f"/report-sessions/{created['session_id']}/messages", data)
+        assert "diagnostics" not in reply and len(calls) == 1
 
 
 def test_failed_rahtal_bind_preserves_running_workspace_token(simulated_rahtal_startup, monkeypatch):
