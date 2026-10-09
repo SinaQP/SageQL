@@ -91,6 +91,24 @@ class DimensionDefinition:
 
 
 @dataclass(frozen=True)
+class EntityLabelDimension(DimensionDefinition):
+    """Group by the local identity, then display a host-registered source label."""
+
+    source_dataset_id: str
+    source_id_dimension_id: str
+    source_id_filter_id: str
+    source_label_dimension_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class RelatedAttributeDimension(DimensionDefinition):
+    """Registered business equivalence, without granting an implicit relation."""
+
+    source_dataset_id: str
+    source_dimension_id: str
+
+
+@dataclass(frozen=True)
 class FilterDefinition:
     id: str
     label: str
@@ -146,6 +164,35 @@ class DatasetDefinition:
     time: TimeDefinition | None = None
     version: str = "1"
     row_key: tuple[str, ...] = ()
+    related_columns: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class RelatedDimension:
+    """Import one permitted source dimension into a fact's business vocabulary."""
+
+    id: str
+    label: str
+    source_dimension_id: str
+
+
+@dataclass(frozen=True)
+class RelatedFilter:
+    id: str
+    label: str
+    source_filter_id: str
+
+
+@dataclass(frozen=True)
+class RelationshipDefinition:
+    """Host-owned equality mapping; never decoded from model/browser output."""
+
+    id: str
+    dataset_id: str
+    source_dataset_id: str
+    key_pairs: tuple[tuple[str, str], ...]
+    dimensions: tuple[RelatedDimension, ...] = ()
+    filters: tuple[RelatedFilter, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -153,6 +200,7 @@ class ReportingCatalog:
     datasets: tuple[DatasetDefinition, ...]
     version: str = "1"
     lookups: tuple[EntityLookupDefinition, ...] = ()
+    relationships: tuple[RelationshipDefinition, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -184,6 +232,8 @@ class PeriodSelection:
     end: str | None = None
     year: int | None = None
     month: int | None = None
+    count: int | None = None
+    unit: str | None = None
 
 
 @dataclass(frozen=True)
@@ -195,6 +245,15 @@ class ResolvedPeriod:
 @dataclass(frozen=True)
 class UserFilter:
     filter_id: str
+    operator: str
+    values: tuple[Scalar, ...] = ()
+
+
+@dataclass(frozen=True)
+class AggregateFilter:
+    """Typed condition on a selected aggregate, evaluated after grouping."""
+
+    metric_id: str
     operator: str
     values: tuple[Scalar, ...] = ()
 
@@ -212,6 +271,7 @@ class ReportSpec:
     descending: bool = False
     limit: int = 100
     comparison: PeriodSelection | None = None
+    aggregate_filters: tuple[AggregateFilter, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return json_value(self)
@@ -221,6 +281,10 @@ class ReportSpec:
         """Decode only the complete specified shape; never ignore extra keys."""
         def record(raw: Any, kind: type) -> dict[str, Any]:
             names = {item.name for item in fields(kind)}
+            if kind is PeriodSelection and isinstance(raw, dict) and set(raw) == names - {"count", "unit"}:
+                raw = {**raw, "count": None, "unit": None}
+            if kind is ReportSpec and isinstance(raw, dict) and set(raw) == names - {"aggregate_filters"}:
+                raw = {**raw, "aggregate_filters": []}
             if not isinstance(raw, dict) or set(raw) != names:
                 raise SDKError("invalid_spec", "Report specification has invalid fields.")
             return dict(raw)
@@ -241,6 +305,15 @@ class ReportSpec:
             item["values"] = tuple(item["values"])
             filters_list.append(UserFilter(**item))
         data["filters"] = tuple(filters_list)
+        if not isinstance(data["aggregate_filters"], list):
+            raise SDKError("invalid_spec", "Aggregate filters must be an array.")
+        aggregate_filters = []
+        for raw in data["aggregate_filters"]:
+            item = record(raw, AggregateFilter)
+            if not isinstance(item["values"], list):
+                raise SDKError("invalid_spec", "Aggregate filter values must be an array.")
+            aggregate_filters.append(AggregateFilter(item["metric_id"], item["operator"], tuple(item["values"])))
+        data["aggregate_filters"] = tuple(aggregate_filters)
         data["period"] = PeriodSelection(**record(data["period"], PeriodSelection))
         if data["comparison"] is not None:
             data["comparison"] = PeriodSelection(**record(data["comparison"], PeriodSelection))
@@ -253,6 +326,8 @@ class Interpretation:
     spec: ReportSpec | None = None
     question: str = ""
     message: str = ""
+    clarification_key: str = ""
+    continues_clarification: bool = False
 
 
 @dataclass(frozen=True)
@@ -263,6 +338,15 @@ class ValidatedReport:
     period: ResolvedPeriod
     comparison_period: ResolvedPeriod | None
     as_of: date
+    related_sources: tuple[ValidatedRelation, ...] = ()
+
+
+@dataclass(frozen=True)
+class ValidatedRelation:
+    definition: RelationshipDefinition
+    source: DatasetDefinition
+    access: DatasetAccess
+    column_pairs: tuple[tuple[str, str], ...]
 
 
 @dataclass(frozen=True)
@@ -278,8 +362,9 @@ class ExecutionLimits:
             raise ValueError("max_rows must be from 1 to 10000")
         for name in ("query_timeout_seconds", "request_timeout_seconds"):
             value = getattr(self, name)
-            if type(value) not in (float, int) or not math.isfinite(value) or not 0 < value <= 300:
-                raise ValueError(f"{name} must be finite and from 0 to 300 seconds")
+            maximum = 300 if name == "query_timeout_seconds" else 900
+            if type(value) not in (float, int) or not math.isfinite(value) or not 0 < value <= maximum:
+                raise ValueError(f"{name} must be finite and from 0 to {maximum} seconds")
         if type(self.max_message_chars) is not int or not 1 <= self.max_message_chars <= 100_000:
             raise ValueError("max_message_chars must be a positive bounded integer")
         if type(self.max_history_messages) is not int or not 3 <= self.max_history_messages <= 40:

@@ -662,11 +662,21 @@ def test_large_catalog_within_response_schema_bounds_reaches_transport():
     assert len(client.calls) == 1
 
 
-@pytest.mark.parametrize("timeout", [True, 0, float("nan"), 181])
+@pytest.mark.parametrize("timeout", [True, 0, float("nan"), 601])
 def test_timeout_must_be_bounded(timeout):
     with pytest.raises(ValueError):
         OpenAIReportInterpreter(LLMConfig("secret"), client=FakeClient("unused"),
                                 timeout_seconds=timeout)
+
+
+def test_ten_minute_timeout_reaches_transport_without_automatic_retries(catalog):
+    client = FakeClient(json.dumps(ready_output()))
+    provider = OpenAIReportInterpreter(LLMConfig("secret"), client=client, timeout_seconds=600)
+    result = provider.interpret((Message("user", "Daily hours for September 2026"),),
+                                None, catalog, date(2026, 10, 5))
+    assert result.status == "ready"
+    assert client.options == {"timeout": 600, "max_retries": 0}
+    assert client.calls[0]["timeout"] == 600 and len(client.calls) == 1
 
 
 def test_injected_transport_must_allow_timeout_and_retry_configuration():

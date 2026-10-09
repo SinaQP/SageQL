@@ -6,6 +6,20 @@ This is the scope and safety design for the new `sageql.sdk` adapter. It is sepa
 
 The host registers a single physical table or trusted reporting view for each dataset. Registration lists physical columns/types, business metric IDs, dimensions, user filters, optional date-only time column, and a contract version. A report selects one dataset and combines registered metrics, dimensions, typed filters, Gregorian date bounds/grains, ordering, and a bounded limit. Comparisons return two labeled periods, not calculated deltas.
 
+The [registered relationship extension](SDK_RELATIONSHIPS.md) extends this
+baseline with explicit host-defined dimensional mappings. A fact may import
+dimensions and filters from several policy-bound sources. Compilation uses
+registered equality keys, grouped dimensional CTEs, left joins and internal
+duplicate-key guards. Metadata verification includes every active physical
+source; virtual imported columns are never looked up on the fact table. The
+SQLite reference authorizer allows only these registered physical sources.
+Aggregate filters run after grouping and before the outer limit. Rolling date
+windows use bounded count/unit selections resolved locally.
+
+This remains a normal database SELECT under the host connection's isolation
+level. Hosts requiring a consistent snapshot during concurrent writes must
+configure suitable database/connection isolation; the SDK does not change it.
+
 A report may also select only registered dimensions: the compiler returns bounded `SELECT DISTINCT` combinations with the same typed filters and mandatory policies. Such listings require table presentation, no time grouping, and no comparison. A dimension-only dataset is allowed; an entirely fieldless dataset or report is rejected. This supports employee-name lists without inventing an aggregate or allowing arbitrary columns.
 
 The separately scoped [registered entity lookup](SDK_ENTITY_LOOKUPS.md) supports
@@ -17,7 +31,7 @@ two separate single-source SELECTs with ordinary adapter bounds and cleanup;
 they are not a join or an atomic cross-source snapshot. Ambiguous/truncated matches
 never select the first row. Lookup rows/IDs do not enter model context.
 
-The first adapter has no joins, arbitrary expressions, user-supplied SQL, cross-database names, timestamp timezone conversion, fiscal/Persian calendar conversion, or write operations. A developer-provided view can encapsulate reviewed business joins; its aggregate grain is the developer's responsibility. The compiler cannot verify that a view's business formula is correct. This boundary prevents the prototype's aggregate fan-out issue from being introduced by model-planned joins.
+The adapter accepts only registered dimensional joins and rejects arbitrary expressions, user-supplied SQL, cross-database names, timestamp timezone conversion, fiscal calendars, and write operations. The [explicit Jalali month extension](SDK_JALALI_MONTHS.md) resolves one supplied month/year locally to ordinary Gregorian date bounds before compilation; it adds no calendar SQL expressions or Jalali time buckets. A developer-provided view can encapsulate reviewed business joins; its aggregate grain is the developer's responsibility. The compiler cannot verify that a view's business formula is correct. Models cannot introduce aggregate fan-out by inventing joins.
 
 ## Inputs and enforcement
 
@@ -40,6 +54,12 @@ A result cap does not bound the work needed to aggregate source rows. ODBC cance
 No credentials, connection strings, returned row data, or raw driver/model errors are emitted in public errors. The package has no default telemetry or transcript logging. Persistent sessions contain report rows and messages and require host-controlled storage permissions and retention. The frontend reference server is loopback-only and is not a production authentication/deployment service. Its explicitly selected Rahtal mode uses a fixed local reporting principal over the existing approved employee/profile and activity sources, with a separate workspace token; it creates no database objects and does not reuse the offline interpreter.
 
 ## Verification gates
+
+The separately scoped [entity-label dimension](SDK_ENTITY_LABELS.md) performs
+post-aggregation display enrichment through bounded profile SELECTs. It does
+not change the single-source compiler or enable model-selected joins. Source
+and target policies, metadata verification and request cancellation apply to
+all reads; duplicate profiles never multiply target aggregates.
 
 Offline tests use fake providers and SQL Server connections, checking compilation, mandatory policies, denied IDs, metadata drift, type compatibility, ordered binds, cancellation, result limits, resource cleanup, sanitized errors, ownership, persistence, duplicate turns, refinements, and failed revisions. SQLite supplies an explicitly read-only reference for synthetic result correctness; it does not provide SQL Server's fixed-point arithmetic guarantees.
 

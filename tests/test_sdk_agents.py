@@ -147,6 +147,46 @@ def test_semantic_spec_error_is_repaired_with_code_only_feedback_before_review(i
     assert "private_" not in feedback[0]
 
 
+@pytest.mark.parametrize("ordering", ["category", "time_bucket", "period_label"])
+def test_registered_but_unselected_ordering_is_replanned_before_review(ordering):
+    invalid = ready(spec(time_grain="none", order_by=ordering))
+    backend = Backend([invalid, ready()], [AgentReview(True)])
+
+    assert interpret(backend) == ready()
+
+    assert [call["stage"] for call in backend.calls] == ["plan", "plan", "review"]
+    assert backend.calls[1]["feedback"] == ("specification_validation: invalid_ordering",)
+    assert backend.calls[-1]["decision"] == ready()
+
+
+def test_ordering_repair_obeys_original_deadline(monkeypatch):
+    ticks = [100.0]
+    monkeypatch.setattr("sageql.sdk.agents.time.monotonic", lambda: ticks[0])
+
+    def invalid():
+        ticks[0] += 8
+        return ready(spec(order_by="category"))
+
+    backend = Backend([invalid, ready()], [AgentReview(True)])
+    assert interpret(backend, timeout_seconds=12) == ready()
+    assert [call["timeout_seconds"] for call in backend.calls] == [12, 4, 4]
+
+
+def test_ordering_repair_does_not_start_after_deadline(monkeypatch):
+    ticks = [100.0]
+    monkeypatch.setattr("sageql.sdk.agents.time.monotonic", lambda: ticks[0])
+
+    def expired():
+        ticks[0] += 12
+        return ready(spec(order_by="category"))
+
+    backend = Backend([expired], [])
+    with pytest.raises(SDKError) as error:
+        interpret(backend, timeout_seconds=12)
+    assert error.value.code == "request_timeout"
+    assert [call["stage"] for call in backend.calls] == ["plan"]
+
+
 @pytest.mark.parametrize("invalid", [
     None, {"status": "ready", "spec": "SELECT secret"},
     Interpretation("run_sql", message="SELECT secret"),
@@ -310,13 +350,33 @@ def test_expired_stage_error_returns_shared_timeout_before_provider_failure(
 
 @pytest.mark.parametrize("options", [
     {"timeout_seconds": True}, {"timeout_seconds": 0}, {"timeout_seconds": float("nan")},
-    {"timeout_seconds": float("inf")}, {"timeout_seconds": 181},
+    {"timeout_seconds": float("inf")}, {"timeout_seconds": 601},
     {"max_revisions": True}, {"max_revisions": -1}, {"max_revisions": 1.5},
     {"max_revisions": 4},
 ])
 def test_agent_runtime_bounds_reject_invalid_configuration(options):
     with pytest.raises(ValueError):
         AgentReportInterpreter(Backend([], []), **options)
+
+
+def test_longer_shared_budget_allows_three_repairs_without_resetting_clock(monkeypatch):
+    ticks = [100.0]
+    monkeypatch.setattr("sageql.sdk.agents.time.monotonic", lambda: ticks[0])
+
+    def plan():
+        ticks[0] += 100
+        return ready()
+
+    def review(approved):
+        def complete():
+            ticks[0] += 20
+            return AgentReview(approved, "Check the requested grouping." if not approved else "")
+        return complete
+
+    backend = Backend([plan] * 4, [review(False)] * 3 + [review(True)])
+    assert interpret(backend, timeout_seconds=600, max_revisions=3) == ready()
+    assert [call["timeout_seconds"] for call in backend.calls] == [600, 500, 480, 380, 360, 260, 240, 140]
+    assert ticks[0] == 580
 
 
 class FakeClient:
@@ -346,11 +406,16 @@ def plan_json(decision=None):
 
 
 def remote(*responses, **options):
+    # These existing tests isolate the backwards-compatible plan/review backend.
+    # Full three-stage OpenAI transport is covered in test_sdk_intent.py.
     client = FakeClient(*responses)
-    provider = OpenAIReportAgent(
+    transport = OpenAIReportAgent(
         LLMConfig("private-api-key", "https://example.test/v1", "configured-model"),
         client=client, **options,
     )
+    provider = AgentReportInterpreter(SimpleNamespace(
+        plan=transport._backend.plan, review=transport._backend.review,
+    ), **{key: value for key, value in options.items() if key in ("timeout_seconds", "max_revisions")})
     return provider, client
 
 
@@ -399,6 +464,57 @@ def test_remote_agent_replans_from_semantic_review_with_unchanged_original_conte
         assert payload["conversation"] == payloads[0]["conversation"]
 
 
+def test_remote_ordering_repair_sends_only_fixed_feedback_then_reviews_valid_candidate():
+    invalid = plan_json(ready(spec(order_by="category")))
+    valid = plan_json()
+    provider, client = remote(invalid, valid, {"approved": True, "feedback": ""})
+
+    assert provider.interpret(MESSAGES, None, catalog(), TODAY) == ready()
+
+    assert len(client.calls) == 3
+    payloads = [json.loads(call["messages"][1]["content"]) for call in client.calls]
+    assert payloads[1]["feedback"] == ["specification_validation: invalid_ordering"]
+    assert "candidate" not in payloads[1]
+    assert payloads[2]["candidate"] == valid
+    assert payloads[2]["candidate"] != invalid
+    for payload in payloads:
+        assert payload["catalog"] == payloads[0]["catalog"]
+        assert payload["conversation"] == payloads[0]["conversation"]
+        assert payload["current_spec"] is None
+    assert "order_by time_bucket" in client.calls[0]["messages"][0]["content"]
+
+
+@pytest.mark.parametrize("ordering", ["unregistered_private_order", "category_filter", {"sql": "SELECT secret"}])
+def test_unknown_or_malformed_ordering_still_fails_without_replan(ordering):
+    invalid = plan_json()
+    invalid["spec"]["order_by"] = ordering
+    provider, client = remote(invalid)
+
+    with pytest.raises(SDKError) as error:
+        provider.interpret(MESSAGES, None, catalog(), TODAY)
+
+    assert error.value.code == "invalid_interpretation"
+    assert len(client.calls) == 1
+    assert "private" not in str(error.value) and "secret" not in str(error.value)
+
+
+@pytest.mark.parametrize("mutation", [
+    lambda value: value.update(sql="SELECT private_source"),
+    lambda value: value["spec"].update(sql="SELECT private_source"),
+    lambda value: value["spec"]["period"].update(year=True),
+])
+def test_known_inactive_ordering_does_not_repair_other_malformed_fields(mutation):
+    invalid = plan_json(ready(spec(order_by="category")))
+    mutation(invalid)
+    provider, client = remote(invalid)
+
+    with pytest.raises(SDKError) as error:
+        provider.interpret(MESSAGES, None, catalog(), TODAY)
+
+    assert error.value.code == "invalid_interpretation"
+    assert len(client.calls) == 1 and "private" not in str(error.value)
+
+
 @pytest.mark.parametrize("response", [
     "not JSON", "[]",
     '{"approved":true,"feedback":"","sql":"SELECT secret"}',
@@ -432,6 +548,29 @@ def test_remote_reviewer_failure_is_sanitized_without_transport_retry():
         provider.interpret(MESSAGES, None, catalog(), TODAY)
     assert error.value.code == "provider_failed" and error.value.retryable
     assert "private" not in str(error.value) and len(client.calls) == 2
+
+
+@pytest.mark.parametrize("output_budget", [4096, 8192])
+def test_empty_length_exhausted_response_still_fails_without_replan(output_budget):
+    class LengthClient(FakeClient):
+        def create(self, **options):
+            response = super().create(**options)
+            response.choices[0].finish_reason = "length"
+            response.usage = SimpleNamespace(completion_tokens=output_budget)
+            return response
+
+    client = LengthClient("")
+    options = {} if output_budget == 4096 else {"max_output_tokens": output_budget}
+    provider = OpenAIReportAgent(LLMConfig("fake-key"), client=client,
+                                timeout_seconds=12, **options)
+
+    with pytest.raises(SDKError) as error:
+        provider.interpret(MESSAGES, None, catalog(), TODAY)
+
+    assert error.value.code == "invalid_interpretation"
+    assert len(client.calls) == 1
+    assert client.calls[0]["max_completion_tokens"] == output_budget
+    assert 0 < client.calls[0]["timeout"] <= 12
 
 
 def policy(actor):
@@ -472,6 +611,21 @@ def engine(database, provider, **options):
     return SageQL(catalog=catalog(), database=CountingAdapter(database), provider=provider,
                   policy=options.pop("policy", policy), clock=lambda: TODAY,
                   execution=options.pop("execution", "validated"), **options)
+
+
+@pytest.mark.parametrize("max_revisions", [0, 1])
+def test_exhausted_ordering_repair_never_reviews_or_executes(database, max_revisions):
+    invalid = plan_json(ready(spec(order_by="category")))
+    provider, client = remote(*([invalid] * (max_revisions + 1)), max_revisions=max_revisions)
+    sdk = engine(database, provider)
+    session = sdk.create_session(ACTOR)
+
+    reply = sdk.submit(session.session_id, MESSAGES[0].content, ACTOR, "invalid-ordering", 0)
+
+    assert reply.error["code"] == "agent_exhausted"
+    assert reply.report is None and sdk.database.calls == []
+    assert len(client.calls) == max_revisions + 1
+    assert all("candidate" not in json.loads(call["messages"][1]["content"]) for call in client.calls)
 
 
 def test_agent_report_executes_only_registered_policy_bound_query_and_retry_is_cached(database):

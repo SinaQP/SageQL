@@ -1,5 +1,46 @@
 # SageQL roadmap
 
+## Intent and clarification consistency correction (2026-10-08)
+
+Outcome: a requested grouping change must be applied or explicitly reported as
+unavailable; the last report must never silently replace that change. Independent
+intent extraction precedes live agent planning. Local checks reject cross-source
+concept combinations and candidate measures/grouping/presentation that disagree
+with that extracted intent, even if a reviewer would approve them. Answered
+clarifications must advance to a different missing detail or a report; the same
+structured missing-detail key cannot be reissued as an answer continuation.
+
+Acceptance: synthetic full conversations cover a table, bar refinement, supported
+regrouping, unavailable regrouping, legacy pending technical confirmation,
+paraphrased repeated questions, legitimate successive details, persistent restart,
+idempotent retries and no database execution on rejected intent. All remote stages
+share the existing deadline and permitted metadata boundary. Custom two-method
+backends retain their existing contract; live OpenAI agents always extract intent.
+No joins, new database objects, profile-based aggregation or calendar expansion
+are introduced. Model intent extraction remains fallible; the deterministic
+guarantee is consistency with its validated output, not universal language accuracy.
+
+Verification: 810 offline tests passed and one opt-in SQL Server test was skipped.
+The synthetic SDK embedding demo and JavaScript syntax check passed. The sdist
+and wheel built successfully after installing the missing build backend into the
+local development environment; a fresh virtual environment installed the wheel
+and imported the public API, with runtime file hashes checked against source.
+
+Interpretation-only checks with the existing configured model returned
+`unsupported` for the original misspelled grouping request, its correction and
+the legacy technical confirmation; no report database queries ran. A supported
+table-to-bar check initially exposed the duplicate identity/name axis inherited
+from the current specification. Local canonicalization now removes only a plain
+identity whose target column matches its selected entity label. After that fix,
+the same live check produced the expected employee-name bar with unchanged hours,
+dates, ordering and limit. The failing attempts and final passing evidence remain
+in ignored local files; these checks do not establish universal language accuracy.
+
+The existing local host still needs a restart to load these changes. Automatic
+tool approval rejected the stop/restart command with `blocked by policy`; that
+command did not run. No database object or stored conversation was changed by
+the manual verification, and no commit was created.
+
 ## Goal
 
 Build an installable Python SDK that a developer embeds in their backend, configures with approved SQL Server datasets and infrastructure, and connects to their frontend so authorized users can create and refine reports through chat. Rahtal is a real-data integration test for that package.
@@ -333,3 +374,257 @@ measures, `last_month` and daily grouping; a greeting returned clarification.
 Both used the new planning/review flow. These checks made no database calls and
 transmitted no lookup results or production rows. Live SQL Server execution with
 this flow and universal language correctness remain unverified.
+
+## Rahtal request timeout increase (2026-10-07)
+
+Outcome: give slow local Rahtal report requests more time to finish. Acceptance:
+the shared model interpretation budget is 180 seconds, the overall request
+deadline is 240 seconds, and each SQL execution is capped at 30 seconds.
+Scope: only the Rahtal SDK frontend defaults; retain row bounds, deterministic
+execution, policies and finite deadlines. Offline setup and HTTP tests verify
+the integration; live model/database performance is not verified by these tests.
+
+## Registered entity-label dimensions (2026-10-07)
+
+Outcome: employee rankings can refine from IDs to names without changing their
+measures, dates or top-N. Acceptance and boundaries are specified in
+[SDK_ENTITY_LABELS.md](SDK_ENTITY_LABELS.md). Implement a host-registered display
+dimension, policy-bound bounded post-aggregation reads, provider capability
+metadata and Rahtal registration. Verify duplicates, missing/conflicting names,
+access revocation, persistence, retries and model data exclusion. No joins,
+new database objects, hardcoded conversation routing or broader authorization.
+
+Verification: 682 offline tests passed, one opt-in synthetic SQL Server test
+skipped. The isolated sdist/wheel build, fresh-wheel installation/imports and
+documented SDK demo passed. The configured real model replayed the supplied
+name-refinement/confirmation conversation, preserving its existing activity-hours
+metric, descending order and top ten. Real Rahtal execution returned ten named
+rows through two bounded SELECTs, with unchanged metric values/order and no
+missing labels; no production names/rows were printed or sent to the model.
+A separate new ambiguous-ranking check eventually requested criterion/period;
+another attempt exhausted the bounded review loop. These checks demonstrate the
+tested behavior, not universal natural-language reliability. Existing user
+timeout changes were retained. No commit was created.
+The existing loopback frontend was restarted with its original workspace token
+and persisted session store; `/config` confirms authenticated Rahtal mode on
+port 8766. Start a new chat for the updated catalog.
+
+## Rahtal company report 2: complete conversations and explicit Jalali months (2026-10-08)
+
+Outcome: show each manager conversation through its final real SDK result, replay
+the two questioned examples, and add more complex reports using Persian months.
+The first report separated clarification and completion onto different pages;
+both quoted conversations had successful later turns. Presentation now keeps
+the full conversation and its final status together.
+
+The scoped implementation adds local deterministic `jalali_month` resolution
+under [SDK_JALALI_MONTHS.md](SDK_JALALI_MONTHS.md), explicit selection provenance
+and persisted refinements. Model prompts select month/year; they never convert
+dates. Gregorian storage/daily buckets, policies and deterministic SQL remain.
+A narrowly classified ordering inconsistency can consume the existing bounded
+agent revision budget; malformed/unknown output still fails closed. Planner-only
+reproductions established a strict ordering rejection, not token truncation;
+the exact subtype of the historical failures cannot be proven from saved traces.
+Verification and live evidence are recorded below when the slice is complete.
+
+Additional planner-only diagnosis of the original Gregorian two-month comparison
+reproduced `invalid_interpretation` with `finish_reason=length`, 4,096 completion
+tokens, 4,096 reasoning tokens and zero output bytes. That concrete replay
+exhausted the output budget; it does not establish a single cause for every
+historical failure. The named-employee Jalali comparison's separate planner
+replay passed strict validation with 4,036 completion tokens (3,904 reasoning);
+a subsequent full-interpretation attempt stopped at planning with the same
+4,096-token reasoning-only exhaustion, before any reviewer request. These
+diagnostics executed no database query and retained only fixed structural
+categories, counts and source hashes in ignored local report-2 files.
+
+The Rahtal host now explicitly supplies `max_output_tokens=8192`; generic SDK
+defaults, the shared 180-second interpretation deadline, the 240-second request
+deadline, strict decoding and revision limits remain unchanged. Fake transport
+tests verify that empty length-exhausted output still fails without replanning;
+host setup tests verify the explicit budget. This adds no generic retry and
+does not accept partial model output or enable any new query operation.
+
+Business-intent QA then found a distinct semantic issue in the monthly all-data
+top-24 example: a model-selected date range excluded the current partial month
+and the last day of September. Report-ready status and strict SQL validation do
+not establish business correctness. Shared planner/reviewer guidance now keeps
+output limits separate from periods: explicit all-data requests retain `all`,
+and latest-N groups use ordering/limit rather than invented dates. No keyword
+router or model-data feedback is introduced. A local scenario acceptance audit
+checks requested measures, effective periods, grouping, ordering and limits;
+the full demonstration is rerun after this prompt correction.
+
+Final verification: 772 offline tests passed and one opt-in synthetic SQL Server
+test was skipped. The documented synthetic SDK embedding demo passed. Independent
+Node Intl checks matched 7,200 Jalali boundary conversions with no differences.
+The label-leak test now checks exact scalar identities rather than accidental
+identity substrings inside randomly generated report UUIDs.
+
+The final live run contains 11 completed scenarios and 21 actual turns: 15 report
+responses, three clarification responses and three failed attempts. The three
+failures were followed by explicit new attempts with identical manager messages
+in the same sessions; their errors and receipts remain in the report. All five
+run archives retain 59 turns, including two earlier report-ready responses with
+incorrect business periods. Final acceptance passed 401 scenario-intent checks,
+46 numerical checks and 142 evidence-selection checks. These are demonstration
+acceptance checks, not a universal language-correctness guarantee or a new SDK
+automatic retry mechanism. Further work should measure planner/reviewer semantic
+accuracy and failure rates across a broader held-out set.
+
+The reviewed company report has 35 pages, with all pages visually inspected;
+native Persian HTML and a UTF-8 transcript accompany the PDF for reliable copying.
+Real local evidence, session receipts, source snapshots and replay scripts remain
+ignored and contain no bundled credentials. Two isolated packaging attempts were
+blocked while obtaining hatchling from PyPI; a current wheel/fresh-install check
+is therefore unverified. Source imports and tests do not substitute for that
+release gate. No commit was created.
+
+## Registered relationships and general management reports (2026-10-09)
+
+User outcome: management reports can aggregate a fact's measures by explicitly
+registered attributes from other sources, refine them in conversation, and rank
+the final groups. Implement the reusable contract in SDK_RELATIONSHIPS.md;
+register the existing Rahtal activity/profile relationship as a host integration.
+Also resolve parameterized rolling date windows locally rather than asking the
+model to calculate three-month date arithmetic. Preserve previous local changes.
+No model-written SQL, guessed joins, new database objects, unregistered formulas
+or promise of unlimited report capabilities. Verification results follow below.
+
+Implemented reusable host registrations, composite equality keys, independent
+dimensional sources, source-aware permission pruning, unambiguous business-intent
+equivalences, deterministic guarded SQL Server/SQLite compilation, physical
+metadata checks on all active sources and persistent conversation refinements.
+Added typed post-aggregate conditions and locally resolved rolling Gregorian
+count/unit windows. Rahtal imports current position and its filter on activities;
+it creates no database objects. Existing local edits were preserved.
+
+Verification: 51 new focused tests passed; the final offline suite passed with
+861 tests and one opt-in synthetic SQL Server test skipped. The existing
+synthetic embedding demo and git diff whitespace check passed. Live configured
+model checks selected the correct rolling window/ranking, refined to job
+position, and added the >100-hour aggregate condition. A canonical real Rahtal
+SQL Server report passed with five groups and no truncation; private rows and
+credentials were not printed or copied into tracked artifacts.
+
+The isolated package build could not obtain hatchling from PyPI because of
+network read timeouts. Building sdist and wheel with the installed build runtime
+(`--no-isolation`) succeeded. A fresh wheel target installation and public
+imports passed using the existing dependency runtime; a fully fresh dependency
+environment remains unverified. No commit was created.
+
+Suggested commit message for this extension:
+`feat(sdk): add registered relationships, aggregate filters, and rolling periods`
+
+## Align effective intent periods with necessary clarification (2026-10-09)
+
+The exact reported job-position request matched failed receipts in a fresh local
+session (revision zero, no messages/current report). The persisted trace records
+intent_mismatch but does not retain stage proposals, so historical rejected
+outputs are not reconstructed. Interpretation-only replay exposed a second
+failure: the intent omitted period and missing details, and planner/reviewer
+accepted all dates without user evidence. The old intent prompt required periods
+for new rankings while planning required them for any dated aggregate.
+
+Add an effective typed PeriodSelection to ReportIntent and share the dated
+aggregate requirement across intent/planning/review. Locally add a period missing
+slot if a new dated aggregate has no period; inherit the current period only for
+same-dataset refinements/answers without a changed time clarification. Check
+accepted ready periods against effective resolved bounds. Preserve focused year/
+calendar questions, all-data requests, timeless counts, dimension-only listings
+and normal revision/time/access boundaries. No question-specific routing, relaxed
+intent guard or database operations are added.
+
+Verification: 874 offline tests passed and one opt-in synthetic SQL Server test
+was skipped. Configured-model replay returned the necessary clarification, then
+selected job-position grouping and a three-month rolling period after the answer.
+The active loopback host on port 8768 was restarted with its existing workspace
+token and persistent sessions; the separate host on 8766 was left running.
+The same two-turn HTTP conversation returned clarification without SQL, followed
+by a real SQL Server report with six groups and no truncation. Saved original
+period selection and the conversation's intentionally frozen date bounds were
+both verified; no result rows or credentials were printed or added to tracked
+files.
+
+The current sdist/wheel build passed using the installed build runtime with
+`--no-isolation`; fresh wheel-target installation and public typed-period imports
+passed using existing dependencies. The earlier isolated build's network timeout
+still leaves a completely fresh dependency environment unverified. Diff whitespace
+checks passed. No commit was created.
+
+Suggested commit message:
+`fix(sdk): align intent periods with aggregate clarification`
+
+## Increase the live reporting budget (2026-10-09)
+
+User outcome: allow complex live report interpretation more time and repair
+opportunities. The latest local failed trace ended in agent_exhausted after
+about 77 seconds, before its 180-second deadline. Raise Rahtal's shared model
+budget to 600 seconds, its overall request to 660 seconds and revisions from one
+to three. Extend trusted SDK model-timeout acceptance to 600 seconds and overall
+request limits to 900 seconds; keep query limits independently capped at 300
+seconds and Rahtal SQL at 30 seconds. Default generic SDK budgets, strict report
+checks, transport no-retry settings and finite repair/deadline behavior remain.
+Verify the higher boundaries and shared deadline with offline fake transports,
+then activate the existing local host while preserving its token/session state.
+
+Verification: 266 focused tests and the complete 882-test offline suite passed;
+one opt-in synthetic SQL Server test was skipped. A fake clock exercised four
+proposals/three revisions over 480 seconds while preserving the decreasing shared
+deadline. Transport tests verified the 600-second timeout with automatic retries
+disabled; overall request and independent SQL bounds were checked. Current
+sdist/wheel builds passed with the installed build runtime (`--no-isolation`),
+and fresh wheel-target imports passed using existing dependencies. A completely
+fresh dependency environment remains unverified after the previously recorded
+network failures. The host on 8768 was restarted with the existing token and
+sessions; authenticated access to a saved session passed. No live semantic report
+replay was run in this timeout-only slice, and larger budgets do not guarantee
+semantic agreement. Diff whitespace checks passed. No commit was created.
+
+Suggested commit message:
+`fix(rahtal): increase bounded report interpretation and repair budgets`
+
+## Verify a managerial workload conversation (2026-10-09)
+
+Outcome: compare Shahrivar/Mordad 1405 workload by current position, drill down
+to employee names, select up to ten employees below 80 recorded hours in
+Shahrivar, and show the same selection in a bar chart. The report describes
+recorded workload and includes employees with activity, not productivity or
+the complete roster. Acceptance and runnable local check are in
+[SDK_MANAGEMENT_REPORT.md](SDK_MANAGEMENT_REPORT.md).
+
+The configured model initially returned an incorrect unsupported claim about
+two explicit Jalali months. Shared capability guidance and review of prose-only
+unsupported claims corrected this case. Add bounded optional effective intent
+controls for comparison, row/aggregate filters, ordering/direction and limit;
+strict live decoding and fixed local feedback reject silent losses before
+review/execution. Explicit empty controls remove earlier constraints, while
+defaults preserve existing custom-backend compatibility.
+
+Add a local live-check CLI with an independent Python arithmetic oracle over
+bounded, policy-bound SDK source-grain reads. Private sessions/source/reply/spec
+artifacts and HTML remain ignored and local. No result rows go to the model.
+The frontend adds a managerial example and displays both comparison names and
+execution ranges without changing stable JSON period row keys.
+
+Independent review reproduced tied top-N drift when display dimensions were
+reordered. Deterministic metric ranking now prioritizes entity-label identity
+ties before other categories, preserving explicit primary ordering and time/
+period ties. Regression coverage reverses employee/position column order with
+more than ten equal-hour employees, then verifies the chart selects the same ten.
+
+All four configured-model/real-SQL Server turns matched the local source oracle;
+final compiler replay of those accepted specifications matched again without
+new model calls. The final complete offline suite passed: 971 tests and one
+optional synthetic SQL Server skip. JavaScript syntax, whitespace, installed-
+runtime package builds and fresh-wheel-target imports passed; completely fresh
+dependency installation was not checked. Interim Windows socket test aborts
+passed on rerun and did not recur in the final complete suite.
+
+Activated the updated authenticated frontend on port 8770 using separate private
+state/token under `.venv/rahtal-management-web/`; existing hosts were preserved.
+No database objects or writes, new remote service, credentials or private result
+rows were added to tracked files. Existing changes were preserved; no commit.
+
+Suggested commit message:
+`feat: add verified Rahtal workload reports and preserve SDK intent`

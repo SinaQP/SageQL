@@ -51,7 +51,7 @@
     <section class="panel chat-panel" aria-label="گفت‌وگوی گزارش">
       <div class="panel-head"><div><h1>دستیار گزارش‌گیری شما</h1><p class="subtitle">پرسش خود را بنویسید و گزارش را در ادامه دقیق‌تر کنید.</p></div><button id="new-chat" type="button">گفت‌وگوی تازه</button></div>
       <div id="messages" class="messages" aria-live="polite"></div>
-      <div class="suggestions"><button type="button">ساعات فعالیت روزانه در سپتامبر</button><button type="button">به تفکیک کارمند نمایش بده</button></div>
+      <div class="suggestions"><button type="button">ساعات فعالیت روزانه در سپتامبر</button><button type="button">به تفکیک کارمند نمایش بده</button><button id="management-example" type="button" hidden data-question="مجموع ساعات فعالیت و تعداد فعالیت‌های ثبت‌شده در شهریور ۱۴۰۵ را با مرداد ۱۴۰۵ به تفکیک سمت شغلی فعلی کارکنان مقایسه کن. در جدول نشان بده و بر اساس مجموع ساعات از بیشترین به کمترین مرتب کن.">مقایسه ماهانه حجم کار</button></div>
       <div id="status" class="status" role="status"></div>
       <form id="chat-form" class="compose"><label for="message" class="hint">پرسش شما</label><textarea id="message" maxlength="8000" placeholder="چه چیزی می‌خواهید بدانید؟" required></textarea><div class="send-row"><span class="hint">Enter برای ارسال · Shift + Enter برای خط جدید</span><button id="retry" class="retry" type="button">تلاش دوباره</button><button id="send" class="primary" type="submit">ارسال ←</button></div></form>
     </section>
@@ -72,9 +72,9 @@
     const el = id => document.getElementById(id);
     let session = null, busy = false, pending = null;
     const persianDigits = value => String(value).replace(/[0-9]/g, digit => '۰۱۲۳۴۵۶۷۸۹'[Number(digit)]);
-    function displayValue(value, field) {
+    function displayValue(value, field, report) {
       if (value === null) return '—';
-      if (field.id === 'period_label') return {base: 'دوره اصلی', comparison: 'دوره مقایسه'}[value] || String(value);
+      if (field.id === 'period_label') return persianDigits(report?.provenance?.period_labels?.[value] || {base: 'دوره اصلی', comparison: 'دوره مقایسه'}[value] || String(value));
       return ['integer', 'decimal', 'number', 'date'].includes(field.type) ? persianDigits(value) : String(value);
     }
     let traces = [], selectedTrace = -1;
@@ -179,16 +179,23 @@
       const provenance = report.provenance || {}, period = provenance.period || {};
       const start = provenance.period_start ?? period.start, end = provenance.period_end_exclusive ?? period.end;
       el('provenance').replaceChildren();
-      if (start && end) {
+      function appendBounds(label, fromDate, untilDate) {
         const from = document.createElement('bdi'), until = document.createElement('bdi');
-        from.dir = until.dir = 'ltr'; from.textContent = persianDigits(start); until.textContent = persianDigits(end);
-        el('provenance').append('بازه میلادی: ', from, ' تا پیش از ', until);
-      } else el('provenance').textContent = 'همه تاریخ‌های موجود';
+        from.dir = until.dir = 'ltr'; from.textContent = persianDigits(fromDate); until.textContent = persianDigits(untilDate);
+        el('provenance').append(label, from, ' تا پیش از ', until);
+      }
+      const comparing = provenance.comparison_start && provenance.comparison_end_exclusive;
+      if (start && end) appendBounds(comparing ? 'بازه میلادی دوره اصلی: ' : 'بازه میلادی: ', start, end);
+      else el('provenance').textContent = 'همه تاریخ‌های موجود';
+      if (comparing) {
+        el('provenance').append(document.createElement('br'));
+        appendBounds('بازه میلادی دوره مقایسه: ', provenance.comparison_start, provenance.comparison_end_exclusive);
+      }
       el('warning').hidden = !report.truncated && report.rows.length > 0;
-      el('warning').textContent = report.truncated ? 'سقف تعداد نتیجه رسیده است. گزارش کامل نیست؛ بازه یا فیلترها را محدود کنید.' : 'داده‌ای مطابق این گزارش یافت نشد.';
+      el('warning').textContent = report.truncated ? `نتیجه به ${persianDigits(report.rows.length)} ردیف محدود شده است؛ ردیف‌های بیشتری مطابق شرایط وجود دارد.` : 'داده‌ای مطابق این گزارش یافت نشد.';
       const table = document.createElement('table'), head = document.createElement('thead'), headRow = document.createElement('tr');
       report.fields.forEach(field => { const cell = document.createElement('th'); cell.scope = 'col'; cell.textContent = field.label + (field.unit ? ` (${field.unit})` : ''); headRow.append(cell); }); head.append(headRow);
-      const body = document.createElement('tbody'); report.rows.forEach(row => { const tr = document.createElement('tr'); row.forEach((value, index) => { const cell = document.createElement('td'); cell.dir = ['integer', 'decimal', 'number', 'date'].includes(report.fields[index].type) ? 'ltr' : 'auto'; cell.textContent = displayValue(value, report.fields[index]); tr.append(cell); }); body.append(tr); });
+      const body = document.createElement('tbody'); report.rows.forEach(row => { const tr = document.createElement('tr'); row.forEach((value, index) => { const cell = document.createElement('td'); cell.dir = ['integer', 'decimal', 'number', 'date'].includes(report.fields[index].type) ? 'ltr' : 'auto'; cell.textContent = displayValue(value, report.fields[index], report); tr.append(cell); }); body.append(tr); });
       table.append(head, body); el('table').replaceChildren(table); renderChart(report);
     }
     async function sendPending() {
@@ -199,6 +206,9 @@
         renderDiagnostics(reply.diagnostics);
         addMessage('assistant', reply.assistant?.text || reply.clarification || 'درخواست انجام شد.');
         if (reply.report) renderReport(reply.report);
+        else if (!el('report').hidden) {
+          el('revision').textContent = `آخرین گزارش موفق · درخواست جدید انجام نشده · نسخه ${persianDigits(reply.revision)}`;
+        }
         status(reply.error ? reply.assistant?.text || 'درخواست انجام نشد.' : '', Boolean(reply.error));
         if (reply.error?.retryable) {
           if (reply.error.code === 'revision_conflict') {
@@ -232,7 +242,7 @@
       const link = document.createElement('a'); link.href = url; link.download = `rahtal-trace-${trace.id}.json`; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     });
-    document.querySelectorAll('.suggestions button').forEach(button => button.addEventListener('click', () => { el('message').value = button.textContent; el('message').focus(); }));
+    document.querySelectorAll('.suggestions button').forEach(button => button.addEventListener('click', () => { el('message').value = button.dataset.question || button.textContent; el('message').focus(); }));
     el('login-form').addEventListener('submit', async event => { event.preventDefault(); try { await api('/auth', {token: el('token').value}); el('token').value = ''; el('login').close(); await newSession(); } catch (error) { el('login-error').textContent = error.message; } });
     (async () => {
       try {
@@ -245,6 +255,7 @@
           const suggestions = document.querySelectorAll('.suggestions button');
           suggestions[0].textContent = "نام کارکنان را نشان بده";
           suggestions[1].textContent = 'ساعات فعالیت روزانه در سپتامبر';
+          el('management-example').hidden = false;
         }
         if (config.requires_auth) { await newSession(); if (!session) el('login').showModal(); }
         else await newSession();

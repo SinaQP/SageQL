@@ -2,6 +2,33 @@
 
 The implemented `sageql.sdk` slice creates and refines reports over one registered SQL Server table or trusted view per dataset. The developer supplies configuration and authentication in their backend; the frontend submits messages, session IDs, request IDs, and revisions. Existing stage APIs and the Rahtal pilot remain available.
 
+Datasets can additionally expose explicit related dimensions and filters through
+the [registered relationship contract](SDK_RELATIONSHIPS.md). Register the mapping
+in trusted host code; users can then combine these concepts with measures, dates,
+aggregate conditions, comparisons and rankings without SQL or join configuration.
+
+```python
+from sageql.sdk import (AggregateFilter, RelatedDimension, RelatedFilter,
+                       RelationshipDefinition, register_relationships)
+
+# `catalog` already contains activities and employees with their physical columns
+# and business concepts. Identity dimension employee_id maps to source user_id.
+catalog = register_relationships(catalog, (RelationshipDefinition(
+    "activity_profile", "activities", "employees", (("user_id", "user_id"),),
+    dimensions=(RelatedDimension("job_position", "Current position", "job_position"),),
+    filters=(RelatedFilter("position_filter", "Current position", "job_position_filter"),),
+),))
+# Select job_position on an activities ReportSpec. To retain only groups with
+# total hours > 100, set aggregate_filters=(AggregateFilter("activity_hours", "gt", (100,)),).
+# Use PeriodSelection("rolling", count=3, unit="month") for the last three months.
+```
+
+Both datasets need current access, and related source keys/imported concepts need
+permission. Missing/inaccessible attributes become null; duplicate visible source
+keys stop the report. Compound equality keys and several independent relationships
+are supported. Historical position joins, recursive relationship paths,
+fact-to-fact aggregation and arbitrary calculated formulas are not inferred.
+
 ## Install and try it
 
 Python 3.10+ is required. Install the local checkout into your backend environment:
@@ -45,9 +72,10 @@ to both the engine and interpreter and register English business labels.
 
 The reference browser uses RTL and displays Persian digits without changing JSON
 keys, concept IDs, typed numbers, decimal strings, ISO dates or result values.
-Dates remain **Gregorian**, including relative periods and Monday weeks. Asking
-in Persian does not enable Solar Hijri conversion; ambiguous calendar requests
-must clarify and confirmed Solar Hijri requests require Gregorian bounds.
+Stored dates, daily buckets, relative periods and Monday weeks remain **Gregorian**.
+The scoped [explicit Jalali month extension](SDK_JALALI_MONTHS.md) accepts a Persian
+month and year from 1300 through 1499, resolving its bounds locally. Missing years
+still require clarification; Jalali relative periods and calendar buckets are unsupported.
 Previously saved replies/reports keep their original text while their catalog
 and access rules still match. Changing catalog labels changes its fingerprint;
 older report/retry access still undergoes the existing compatibility checks.
@@ -103,7 +131,7 @@ engine = SageQL(
 )
 ```
 
-Reporting IDs are simple identifiers, unique across metrics, dimensions, and filters within each dataset. `time_bucket` and `period_label` are reserved result IDs. Register only columns the adapter needs. The interpreter receives labels, business IDs, aggregate/type/unit information, available filters and time capabilities; physical names, row keys and policy-only columns are omitted from its request.
+Reporting IDs are simple identifiers, unique across metrics, dimensions, and filters within each dataset. `time_bucket`, `period_label` and the internal `__sageql_relation_guard` are reserved result IDs. Register only columns the adapter needs. The interpreter receives labels, business IDs, aggregate/type/unit information, available filters and time capabilities; physical names, row keys and policy-only columns are omitted from its request.
 
 Use a dedicated reporting credential. The connection factory must bound login time and return a handle the adapter may roll back and close. The adapter verifies registered columns, compatible types and object kind before each report. It executes only its own deterministic parameterized SELECT. See the [execution scope](SDK_SQL_SERVER.md) for lifecycle, cancellation and database workload limits.
 
@@ -111,7 +139,8 @@ Use a dedicated reporting credential. The connection factory must bound login ti
 planning, local specification checks and semantic review. Rejected business
 interpretations can be revised once by default (`max_revisions=1`); all calls
 share `timeout_seconds=30`. Both agents use the configured endpoint and model.
-Each normal turn uses two model requests, so allow for the extra latency and
+Each normal live agent turn uses three model requests (intent, planning and
+review), so allow for the extra latency and
 usage in host configuration. Invalid output and unknown concepts fail closed;
 agents never execute a query or see lookup identities/results. The engine still
 validates the accepted specification against current host policy.
@@ -150,11 +179,11 @@ After clarification or a successful report, submit the next message with the ret
 
 The built-in stores allow one active turn per session and retain the last 20 reports and 100 full request replies. Older IDs remain tombstones and return `request_retired`, so they cannot repeat execution. A session accepts at most 1,000 request IDs; create a new session after that limit. An expired turn returns an interrupted-request receipt; the package cannot infer whether a driver finished an interrupted read. Store files contain messages and report rows and require host-owned access, backup and retention rules. The package does not log transcripts or emit telemetry by default.
 
-Successful report periods are frozen to explicit dates for later refinements. The host can inject `clock=lambda: ...` returning a `date` in its business timezone; the default is today's UTC date. A non-UTC `TimeDefinition` requires an explicit clock, since date-only storage has no timestamp conversion. Conversation history is bounded to 3–40 messages. Pending original requests and earlier clarification answers are carried forward as bounded context; if that context exceeds the configured message limit, start a new session with a complete question.
+Successful relative report periods are frozen to explicit dates for later refinements. Explicit `jalali_month` selections retain their original year/month and are resolved deterministically on each refinement; provenance also contains the Gregorian boundaries. The host can inject `clock=lambda: ...` returning a `date` in its business timezone; the default is today's UTC date. A non-UTC `TimeDefinition` requires an explicit clock, since date-only storage has no timestamp conversion. Conversation history is bounded to 3–40 messages. Pending original requests and earlier clarification answers are carried forward as bounded context; if that context exceeds the configured message limit, start a new session with a complete question.
 
 ## Implemented scope
 
-Metrics support `sum`, `count_rows`, `count_distinct`, `average`, `minimum`, and `maximum` where types permit. User and mandatory filters support equality, inequality, ordered comparisons, `in`, and null checks. Policies are independent of the model-selected filters. Date-only Gregorian periods support explicit ranges/months/years and current/previous days, weeks, months, quarters and years. Weeks start Monday; range ends are exclusive. Comparisons return labeled base/comparison rows as a table. Grouping, metric ordering and bounded top-N are supported; omitted dates are never inferred from an ambiguous month.
+Metrics support `sum`, `count_rows`, `count_distinct`, `average`, `minimum`, and `maximum` where types permit. User and mandatory filters support equality, inequality, ordered comparisons, `in`, and null checks. Policies are independent of the model-selected filters. Date-only Gregorian periods support explicit ranges/months/years and current/previous days, weeks, months, quarters and years. Explicit Jalali month/year selections use `PeriodSelection("jalali_month", year=1405, month=6)` under the [bounded month contract](SDK_JALALI_MONTHS.md). Weeks start Monday; range ends are exclusive. Comparisons return labeled base/comparison rows as a table. Grouping, metric ordering and bounded top-N are supported; omitted dates are never inferred from an ambiguous month.
 
 For a names/category list, use empty `metric_ids` with nonempty registered `dimension_ids`, `chart="table"`, `time_grain="none"`, and no comparison. The result contains distinct dimension combinations and still applies all current access policies, user filters and result bounds. Timeless sources use period `all`. The real model interpreter understands this listing shape; the offline keyword demo remains deliberately scripted. The [Rahtal frontend](../sageql_rahtal/README.md#local-frontend-on-the-real-database) connects existing approved sources and the existing model configuration.
 
@@ -191,7 +220,33 @@ under current scope. Lookup results and derived identity binds are excluded from
 provider specifications. Start a new chat after upgrading Rahtal's catalog;
 old reports/receipts still require matching catalog and access fingerprints.
 
-Each report queries one registered table/view. Model-selected joins, arbitrary formulas, timestamp timezone conversion, fiscal/Persian calendars, calculated comparison deltas, exports and production HTTP authentication remain future work. The SQLite reference uses ISO date storage and SQLite numeric affinity; it does not guarantee SQL Server fixed-point arithmetic. SQL Server cancellation is cooperative and driver-dependent; row caps do not bound source aggregation work.
+Each report selects one registered fact table/view with optional host-defined dimensional relationships. Model-selected joins, arbitrary formulas, timestamp timezone conversion, fiscal calendars, Jalali time buckets beyond the explicit month-selection extension, calculated comparison deltas, exports and production HTTP authentication remain future work. The SQLite reference uses ISO date storage and SQLite numeric affinity; it does not guarantee SQL Server fixed-point arithmetic. SQL Server cancellation is cooperative and driver-dependent; row caps do not bound source aggregation work.
+
+## Registered display names
+
+For grouped reports that need a display name from another approved source,
+register an `EntityLabelDimension` instead of an ordinary dimension. For example,
+include this dimension in `activities.dimensions`, where `employees` already
+registers the identity dimension/filter and the first/last-name dimensions:
+
+```python
+from sageql.sdk import EntityLabelDimension
+
+employee_name = EntityLabelDimension(
+    "employee_name", "نام کامل کارمند", "employee_id",
+    "employees", "employee_id", "employee_id_filter", ("first_name", "last_name"),
+)
+```
+
+Its `column` is the target table's identity column. The model selects the business
+dimension; the SDK groups and ranks identities, then replaces its result cells
+with locally fetched names using separate bounded source reads. Current source
+dimension/filter permissions and policies are mandatory. Metrics, ranking and
+row count are preserved even for equal names or duplicate profiles. One label
+dimension is permitted per report, sorting by it is unsupported, conflicting
+profiles/truncated reads fail closed, and missing names receive an unavailable
+label. See [SDK_ENTITY_LABELS.md](SDK_ENTITY_LABELS.md) for the full contract.
+The Rahtal catalog registers `employee_name`; start a fresh chat after upgrading.
 
 ## Verify
 

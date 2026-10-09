@@ -6,7 +6,7 @@ from threading import Event
 from typing import Callable
 
 from sageql.sdk.models import (
-    AccessScope, AdapterResult, DatabaseAdapter, EntityLookupDefinition, ExecutionLimits,
+    AccessScope, AdapterResult, DatabaseAdapter, EntityLabelDimension, EntityLookupDefinition, ExecutionLimits,
     ReportSpec, ReportingCatalog, SDKError, UserFilter, ValidatedReport,
 )
 from sageql.sdk.names import normalize_name
@@ -28,13 +28,24 @@ def prepare_request(
     Its type allows the existing target-report validators to check every other
     operation before the lookup. Only resolve_request supplies an actual ID.
     """
-    if not isinstance(spec, ReportSpec) or not isinstance(spec.filters, tuple) or len(spec.filters) > 32:
+    if (not isinstance(spec, ReportSpec) or not isinstance(spec.filters, tuple) or len(spec.filters) > 32
+            or not isinstance(spec.dimension_ids, tuple)
+            or any(not isinstance(item, str) for item in spec.dimension_ids)):
         raise SDKError("invalid_spec", "A bounded report specification is required.")
     visible = permitted_catalog(catalog, scope)
     dataset = next((item for item in catalog.datasets if item.id == spec.dataset_id), None)
     access = next((item for item in scope.datasets if item.dataset_id == spec.dataset_id), None)
     if dataset is None or access is None:
         raise SDKError("access_denied", "Report dataset is unavailable for this caller.")
+    from sageql.sdk.relationships import bind_relationships
+
+    def validate_target(candidate):
+        return bind_relationships(catalog, validate_report(dataset, candidate, access, today=today), scope)
+    label_ids = {item.id for item in dataset.dimensions if isinstance(item, EntityLabelDimension)}
+    visible_target = next((item for item in visible.datasets if item.id == dataset.id), None)
+    available_labels = {item.id for item in visible_target.dimensions} if visible_target else set()
+    if any(item in label_ids and item not in available_labels for item in spec.dimension_ids):
+        raise SDKError("access_denied", "Entity labels are unavailable under current access rules.")
     declared = tuple(item for item in catalog.lookups if item.dataset_id == spec.dataset_id)
     available = {item.id: item for item in visible.lookups if item.dataset_id == spec.dataset_id}
     lookup_ids = {item.id for item in declared}
@@ -55,7 +66,7 @@ def prepare_request(
         selected[condition.filter_id] = condition
     named = [item for item in declared if item.id in selected]
     if not selected:
-        return validate_report(dataset, spec, access, today=today), None
+        return validate_target(spec), None
     if len(named) != 1:
         raise SDKError("invalid_spec", "Select one registered entity name with its optional qualifiers.")
     definition = available.get(named[0].id)
@@ -71,7 +82,7 @@ def prepare_request(
     target_filter = next(item for item in dataset.filters if item.id == definition.target_filter_id)
     family = column_type(next(item for item in dataset.columns if item.name == target_filter.column).data_type)
     placeholder = UserFilter(definition.target_filter_id, "eq", (0 if family == "integer" else "",))
-    prepared = validate_report(dataset, replace(spec, filters=(*normal, placeholder)), access, today=today)
+    prepared = validate_target(replace(spec, filters=(*normal, placeholder)))
     source = next(item for item in catalog.datasets if item.id == definition.source_dataset_id)
     source_access = next(item for item in scope.datasets if item.dataset_id == source.id)
     conditions = [UserFilter(definition.source_name_filter_id, "eq", selected[definition.id].values)]
@@ -113,4 +124,5 @@ def resolve_request(
         UserFilter(item.filter_id, "eq", (identity,)) if item.filter_id == lookup.definition.target_filter_id else item
         for item in spec.filters
     ))
-    return validate_report(prepared.dataset, concrete, prepared.access, today=prepared.as_of), ""
+    return replace(validate_report(prepared.dataset, concrete, prepared.access, today=prepared.as_of),
+                   related_sources=prepared.related_sources), ""

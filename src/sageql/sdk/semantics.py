@@ -1,23 +1,26 @@
 """Validate reporting vocabulary and resolve date boundaries without a model.
 
-The first SDK query shape scans one registered table or view. It cannot create
-joins or accept expressions, and access predicates remain separate from the
-model's specification. A host supplies ``today`` in its business timezone.
+Reports select a registered fact and optionally registered dimensional imports.
+Models cannot invent joins or expressions; access predicates remain separate
+from the specification. A host supplies ``today`` in its business timezone.
 """
 
 from __future__ import annotations
 
 from dataclasses import replace
 from datetime import date, timedelta
+from calendar import monthrange
 from decimal import Decimal, InvalidOperation
 import math
 import re
 
 from sageql.schema import Column, Table
 from sageql.sdk.names import normalize_name
+from sageql.sdk.calendars import jalali_month_bounds
 from sageql.sdk.models import (
-    AccessScope, DatasetAccess, DatasetDefinition, DimensionDefinition,
-    EntityLookupDefinition, FilterDefinition, FullNameFilterDefinition, LookupQualifier,
+    AccessScope, AggregateFilter, DatasetAccess, DatasetDefinition, DimensionDefinition,
+    EntityLabelDimension, EntityLookupDefinition, FilterDefinition, FullNameFilterDefinition, LookupQualifier,
+    RelatedAttributeDimension,
     MetricDefinition, PeriodSelection, ReportSpec,
     ReportingCatalog, ResolvedPeriod, RowPolicy, SDKError, TimeDefinition,
     UserFilter, ValidatedReport,
@@ -36,7 +39,7 @@ _FAMILIES = {
     "date": {"date"},
     "datetime": {"datetime", "datetime2", "smalldatetime", "datetimeoffset"},
 }
-_RESERVED_IDS = {"time_bucket", "period_label"}
+_RESERVED_IDS = {"time_bucket", "period_label", "__sageql_relation_guard"}
 
 
 def _fail(code: str, message: str) -> None:
@@ -120,9 +123,15 @@ def _validate_dataset(dataset: DatasetDefinition) -> None:
         names.add(column.name.casefold())
         column_type(column.data_type)
     columns = _columns(dataset)
+    _tuple(dataset.related_columns, code, "Related column declarations must be bounded.")
+    if (len(set(dataset.related_columns)) != len(dataset.related_columns)
+            or any(not isinstance(name, str) or name not in columns for name in dataset.related_columns)):
+        _fail(code, "Related columns must reference distinct registered projections.")
     _tuple(dataset.row_key, code, "Dataset row keys must be a tuple.")
     if any(not isinstance(name, str) or name not in columns for name in dataset.row_key) or len(set(dataset.row_key)) != len(dataset.row_key):
         _fail(code, "Dataset row keys must reference registered columns.")
+    if set(dataset.row_key).intersection(dataset.related_columns):
+        _fail(code, "Fact row keys cannot contain related projections.")
     ids = set()
     for definitions, kind in ((dataset.metrics, MetricDefinition), (dataset.dimensions, DimensionDefinition), (dataset.filters, FilterDefinition)):
         _tuple(definitions, code, "Reporting definitions must be bounded tuples.", maximum=256)
@@ -140,6 +149,8 @@ def _validate_dataset(dataset: DatasetDefinition) -> None:
             elif not isinstance(definition.column, str) or definition.column not in columns:
                 _fail(code, "Reporting definitions must reference registered physical columns.")
             if kind is MetricDefinition:
+                if definition.column in dataset.related_columns:
+                    _fail(code, "Measures must retain the physical fact grain.")
                 if not isinstance(definition.aggregation, str) or definition.aggregation not in _AGGREGATIONS or not isinstance(definition.unit, str) or len(definition.unit) > 100 or "\x00" in definition.unit:
                     _fail(code, "A metric has an unsupported aggregate or unit.")
                 if definition.column is not None:
@@ -152,6 +163,18 @@ def _validate_dataset(dataset: DatasetDefinition) -> None:
                         _fail("unsupported", "Timestamp reporting requires explicit timezone support.")
             elif column_type(columns[definition.column].data_type) == "datetime":
                 _fail("unsupported", "Timestamp reporting requires explicit timezone support.")
+            if isinstance(definition, EntityLabelDimension):
+                for identifier in (definition.source_dataset_id, definition.source_id_dimension_id,
+                                   definition.source_id_filter_id):
+                    _id(identifier, code)
+                _tuple(definition.source_label_dimension_ids, code, "Entity label fields must be bounded.", maximum=4)
+                if (not definition.source_label_dimension_ids
+                        or any(not isinstance(item, str) for item in definition.source_label_dimension_ids)
+                        or len(set(definition.source_label_dimension_ids)) != len(definition.source_label_dimension_ids)):
+                    _fail(code, "Entity labels require one to four distinct source dimensions.")
+            if isinstance(definition, RelatedAttributeDimension):
+                _id(definition.source_dataset_id, code)
+                _id(definition.source_dimension_id, code)
             if kind is FilterDefinition:
                 _tuple(definition.operators, code, "Filter operators must be a tuple.", maximum=9)
                 if not definition.operators or any(not isinstance(operator, str) or operator not in _OPERATORS for operator in definition.operators) or len(set(definition.operators)) != len(definition.operators):
@@ -172,6 +195,8 @@ def _validate_dataset(dataset: DatasetDefinition) -> None:
         time = dataset.time
         if not isinstance(time, TimeDefinition) or not isinstance(time.column, str) or time.column not in columns:
             _fail(code, "Time configuration must reference a registered column.")
+        if time.column in dataset.related_columns:
+            _fail(code, "Time configuration must retain the physical fact date.")
         if column_type(columns[time.column].data_type) != "date":
             _fail("unsupported", "Only date columns support SDK time operations.")
         if time.calendar != "gregorian" or type(time.week_start) is not int or time.week_start != 0:
@@ -193,7 +218,37 @@ def validate_catalog(catalog: ReportingCatalog) -> None:
         if dataset.id.casefold() in ids:
             _fail("invalid_catalog", "Dataset IDs must be unique.")
         ids.add(dataset.id.casefold())
+    _validate_labels(catalog)
     _validate_lookups(catalog)
+    from sageql.sdk.relationships import validate_relationships
+    validate_relationships(catalog)
+
+
+def _validate_labels(catalog: ReportingCatalog) -> None:
+    datasets = {item.id: item for item in catalog.datasets}
+    for target in catalog.datasets:
+        for label in target.dimensions:
+            if not isinstance(label, EntityLabelDimension):
+                continue
+            source = datasets.get(label.source_dataset_id)
+            if source is None or source.id == target.id or source.time is not None:
+                _fail("invalid_catalog", "Entity labels require a distinct timeless source.")
+            dimensions = {item.id: item for item in source.dimensions}
+            identity = dimensions.get(label.source_id_dimension_id)
+            key_filter = next((item for item in source.filters if item.id == label.source_id_filter_id), None)
+            if (identity is None or isinstance(identity, EntityLabelDimension)
+                    or key_filter is None or isinstance(key_filter, FullNameFilterDefinition)
+                    or key_filter.column != identity.column or "in" not in key_filter.operators):
+                _fail("invalid_catalog", "Entity labels require a scalar identity dimension and matching IN filter.")
+            family = column_type(_columns(target)[label.column].data_type)
+            if family not in {"integer", "text"} or column_type(_columns(source)[identity.column].data_type) != family:
+                _fail("invalid_catalog", "Entity label identities must use matching integer/text types.")
+            for identifier in label.source_label_dimension_ids:
+                dimension = dimensions.get(identifier)
+                if (dimension is None or isinstance(dimension, EntityLabelDimension)
+                        or column_type(_columns(source)[dimension.column].data_type) != "text"
+                        or dimension.id == identity.id):
+                    _fail("invalid_catalog", "Entity label parts must be registered scalar text dimensions.")
 
 
 def _validate_lookups(catalog: ReportingCatalog) -> None:
@@ -322,6 +377,8 @@ def _validate_access(dataset: DatasetDefinition, access: DatasetAccess) -> None:
     for policy in access.policies:
         if not isinstance(policy, RowPolicy) or not isinstance(policy.column, str) or policy.column not in columns:
             _fail("invalid_scope", "Row policies must reference registered columns.")
+        if policy.column in dataset.related_columns:
+            _fail("invalid_scope", "Related source policies belong to the source dataset.")
         _predicate(columns[policy.column], policy.operator, policy.values, "invalid_scope")
 
 
@@ -345,20 +402,53 @@ def permitted_catalog(catalog: ReportingCatalog, scope: AccessScope) -> Reportin
     """Expose only permitted reporting definitions, never compiler-only columns."""
     validate_scope(catalog, scope)
     datasets = {dataset.id: dataset for dataset in catalog.datasets}
+    from sageql.sdk.relationships import relation_allowed
+    accesses = {item.dataset_id: item for item in scope.datasets}
+    related = {(relation.dataset_id, item.id): relation
+               for relation in catalog.relationships for item in (*relation.dimensions, *relation.filters)}
+
+    def related_allowed(dataset_id, identifier):
+        relation = related.get((dataset_id, identifier))
+        if relation is None:
+            return True
+        access = accesses.get(relation.source_dataset_id)
+        return access is not None and relation_allowed(
+            relation, datasets[relation.source_dataset_id], access, concept_id=identifier)
     permitted = []
     for access in scope.datasets:
         dataset = datasets[access.dataset_id]
         metrics = tuple(item for item in dataset.metrics if access.metric_ids is None or item.id in access.metric_ids)
-        dimensions = tuple(item for item in dataset.dimensions if access.dimension_ids is None or item.id in access.dimension_ids)
+        dimensions = tuple(item for item in dataset.dimensions
+                           if (access.dimension_ids is None or item.id in access.dimension_ids)
+                           and related_allowed(dataset.id, item.id))
         if not metrics and not dimensions:
             continue
-        filters = tuple(item for item in dataset.filters if access.filter_ids is None or item.id in access.filter_ids)
+        filters = tuple(item for item in dataset.filters
+                        if (access.filter_ids is None or item.id in access.filter_ids)
+                        and related_allowed(dataset.id, item.id))
         needed = {item.column for item in (*metrics, *dimensions, *filters) if item.column is not None}
         needed.update(name for item in filters if isinstance(item, FullNameFilterDefinition)
                       for name in item.name_columns)
         if dataset.time:
             needed.add(dataset.time.column)
-        permitted.append(replace(dataset, metrics=metrics, dimensions=dimensions, filters=filters, columns=tuple(column for column in dataset.columns if column.name in needed), row_key=()))
+        permitted.append(replace(dataset, metrics=metrics, dimensions=dimensions, filters=filters,
+                                 columns=tuple(column for column in dataset.columns if column.name in needed),
+                                 row_key=(), related_columns=()))
+    by_id = {item.id: item for item in permitted}
+    # A display capability is visible only while every source dependency is
+    # permitted. Ordinary access to the target identity does not grant names.
+    def label_allowed(label: EntityLabelDimension) -> bool:
+        source = by_id.get(label.source_dataset_id)
+        return (source is not None
+                and {label.source_id_dimension_id, *label.source_label_dimension_ids}
+                <= {item.id for item in source.dimensions}
+                and label.source_id_filter_id in {item.id for item in source.filters})
+
+    permitted = [replace(item, dimensions=tuple(
+        dimension for dimension in item.dimensions
+        if not isinstance(dimension, EntityLabelDimension) or label_allowed(dimension)
+    )) for item in permitted]
+    permitted = [item for item in permitted if item.metrics or item.dimensions]
     by_id = {item.id: item for item in permitted}
     lookups = []
     for lookup in catalog.lookups:
@@ -386,8 +476,10 @@ def resolve_period(period: PeriodSelection, today: date) -> ResolvedPeriod:
     """Resolve inclusive start/exclusive end boundaries from an injected date."""
     if not isinstance(period, PeriodSelection) or not isinstance(period.kind, str) or type(today) is not date:
         _fail("invalid_spec", "A period selection and business date are required.")
-    supplied = {name for name in ("start", "end", "year", "month") if getattr(period, name) is not None}
-    required = {"range": {"start", "end"}, "month": {"year", "month"}, "year": {"year"}}.get(period.kind, set())
+    supplied = {name for name in ("start", "end", "year", "month", "count", "unit") if getattr(period, name) is not None}
+    required = {"range": {"start", "end"}, "month": {"year", "month"},
+                "jalali_month": {"year", "month"}, "year": {"year"},
+                "rolling": {"count", "unit"}}.get(period.kind, set())
     if supplied != required:
         _fail("invalid_spec", "A period selection contains missing or contradictory fields.")
     if period.kind == "all":
@@ -399,11 +491,31 @@ def resolve_period(period: PeriodSelection, today: date) -> ResolvedPeriod:
         return ResolvedPeriod(start, end)
     if period.kind == "month":
         return _month(period.year, period.month)
+    if period.kind == "jalali_month":
+        try:
+            start, end = jalali_month_bounds(period.year, period.month)
+        except ValueError:
+            _fail("invalid_spec", "A Jalali month requires year 1300 through 1499 and month 1 through 12.")
+        return ResolvedPeriod(start, end)
     if period.kind == "year":
         if type(period.year) is not int or not 1 <= period.year <= 9998:
             _fail("invalid_spec", "A year selection needs a supported explicit year.")
         return ResolvedPeriod(date(period.year, 1, 1), date(period.year + 1, 1, 1))
     try:
+        if period.kind == "rolling":
+            if (type(period.count) is not int or not 1 <= period.count <= 1200
+                    or period.unit not in {"day", "week", "month", "quarter", "year"}):
+                _fail("invalid_spec", "A rolling period requires a bounded positive count and registered unit.")
+            end = today + timedelta(days=1)
+            if period.unit in {"day", "week"}:
+                start = end - timedelta(days=period.count * (7 if period.unit == "week" else 1))
+            else:
+                months = period.count * {"month": 1, "quarter": 3, "year": 12}[period.unit]
+                month_index = today.year * 12 + today.month - 1 - months
+                year, zero_month = divmod(month_index, 12)
+                month = zero_month + 1
+                start = date(year, month, min(today.day, monthrange(year, month)[1]))
+            return ResolvedPeriod(start, end)
         if period.kind in {"today", "yesterday"}:
             start = today - timedelta(days=period.kind == "yesterday")
             return ResolvedPeriod(start, start + timedelta(days=1))
@@ -444,6 +556,30 @@ def validate_report(dataset: DatasetDefinition, spec: ReportSpec, access: Datase
             _fail("access_denied", "A requested reporting field is unavailable.")
     if not spec.metric_ids and not spec.dimension_ids:
         _fail("invalid_spec", "A report needs at least one registered metric or dimension.")
+    _tuple(spec.aggregate_filters, "invalid_spec", "Aggregate conditions must be bounded.", maximum=32)
+    metrics = {item.id: item for item in dataset.metrics}
+    seen_aggregates = set()
+    for condition in spec.aggregate_filters:
+        if (not isinstance(condition, AggregateFilter) or not isinstance(condition.metric_id, str)
+                or condition.metric_id not in spec.metric_ids
+                or not isinstance(condition.operator, str)):
+            _fail("invalid_spec", "An aggregate condition must reference a selected metric.")
+        key = (condition.metric_id, condition.operator)
+        if key in seen_aggregates:
+            _fail("invalid_spec", "Duplicate aggregate conditions are unsupported.")
+        seen_aggregates.add(key)
+        metric = metrics[condition.metric_id]
+        family = "integer" if metric.aggregation in {"count_rows", "count_distinct"} else column_type(_columns(dataset)[metric.column].data_type)
+        if metric.aggregation in {"sum", "average"} and family == "integer":
+            family = "decimal"
+        output_type = {"integer": "bigint", "number": "float", "decimal": "decimal",
+                       "text": "nvarchar", "date": "date", "boolean": "bit"}[family]
+        _predicate(Column(dataset.table.key, "aggregate", output_type), condition.operator, condition.values, "invalid_spec")
+    label_ids = {item.id for item in dataset.dimensions if isinstance(item, EntityLabelDimension)}
+    if len(label_ids.intersection(spec.dimension_ids)) > 1:
+        _fail("unsupported", "A report supports one registered entity-label dimension.")
+    if isinstance(spec.order_by, str) and spec.order_by in label_ids:
+        _fail("unsupported", "Sorting by resolved entity labels is unsupported; order by a metric instead.")
     _tuple(spec.filters, "invalid_spec", "User filters must be a bounded tuple.", maximum=32)
     definitions = {definition.id: definition for definition in dataset.filters}
     columns = _columns(dataset)
@@ -475,6 +611,10 @@ def validate_report(dataset: DatasetDefinition, spec: ReportSpec, access: Datase
         _fail("invalid_spec", "A report requires a bounded row limit and explicit sort direction.")
     period = resolve_period(spec.period, today)
     comparison = resolve_period(spec.comparison, today) if spec.comparison is not None else None
+    if (any(selection is not None and selection.kind == "jalali_month"
+            for selection in (spec.period, spec.comparison))
+            and spec.time_grain not in {"none", "day"}):
+        _fail("unsupported", "A Jalali month supports totals or daily dates; Jalali calendar buckets are not registered.")
     if (period.start is not None or spec.time_grain != "none" or comparison is not None) and dataset.time is None:
         _fail("unsupported", "This dataset has no configured date field.")
     if comparison is not None and (period.start is None or comparison.start is None):

@@ -325,3 +325,46 @@ def test_decimal_parameter_bounds_match_sql_server_numeric_capacity():
 ])
 def test_unsupported_sql_types_and_malformed_type_parameters_fail(declared):
     assert_error("invalid_catalog", lambda: column_type(declared))
+
+
+def test_explicit_jalali_month_resolves_locally_and_binds_gregorian_sql_dates():
+    from sageql.sdk.adapters import compile_report
+    from sageql.sdk.models import ExecutionLimits
+    requested = spec(period=PeriodSelection("jalali_month", year=1405, month=6))
+    report = validate_report(dataset(), requested, access(), today=TODAY)
+    assert report.period.start == date(2026, 8, 23)
+    assert report.period.end == date(2026, 9, 23)
+    query = compile_report(report, ExecutionLimits(), dialect="tsql")
+    assert [value for value in query.parameters if type(value) is date] == [date(2026, 8, 23), date(2026, 9, 23)]
+    assert "[tenant_id] = ?" in query.sql and "[deleted] = ?" in query.sql
+    assert "1405" not in query.sql and "2026-08-23" not in query.sql
+
+
+def test_jalali_month_comparison_keeps_each_period_and_mandatory_policies():
+    from sageql.sdk.adapters import compile_report
+    from sageql.sdk.models import ExecutionLimits
+    requested = spec(period=PeriodSelection("jalali_month", year=1405, month=6),
+                     comparison=PeriodSelection("jalali_month", year=1405, month=5))
+    report = validate_report(dataset(), requested, access(), today=TODAY)
+    query = compile_report(report, ExecutionLimits(), dialect="tsql")
+    assert report.comparison_period.start == date(2026, 7, 23)
+    assert report.comparison_period.end == report.period.start
+    assert query.sql.count("[tenant_id] = ?") == 2
+    assert query.sql.count("[deleted] = ?") == 2
+
+
+@pytest.mark.parametrize("period", [
+    PeriodSelection("jalali_month", month=6),
+    PeriodSelection("jalali_month", year=True, month=6),
+    PeriodSelection("jalali_month", year=1405, month=13),
+    PeriodSelection("jalali_month", year=1500, month=1),
+    PeriodSelection("jalali_month", year=1405, month=6, start="2026-08-23"),
+])
+def test_jalali_selection_rejects_missing_contradictory_or_unsupported_fields(period):
+    assert_error("invalid_spec", lambda: resolve_period(period, TODAY))
+
+
+@pytest.mark.parametrize("grain", ["week", "month", "quarter", "year"])
+def test_jalali_selection_does_not_silently_use_gregorian_calendar_buckets(grain):
+    requested = spec(period=PeriodSelection("jalali_month", year=1405, month=6), time_grain=grain)
+    assert_error("unsupported", lambda: validate_report(dataset(), requested, access(), today=TODAY))

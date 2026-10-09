@@ -4,15 +4,32 @@ Read this file before changing code. `AGENTS.md` points here; keep both files in
 
 ## Product contract
 
-SageQL is an installable reporting SDK embedded in a developer's backend. The approved `sageql.sdk` slice separates trusted catalog/infrastructure/authenticated actor policies from end-user messages, asks clarification, resolves date-only Gregorian periods, validates registered concepts, compiles deterministic single-source SQL Server or SQLite SELECTs, executes only with explicit host opt-in, and returns typed table/chart JSON. Persistent sessions support refinements, ownership, current access checks, revisions and idempotent retries. Read [docs/SDK.md](../docs/SDK.md) and [docs/SDK_SQL_SERVER.md](../docs/SDK_SQL_SERVER.md) for actual API and scope. Model-selected joins, arbitrary formulas, timestamp/calendar conversion and production HTTP identity are outside this slice.
+SageQL is an installable reporting SDK embedded in a developer's backend. The approved `sageql.sdk` slice separates trusted catalog/infrastructure/authenticated actor policies from end-user messages, asks clarification, resolves date-only Gregorian periods and explicitly supplied Jalali months, validates registered concepts, compiles deterministic SQL Server or SQLite SELECTs over registered facts and optional dimensional relationships, executes only with explicit host opt-in, and returns typed table/chart JSON. Persistent sessions support refinements, ownership, current access checks, revisions and idempotent retries. Read [docs/SDK.md](../docs/SDK.md) and [docs/SDK_SQL_SERVER.md](../docs/SDK_SQL_SERVER.md) for actual API and scope. Model-selected joins, arbitrary formulas, timestamp conversion, calendars beyond the scoped month extension and production HTTP identity are outside this slice.
 
 The historical staged API/CLI still begins with a report question and Database/LLM configuration, clarifies understanding/context, discovers user-supplied metadata, builds Step 6 logical plans, renders Step 7 SQLite SQL, validates Step 8, and explicitly executes Step 9 read-only SQLite reports. The isolated Rahtal pilot retains its deterministic T-SQL renderer/executor for approved daily-performance tables. Its ignored local config holds questions/run options and `.env` holds credentials. Step 5 remains undefined; SDK table/chart JSON is independent of that historical step and does not imply a PDF/document export. The earlier model-written SQL proposal API remains experimental and never enters SDK execution.
 
 The local Rahtal frontend explicitly reuses its existing approved activity and employee-profile tables and configured model endpoint. A fixed local reporting principal and separate workspace token protect this loopback demo; it is not production per-employee authorization. Registered dimension-only DISTINCT listings are approved under the same policies and execution bounds. Do not create database objects, add implicit source joins, copy credentials into tracked files, or substitute synthetic data when Rahtal is unreachable.
 
+The approved [registered relationship extension](../docs/SDK_RELATIONSHIPS.md)
+adds host-defined many-to-one equality mappings and explicit dimension/filter
+imports. Models select exposed business concepts, never keys or join types.
+Both sides' current policies and permissions apply; duplicate visible source
+keys fail closed in canonical compilation/execution. Grouping and aggregate
+conditions precede ranking/limits. Fact-to-fact joins, recursive paths and
+arbitrary formulas remain unregistered. Rolling Gregorian date windows resolve
+locally from a bounded count/unit. Rahtal registers current employee position,
+not historical position at the activity date.
+
 The registered entity-name lookup extension has its own [scope](../docs/SDK_ENTITY_LOOKUPS.md): one bounded profile SELECT finds a unique identity from a full name and optional registered qualifier; a separate single-source report binds that identity. Fixed name concatenation/normalization is allowed only over host-declared text columns. Both source and target access/policies remain mandatory. Do not pick the first ambiguous match or forward lookup rows/resolved identities to the model. This is a report filter, never caller identity or production authorization.
 
+Registered entity-label dimensions have their own [scope](../docs/SDK_ENTITY_LABELS.md): group/rank by target identity first, then resolve display names through bounded policy-bound source SELECTs. The host fixes all source concepts; at most one label dimension per report is allowed. Both sources retain current access checks, execution opt-in, deterministic SQL and request bounds. Never sort by resolved labels, select conflicting/truncated candidates or forward identities/results to the model. Names decorate identity groups; they never merge groups or change aggregates.
+
 ## Working rules
+
+The explicitly requested [Jalali month extension](../docs/SDK_JALALI_MONTHS.md)
+adds deterministic date-only bounds for a supplied month/year. It does not add
+timestamp conversion, Jalali time buckets or inferred years. The source calendar
+and SQL remain Gregorian; the existing execution and model-data boundaries apply.
 
 1. Inspect the current tree, Git state, public API, and tests before editing. Preserve user changes.
 2. State the next small deliverable. Implement one vertical slice, run focused checks, and record the result before moving on.

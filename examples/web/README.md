@@ -15,8 +15,16 @@ refinements. The offline demo understands only its documented keyword examples;
 use the configured interpreter for arbitrary questions and literal name filters.
 See the [SDK language contract](../../docs/SDK.md#persian-by-default).
 
-Live SQL Server and Rahtal modes use `OpenAIReportAgent` with planner/reviewer
-requests to the same configured model. Interpretations and clarifications can
+Rahtal mode includes a monthly workload comparison suggestion. Comparison
+tables display the locally resolved period names and both execution ranges,
+while JSON row values remain `base` / `comparison`. Existing saved reports
+without display labels retain their generic period labels. See the
+[managerial verification scenario](../../docs/SDK_MANAGEMENT_REPORT.md).
+
+Live SQL Server and Rahtal modes use `OpenAIReportAgent` with independent intent,
+planner and reviewer requests to the same configured model. Local checks reject
+unavailable source combinations and lost grouping changes; persisted clarification
+keys stop repeated answer continuations. Interpretations and clarifications can
 be revised once within the original total timeout, without phrase-specific
 routing. The offline demo stays scripted. See the
 [agent contract](../../docs/SDK_AGENTS.md); full SDK validation and explicit host

@@ -1,4 +1,4 @@
-"""Deterministic, bounded adapters for one registered reporting table or view.
+"""Deterministic, bounded adapters for registered reporting sources.
 
 SQL Server uses a host-supplied, dedicated connection factory. The factory must
 set a finite login timeout and return a disposable connection (or a pool lease
@@ -11,7 +11,7 @@ or a factory ignoring its login timeout cannot be forcibly stopped in Python.
 SQLite is an offline reference, with a read-only file connection, an authorizer
 and a VM work budget. It supports ordinary tables in the main schema only.
 Its numeric affinity does not provide SQL Server's fixed-point decimal accuracy.
-Both adapters reject joins, arbitrary expressions and unregistered objects.
+Both adapters reject unregistered joins, arbitrary expressions and objects.
 """
 
 from __future__ import annotations
@@ -30,7 +30,7 @@ from typing import Any, Callable
 
 from sageql.errors import InvalidSQL
 from sageql.sdk.models import (
-    AdapterResult, ExecutionLimits, FullNameFilterDefinition, ReportField, SDKError, ValidatedReport,
+    AdapterResult, EntityLabelDimension, ExecutionLimits, FullNameFilterDefinition, ReportField, SDKError, ValidatedReport,
 )
 from sageql.sdk.names import NAME_REPLACEMENTS, normalize_name
 from sageql.sdk.semantics import column_type, validate_report
@@ -45,6 +45,7 @@ class CompiledReport:
     parameters: tuple[object, ...]
     fields: tuple[ReportField, ...]
     limit: int
+    guarded: bool = False
 
 
 def _quote(value: str, dialect: str) -> str:
@@ -59,7 +60,10 @@ def _revalidate(report: ValidatedReport) -> None:
     if not isinstance(report, ValidatedReport):
         raise SDKError("invalid_spec", "A validated report specification is required.")
     canonical = validate_report(report.dataset, report.spec, report.access, today=report.as_of)
-    if canonical != report:
+    from dataclasses import replace
+    from sageql.sdk.relationships import validate_bound_relationships
+    validate_bound_relationships(report)
+    if canonical != replace(report, related_sources=()):
         raise SDKError("invalid_spec", "Resolved report differs from its validated specification.")
 
 
@@ -129,8 +133,14 @@ def compile_report(
     fields: list[ReportField] = []
     group: list[str] = []
     selections: list[str] = []
+    related_expressions = {}
+    for index, bound in enumerate(report.related_sources):
+        for field_index, (local, _) in enumerate(bound.column_pairs):
+            related_expressions[local] = f"r{index}." + _quote(f"v{field_index}", dialect)
 
     def col(name: str) -> str:
+        if name in related_expressions:
+            return related_expressions[name]
         return "t." + _quote(name, dialect)
 
     if report.comparison_period:
@@ -181,6 +191,45 @@ def compile_report(
 
     operators = {"eq": "=", "neq": "<>", "gt": ">", "gte": ">=", "lt": "<", "lte": "<="}
 
+    ctes = []
+    joins = []
+    guards = []
+    for index, bound in enumerate(report.related_sources):
+        source = bound.source
+        if dialect == "sqlite" and (source.table.schema not in {"", "main"}
+                                      or source.table.kind != "TABLE"):
+            raise SDKError("unsupported", "SQLite related sources require main-schema tables.")
+        source_columns = {item.name: item for item in source.columns}
+        keys = ["s." + _quote(remote, dialect) for _, remote in bound.definition.key_pairs]
+        projected = [expression + " AS " + _quote(f"k{i}", dialect) for i, expression in enumerate(keys)]
+        for i, (_, remote) in enumerate(bound.column_pairs):
+            expression = "s." + _quote(remote, dialect)
+            if column_type(source_columns[remote].data_type) == "boolean" and dialect == "tsql":
+                expression = f"CAST({expression} AS int)"
+            projected.append(f"MIN({expression}) AS " + _quote(f"v{i}", dialect))
+        count = "COUNT_BIG(*)" if dialect == "tsql" else "COUNT(*)"
+        projected.append(count + " AS " + _quote("__count", dialect))
+        predicates = [expression + " IS NOT NULL" for expression in keys]
+        for policy in bound.access.policies:
+            expression = "s." + _quote(policy.column, dialect)
+            family = column_type(source_columns[policy.column].data_type)
+            if policy.operator in {"is_null", "is_not_null"}:
+                predicates.append(expression + (" IS NULL" if policy.operator == "is_null" else " IS NOT NULL"))
+            elif policy.operator == "in":
+                predicates.append(expression + " IN (" + ", ".join(bind(value, family) for value in policy.values) + ")")
+            else:
+                predicates.append(expression + " " + operators[policy.operator] + " " + bind(policy.values[0], family))
+        source_table = _quote(source.table.name, dialect)
+        source_schema = source.table.schema or ("dbo" if dialect == "tsql" else "")
+        if source_schema:
+            source_table = _quote(source_schema, dialect) + "." + source_table
+        ctes.append(f"r{index} AS (SELECT " + ", ".join(projected) + " FROM " + source_table
+                    + " AS s WHERE " + " AND ".join(predicates) + " GROUP BY " + ", ".join(keys) + ")")
+        join_keys = [col(local) + f" = r{index}." + _quote(f"k{i}", dialect)
+                     for i, (local, _) in enumerate(bound.definition.key_pairs)]
+        joins.append(f"LEFT JOIN r{index} ON " + " AND ".join(join_keys))
+        guards.append(f"EXISTS (SELECT 1 FROM r{index} WHERE " + _quote("__count", dialect) + " > 1)")
+
     def condition(name: str, operator: str, values: tuple[object, ...]) -> str:
         expression = col(name)
         family = column_type(columns[name].data_type)
@@ -216,6 +265,8 @@ def compile_report(
         if report.comparison_period:
             selected.insert(0, f"'{label}' AS " + _quote("period_label", dialect))
         sql = ("SELECT DISTINCT " if dimension_listing else "SELECT ") + ", ".join(selected) + "\nFROM " + table + " AS t"
+        if joins:
+            sql += "\n" + "\n".join(joins)
         if predicates:
             sql += "\nWHERE " + " AND ".join(predicates)
         if group and not dimension_listing:
@@ -227,19 +278,53 @@ def compile_report(
         body += "\nUNION ALL\n" + branch("comparison", report.comparison_period)
     # The cap applies to the entire result, including comparison branches.
     projection = ", ".join(_quote(item.id, dialect) for item in fields)
+    if guards:
+        projection += ", CASE WHEN " + " OR ".join(guards) + " THEN 1 ELSE 0 END AS " + _quote("__sageql_relation_guard", dialect)
     sql = ("SELECT TOP (?) " if dialect == "tsql" else "SELECT ") + projection
     sql += "\nFROM (\n" + body + "\n) AS report"
+    aggregate_predicates = []
+    for item in spec.aggregate_filters:
+        expression = _quote(item.metric_id, dialect)
+        family = next(field.type for field in fields if field.id == item.metric_id)
+
+        def aggregate_bind(value):
+            placeholder = bind(value, family)
+            # Aggregate expressions have no SQLite column affinity. Decimal
+            # driver strings need an explicit numeric cast for comparisons.
+            return f"CAST({placeholder} AS NUMERIC)" if dialect == "sqlite" and family == "decimal" else placeholder
+
+        if item.operator in {"is_null", "is_not_null"}:
+            aggregate_predicates.append(expression + (" IS NULL" if item.operator == "is_null" else " IS NOT NULL"))
+        elif item.operator == "in":
+            aggregate_predicates.append(expression + " IN (" + ", ".join(aggregate_bind(value) for value in item.values) + ")")
+        else:
+            aggregate_predicates.append(expression + " " + operators[item.operator] + " " + aggregate_bind(item.values[0]))
+    if aggregate_predicates:
+        sql += "\nWHERE " + " AND ".join(aggregate_predicates)
     order: list[str] = []
     if spec.order_by:
         order.append(_quote(spec.order_by, dialect) + (" DESC" if spec.descending else " ASC"))
-    order += [_quote(item.id, dialect) + " ASC" for item in fields
-              if item.id in {"period_label", "time_bucket", *spec.dimension_ids}
-              and item.id != spec.order_by]
+    tie_dimensions = list(spec.dimension_ids)
+    if spec.order_by in spec.metric_ids:
+        # A display-column reorder must not change tied entity top-N groups.
+        # Labels still sort by their underlying identity before enrichment.
+        tie_dimensions.sort(key=lambda key: not isinstance(dimensions[key], EntityLabelDimension))
+    selected_ids = {item.id for item in fields}
+    tie_ids = [key for key in ("period_label", "time_bucket", *tie_dimensions)
+               if key in selected_ids and key != spec.order_by]
+    order += [_quote(key, dialect) + " ASC" for key in tie_ids]
     if order:
         sql += "\nORDER BY " + ", ".join(order)
     if dialect == "sqlite":
         sql += "\nLIMIT ?"
         parameters.append(limit + 1)
+    if ctes:
+        sql = "WITH " + ",\n".join(ctes) + "\n" + sql
+        # CTE policies precede SQL Server's TOP placeholder in textual bind order.
+        if dialect == "tsql":
+            source_parameters = sum(len(policy.values) for bound in report.related_sources
+                                    for policy in bound.access.policies)
+            parameters = [*parameters[1:1 + source_parameters], parameters[0], *parameters[1 + source_parameters:]]
     # Conservative portable budgets leave room for ODBC's prepared-call
     # bookkeeping and SQLite builds with the older 999-variable default.
     if len(parameters) > (2_000 if dialect == "tsql" else 900):
@@ -248,10 +333,19 @@ def compile_report(
         validate_sql(sql, dialect=dialect)
     except InvalidSQL:
         raise SDKError("invalid_query", "Compiled report did not pass SQL validation.") from None
-    return CompiledReport(sql, tuple(parameters), tuple(fields), limit)
+    return CompiledReport(sql, tuple(parameters), tuple(fields), limit, bool(guards))
 
 
 def _rows(query: CompiledReport, description: Any, fetched: Any) -> AdapterResult:
+    if query.guarded:
+        if (tuple(item[0] for item in description or ()) != (*[field.id for field in query.fields], "__sageql_relation_guard")
+                or any(len(row) != len(query.fields) + 1 or type(row[-1]) not in (int, bool)
+                       or row[-1] not in (0, 1) for row in fetched)):
+            raise SDKError("execution_failed", "Database returned invalid related report fields.")
+        if any(row[-1] for row in fetched):
+            raise SDKError("relationship_cardinality", "Related source has multiple visible rows for a registered key.")
+        description = description[:-1]
+        fetched = [row[:-1] for row in fetched]
     if tuple(item[0] for item in description or ()) != tuple(field.id for field in query.fields):
         raise SDKError("execution_failed", "Database returned unexpected report fields.")
     normalized = []
@@ -337,8 +431,12 @@ class SQLServerAdapter:
         self._slots = BoundedSemaphore(max_concurrent_queries)
 
     def _verify_schema(self, cursor: Any, report: ValidatedReport) -> None:
-        dataset = report.dataset
-        names = tuple(column.name for column in dataset.columns)
+        for dataset in (report.dataset, *(bound.source for bound in report.related_sources)):
+            self._verify_dataset(cursor, dataset)
+
+    def _verify_dataset(self, cursor: Any, dataset) -> None:
+        physical_columns = tuple(column for column in dataset.columns if column.name not in dataset.related_columns)
+        names = tuple(column.name for column in physical_columns)
         sql = (
             "SELECT c.name, ty.name, c.is_nullable, o.type, c.precision, c.scale "
             "FROM sys.columns AS c "
@@ -353,7 +451,7 @@ class SQLServerAdapter:
         by_name = {row[0]: row for row in actual}
         if len(actual) != len(names) or len(by_name) != len(names):
             raise SDKError("schema_drift", "Registered database schema is unavailable or has changed.")
-        for column in dataset.columns:
+        for column in physical_columns:
             row = by_name.get(column.name)
             if row is not None and isinstance(row[1], str) and row[1].strip().casefold() in {"text", "ntext"}:
                 raise SDKError("unsupported", "SQL Server reporting requires modern text column types.")
@@ -467,14 +565,18 @@ class SQLiteAdapter:
         work_exceeded = False
         error = result = None
         dataset = report.dataset
-        allowed = {column.name for column in dataset.columns}
+        datasets = (dataset, *(bound.source for bound in report.related_sources))
+        allowed = {}
+        for source_dataset in datasets:
+            allowed.setdefault(source_dataset.table.name, set()).update(
+                column.name for column in source_dataset.columns if column.name not in source_dataset.related_columns)
 
         def authorizer(action: int, arg1: Any, arg2: Any, db_name: Any, source: Any) -> int:
             if action == sqlite3.SQLITE_SELECT:
                 return sqlite3.SQLITE_OK
             if action == sqlite3.SQLITE_READ:
-                return (sqlite3.SQLITE_OK if db_name == "main" and arg1 == dataset.table.name
-                        and (not arg2 or arg2 in allowed) else sqlite3.SQLITE_DENY)
+                return (sqlite3.SQLITE_OK if db_name == "main" and arg1 in allowed
+                        and (not arg2 or arg2 in allowed[arg1]) else sqlite3.SQLITE_DENY)
             if action == sqlite3.SQLITE_FUNCTION:
                 return (sqlite3.SQLITE_OK if (arg2 or "").casefold() in
                         {"sum", "avg", "min", "max", "count", "date", "strftime", "printf", "replace", "coalesce"}
@@ -492,29 +594,8 @@ class SQLiteAdapter:
                                          timeout=max(0.001, min(1.0, deadline - time.monotonic())))
             connection.execute("PRAGMA query_only = ON").close()
             connection.execute("PRAGMA trusted_schema = OFF").close()
-            with closing(connection.execute("SELECT type FROM sqlite_schema WHERE name = ?", (dataset.table.name,))) as metadata_cursor:
-                actual = metadata_cursor.fetchall()
-            if actual != [("table",)]:
-                raise SDKError("schema_drift", "Registered SQLite table is unavailable or has changed.")
-            with closing(connection.execute("PRAGMA table_info(" + _quote(dataset.table.name, "sqlite") + ")")) as metadata_cursor:
-                metadata = metadata_cursor.fetchall()
-            by_name = {row[1]: row for row in metadata}
-            primary_key_columns = [row for row in metadata if row[5]]
-            for column in dataset.columns:
-                row = by_name.get(column.name)
-                try:
-                    compatible = row is not None and column_type(row[2]) == column_type(column.data_type)
-                    # Only a single INTEGER PRIMARY KEY is an implicit non-null
-                    # rowid alias; ordinary SQLite primary keys can contain null.
-                    nonnull = (bool(row[3]) or (len(primary_key_columns) == 1 and bool(row[5])
-                                              and row[2].strip().casefold() == "integer")) if row else False
-                    compatible = compatible and (column.nullable or nonnull)
-                    if column.name in dataset.row_key:
-                        compatible = compatible and nonnull
-                except (SDKError, TypeError, ValueError, AttributeError, IndexError):
-                    compatible = False
-                if not compatible:
-                    raise SDKError("schema_drift", "Registered SQLite schema is unavailable or has changed.")
+            for source_dataset in datasets:
+                _verify_sqlite_dataset(connection, source_dataset)
             connection.set_authorizer(authorizer)
             connection.set_progress_handler(progress, 1_000)
             _check_deadline(deadline, cancel)
@@ -541,3 +622,31 @@ class SQLiteAdapter:
         if cleanup_failed:
             raise SDKError("execution_failed", "Report connection cleanup failed.", retryable=True)
         return result
+
+
+def _verify_sqlite_dataset(connection, dataset):
+    with closing(connection.execute("SELECT type FROM sqlite_schema WHERE name = ?", (dataset.table.name,))) as metadata_cursor:
+        actual = metadata_cursor.fetchall()
+    if actual != [("table",)]:
+        raise SDKError("schema_drift", "Registered SQLite table is unavailable or has changed.")
+    with closing(connection.execute("PRAGMA table_info(" + _quote(dataset.table.name, "sqlite") + ")")) as metadata_cursor:
+        metadata = metadata_cursor.fetchall()
+    by_name = {row[1]: row for row in metadata}
+    primary_key_columns = [row for row in metadata if row[5]]
+    for column in dataset.columns:
+        if column.name in dataset.related_columns:
+            continue
+        row = by_name.get(column.name)
+        try:
+            compatible = row is not None and column_type(row[2]) == column_type(column.data_type)
+            # Only a single INTEGER PRIMARY KEY is an implicit non-null
+            # rowid alias; ordinary SQLite primary keys can contain null.
+            nonnull = (bool(row[3]) or (len(primary_key_columns) == 1 and bool(row[5])
+                                      and row[2].strip().casefold() == "integer")) if row else False
+            compatible = compatible and (column.nullable or nonnull)
+            if column.name in dataset.row_key:
+                compatible = compatible and nonnull
+        except (SDKError, TypeError, ValueError, AttributeError, IndexError):
+            compatible = False
+        if not compatible:
+            raise SDKError("schema_drift", "Registered SQLite schema is unavailable or has changed.")

@@ -16,12 +16,25 @@ from sageql.conversation import Message
 from sageql.localization import GRAINS_FA, error_text, validate_language
 from sageql.sdk.models import (
     AccessScope, ActorContext, AdapterResult, DatabaseAdapter, ExecutionLimits,
-    Interpretation, PeriodSelection, Reply, ReportArtifact, ReportField, ReportingCatalog,
+    Interpretation, PeriodSelection, Reply, ReportArtifact, ReportField, ReportingCatalog, ResolvedPeriod,
     ReportPolicy, ReportProvider, ReportSpec, SDKError, json_value,
 )
 from sageql.sdk.semantics import permitted_catalog, validate_catalog, validate_report, validate_scope
 from sageql.sdk.sessions import InMemorySessionStore, SessionStore
 from sageql.sdk.lookups import prepare_request, resolve_request
+from sageql.sdk.labels import resolve_labels
+from sageql.sdk.calendars import JALALI_MONTH_NAMES
+
+
+def _period_caption(selection: PeriodSelection, bounds: ResolvedPeriod, language: str) -> str:
+    """Describe resolved periods locally without changing comparison row keys."""
+    if selection.kind == "jalali_month":
+        return (f"{JALALI_MONTH_NAMES[selection.month - 1]} {selection.year}" if language == "fa"
+                else f"Jalali {selection.year}-{selection.month:02d}")
+    if bounds.start is not None:
+        return (f"{bounds.start.isoformat()} تا پیش از {bounds.end.isoformat()}" if language == "fa"
+                else f"[{bounds.start.isoformat()}, {bounds.end.isoformat()})")
+    return "همه تاریخ‌های موجود" if language == "fa" else "All available dates"
 
 
 def _typed(value: Any) -> Any:
@@ -147,6 +160,8 @@ class SageQL:
             "schema_version": 1, "id": session_id, "language": self.language,
             "owner": [actor.subject, actor.tenant_id], "revision": 0,
             "messages": [], "current_spec": None, "pending_question": None, "pending_origin": None,
+            "pending_clarification_key": None,
+            "pending_clarification_keys": [],
             "last_report_id": None, "reports": {}, "receipts": {}, "inflight": None,
         })
         return Reply(session_id, 0, "session_ready", "چه گزارشی می‌خواهید تهیه کنید؟"
@@ -303,6 +318,19 @@ class SageQL:
                 if (decision.spec is not None or not isinstance(decision.question, str)
                         or not decision.question.strip() or len(decision.question) > 4_000):
                     raise SDKError("invalid_interpretation", "Provider returned an invalid clarification.")
+                if (not isinstance(decision.clarification_key, str)
+                        or len(decision.clarification_key) > 64
+                        or type(decision.continues_clarification) is not bool
+                        or (decision.continues_clarification and not decision.clarification_key)):
+                    raise SDKError("invalid_interpretation", "Provider returned invalid clarification context.")
+                clarification_keys = state.get("pending_clarification_keys") or (
+                    [state["pending_clarification_key"]] if state.get("pending_clarification_key") else [])
+                if (decision.continues_clarification
+                        and decision.clarification_key in clarification_keys):
+                    raise SDKError("clarification_stalled",
+                                   "Clarification made no progress. Please provide the complete report request including the missing detail.")
+                if decision.continues_clarification and len(clarification_keys) >= 16:
+                    raise SDKError("clarification_limit", "Clarification reached its limit; provide a complete new report request.")
                 reply = Reply(session_id, revision + 1, "needs_clarification", decision.question.strip(),
                               clarification=decision.question.strip())
                 context = state.get("pending_origin") or message.strip()
@@ -312,6 +340,10 @@ class SageQL:
                     raise SDKError("clarification_limit", "Clarification context reached its limit; start a new session with a complete question.")
                 state["pending_question"] = decision.question.strip()
                 state["pending_origin"] = context
+                state["pending_clarification_key"] = decision.clarification_key or None
+                state["pending_clarification_keys"] = (
+                    [*clarification_keys, decision.clarification_key] if decision.continues_clarification
+                    else [decision.clarification_key]) if decision.clarification_key else []
             elif decision.status == "unsupported":
                 if decision.spec is not None or decision.question or not isinstance(decision.message, str):
                     raise SDKError("invalid_interpretation", "Provider returned an invalid unsupported result.")
@@ -320,6 +352,8 @@ class SageQL:
                               if self.language == "fa" else "The registered data cannot support this report."))
                 state["pending_question"] = None
                 state["pending_origin"] = None
+                state["pending_clarification_key"] = None
+                state["pending_clarification_keys"] = []
             elif decision.status == "ready":
                 if not isinstance(decision.spec, ReportSpec) or decision.question or prepared is None:
                     raise SDKError("invalid_interpretation", "Provider returned an invalid report specification.")
@@ -334,6 +368,16 @@ class SageQL:
                 if _digest(self._scope(actor)) != scope_key:
                     raise SDKError("access_denied", "Report access changed during this request.")
                 artifact = self._make_report(session_id, revision + 1, prepared, result, scope)
+
+                def check_label_access() -> None:
+                    active()
+                    if _digest(self._scope(actor)) != scope_key:
+                        raise SDKError("access_denied", "Report access changed during this request.")
+
+                artifact = resolve_labels(
+                    self.catalog, prepared, artifact, scope, self.database, self.limits,
+                    cancel=cancelled, check_access=check_label_access, language=self.language,
+                )
                 if prepared.spec.filters != spec.filters:
                     # Name/qualifier inputs belong in the public report context.
                     # The resolved identity stays out of provider specifications.
@@ -351,16 +395,20 @@ class SageQL:
                 state["last_report_id"] = artifact.id
                 # Refinements preserve effective dates across a day/month change.
                 # The saved report still records the original period selection.
-                frozen_period = (PeriodSelection("range", prepared.period.start.isoformat(),
+                frozen_period = (spec.period if spec.period.kind == "jalali_month" else
+                                 PeriodSelection("range", prepared.period.start.isoformat(),
                                                  prepared.period.end.isoformat())
                                  if prepared.period.start is not None else spec.period)
-                frozen_comparison = (PeriodSelection("range", prepared.comparison_period.start.isoformat(),
+                frozen_comparison = (spec.comparison if spec.comparison is not None and spec.comparison.kind == "jalali_month" else
+                                     PeriodSelection("range", prepared.comparison_period.start.isoformat(),
                                                      prepared.comparison_period.end.isoformat())
                                      if prepared.comparison_period else None)
                 state["current_spec"] = _typed(replace(spec, period=frozen_period,
                                                       comparison=frozen_comparison))
                 state["pending_question"] = None
                 state["pending_origin"] = None
+                state["pending_clarification_key"] = None
+                state["pending_clarification_keys"] = []
                 reply = Reply(session_id, revision + 1, "report_ready", artifact.title, report=artifact)
             else:
                 raise SDKError("invalid_interpretation", "Provider returned an unsupported status.")
@@ -413,6 +461,12 @@ class SageQL:
             title = dataset.label + ": " + separator.join(labels)
         elif labels:
             title += (" به تفکیک " if self.language == "fa" else " by ") + separator.join(labels)
+        if spec.period.kind == "jalali_month" or prepared.comparison_period is not None:
+            title += (" در " if self.language == "fa" else " in ") + _period_caption(
+                spec.period, prepared.period, self.language)
+        if prepared.comparison_period is not None:
+            title += (" در مقایسه با " if self.language == "fa" else " compared with ") + _period_caption(
+                spec.comparison, prepared.comparison_period, self.language)
         report_fields = tuple(
             replace(item, label={"time_bucket": "تاریخ", "period_label": "دوره"}[item.id])
             if self.language == "fa" and item.id in {"time_bucket", "period_label"} else item
@@ -438,7 +492,20 @@ class SageQL:
                          "aggregation": metric_defs[key].aggregation, "unit": metric_defs[key].unit}
                         for key in spec.metric_ids],
             "filters": json_value(spec.filters),
+            "aggregate_filters": json_value(spec.aggregate_filters),
+            "relationships": [{"id": bound.definition.id, "source_dataset_id": bound.source.id,
+                               "source_dataset_version": bound.source.version}
+                              for bound in prepared.related_sources],
             "completeness": "truncated" if result.truncated else ("empty" if not result.rows else "complete"),
         }
+        if any(selection is not None and selection.kind == "jalali_month"
+               for selection in (spec.period, spec.comparison)):
+            provenance.update(period_selection=json_value(spec.period),
+                              comparison_selection=json_value(spec.comparison))
+        if prepared.comparison_period is not None:
+            provenance["period_labels"] = {
+                "base": _period_caption(spec.period, prepared.period, self.language),
+                "comparison": _period_caption(spec.comparison, prepared.comparison_period, self.language),
+            }
         return ReportArtifact(uuid4().hex, session_id, revision, title, report_fields, result.rows,
                               visualization, provenance, result.truncated)

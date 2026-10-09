@@ -1,11 +1,29 @@
 # Bounded agent planning for the embedded SDK
 
-The embedded SDK can delegate report interpretation to a planner and a semantic
-reviewer through `OpenAIReportAgent`. Both decide from the user's conversation
+The [registered relationship extension](SDK_RELATIONSHIPS.md) exposes related
+attributes on the fact's business catalog. Intent extraction, planning and review
+can combine these with fact measures without selecting physical keys. Locally,
+an unambiguous permitted source-dimension reference can canonicalize to its
+registered fact import; ambiguous roles remain unresolved. Unregistered
+cross-source combinations still return unsupported. Related filters, rolling
+count/unit periods and aggregate filters are part of the complete ReportSpec;
+the engine, rather than agents, binds source policies and compiles their SQL.
+
+The embedded SDK extracts independent intent, then delegates report planning
+and semantic review through `OpenAIReportAgent`. All stages use the user's conversation
 and the permitted reporting concepts. They produce a complete `Interpretation`,
 then the existing engine validates and executes the accepted specification using
 the host's current catalog and policies. The planner and reviewer never query a
 database or write SQL.
+
+Registered dimensions marked `entity_label` let the planner select display names
+on the existing report dataset without inventing joins or switching to a profile
+listing. A name refinement preserves the current measures, dates, filters and
+top-N ordering. The reviewer checks this distinction and can reject unnecessary
+technical confirmation. A new ambiguous ranking needs its business criterion
+and period. Label resolution happens locally after aggregation under the
+[registered display contract](SDK_ENTITY_LABELS.md); neither agent sees rows,
+names returned by the database or resolved identities.
 
 This is a scoped change to the interpretation layer described in [SDK.md](SDK.md).
 The [SQL Server execution contract](SDK_SQL_SERVER.md) and
@@ -38,8 +56,14 @@ The slice is accepted when these behaviors hold:
 - Existing ownership, current access checks, revision control, frozen periods,
   persistent refinements and idempotent request receipts continue to apply.
 
+Explicit Persian month selections use the separately scoped
+[Jalali month contract](SDK_JALALI_MONTHS.md). The model selects the stated
+year/month; the host resolves Gregorian boundaries locally. Missing years still
+require clarification. This does not enable general calendar conversion or
+Jalali time buckets.
+
 The slice does not add model-selected joins, arbitrary formulas, writes, new
-database objects, fuzzy identity matching, new calendars, timestamp conversion,
+database objects, fuzzy identity matching, timestamp conversion,
 result-row reasoning, exports, production HTTP identity, or an unrestricted
 database tool agent. The supported reporting operations remain explicitly
 registered and deterministically compiled. Semantic review does not guarantee
@@ -56,6 +80,8 @@ The following types are exported from `sageql.sdk`:
 | `AgentReportInterpreter` | Provider-neutral orchestration implementing the existing `ReportProvider.interpret` interface. |
 | `ReportAgentBackend` | Replaceable `plan` and `review` interface, suitable for fake offline backends or another configured model transport. |
 | `AgentReview` | Immutable semantic judgment with `approved: bool` and bounded `feedback: str`. Approval requires empty feedback; rejection requires nonempty feedback. |
+| `ConceptRef` | A permitted dataset/concept pair, never a physical mapping or resolved identity. |
+| `ReportIntent` | Complete effective measures/grouping and period, missing business details, turn kind, and optional constraints on presentation, comparison, row/aggregate filters, ordering and result limit. |
 
 Use the same trusted `LLMConfig` that the host already supplies:
 
@@ -96,9 +122,32 @@ def review(messages, current_spec, catalog, today, decision, *, timeout_seconds)
 
 `feedback` is a tuple of bounded advisory strings. A backend must honor the
 remaining timeout and curate its remote payload; it must not serialize the
-physical catalog dataclasses wholesale. The existing `Interpretation` and
-complete `ReportSpec` contracts are unchanged, as are HTTP reply/report JSON and
-the `SageQL` facade.
+physical catalog dataclasses wholesale. Complete `ReportSpec`, HTTP reply/report
+JSON and the `SageQL` facade remain unchanged. `Interpretation` adds optional
+`clarification_key` and `continues_clarification` fields, defaulting to empty/false
+for existing providers. They are internal progress metadata, not HTTP fields.
+
+Live OpenAI agents always run `understand` before planning. Custom backends can
+opt into the same checks by implementing:
+
+```python
+def understand(messages, current_spec, catalog, today, *, timeout_seconds):
+    # Return ReportIntent with complete effective selections, including any
+    # unchanged selections inherited from current_spec. No report candidate is
+    # available at this stage. References can expose an unavailable combination.
+    ...
+
+def plan(messages, current_spec, catalog, today, *, feedback, timeout_seconds, intent):
+    ...
+
+def review(messages, current_spec, catalog, today, decision, *, timeout_seconds, intent):
+    ...
+```
+
+Two-method custom backends retain their original plan/review behavior; they do
+not gain independent intent enforcement automatically. `OpenAIReportInterpreter`
+also retains its earlier single-interpreter path. Neither compatibility path
+should be described as offering the live agent's independent intent gate.
 
 Custom backends retain typed `Decimal` and date filter values in their context
 and returned specification. Vocabulary checks use the JSON representation;
@@ -110,11 +159,88 @@ the agent provider.
 `OpenAIReportInterpreter` remains exported for hosts that explicitly choose the
 previous interpreter and its compatibility behavior. The live reference web
 host's `--sqlserver` and `--rahtal` modes now select `OpenAIReportAgent`; their
-host-specific total agent timeouts are 25 and 45 seconds respectively. The
-`--demo` frontend and `examples/sdk_demo.py` remain deterministic offline demos.
+host-specific total agent timeouts are 25 and 600 seconds respectively. Rahtal
+allows three revisions within that shared budget and a 660-second overall request.
+The `--demo` frontend and `examples/sdk_demo.py` remain deterministic offline demos.
 Changing the live provider does not change those demos into language benchmarks.
 
 ## Plan, preview, review and revise
+
+Before planning, a separate strict request extracts `ReportIntent` without seeing
+a proposed report. References are validated against the actor's permitted catalog.
+If the effective measures and grouping require different datasets, the host
+returns a localized `unsupported` explanation before planning or database reads.
+A registered label decorates identities; it cannot group measures by another
+profile attribute. Confirming an earlier assistant's unsupported suggestion
+cannot authorize a source combination. Model-proposed `unsupported_reason`
+is advisory: it goes through planning and semantic review, so an incorrect
+capability claim can be reconsidered within the normal revision/deadline budget.
+Only locally detected incompatible dataset references finish before planning.
+Two independently supplied explicit Jalali months are supported as the base
+and comparison periods of a table; they do not require a multi-month Jalali range.
+
+For an explicitly requested bar chart, a raw identity dimension selected together
+with its registered entity label repeats the same target grouping column. The
+host locally canonicalizes that pair to the display label before planning.
+This preserves group membership and aggregates while providing a single axis.
+Other grouping columns and distinct label mappings are never discarded. The
+physical equivalence stays out of the model payload.
+
+Within the existing revision budget, fixed `intent_validation` feedback rejects
+candidate measures/grouping that differ from the complete extracted intent,
+explicit chart/time-grain mismatches, ready reports with missing information and
+clarification when no business detail is missing. These candidates never reach
+the reviewer or database. Exhausted intent repair returns non-retryable
+`intent_mismatch`; the last successful report remains available. This prevents
+an approving reviewer from overriding a locally detected intent mismatch.
+
+The same local gate checks comparison periods, row filters, aggregate thresholds,
+sort field/direction and requested limits when independently extracted. It compares
+resolved bounds while preserving explicit Jalali selections, treats conjunction
+and IN-member order as equivalent, and normalizes numeric values by registered
+type. Fixed mismatch codes contain no scalar values. A lost threshold, reversed
+ranking, changed top-N or retained explicitly removed comparison must be repaired
+before review or execution.
+
+For provider-neutral compatibility, new controls are optional in `ReportIntent`:
+`filters` / `aggregate_filters` set to `None` leave those controls unconstrained;
+an empty tuple requires their removal. `comparison_specified=True` constrains
+`comparison`, including `None` for explicit removal. `ordering_specified=True`
+similarly constrains `order_by`, including removal. Non-null `descending` and
+`limit` constrain direction and the row cap. The live strict JSON shape requires
+all control fields, and its instructions extract effective user/conversation
+constraints and preserve refinements. Unknown concepts, invalid operators,
+malformed values and unbounded controls fail closed. Older two-method backends
+still have no independent intent gate. These checks establish consistency with
+the extraction; they cannot prove that extraction understood the original text.
+
+An accepted clarification receives a stable key from its missing-detail slots
+and concept references, without retaining its phrasing. Sessions persist that
+key and the bounded key history for the pending request. A following `answer`
+that asks for slots already seen in that pending request fails with
+non-retryable `clarification_stalled`, even if the question is paraphrased or the
+process restarted; alternating between earlier topics is also stopped. At most
+16 distinct answer-continuation keys are retained. A different missing detail may proceed; a fresh `new` request
+may need the same slot again. Success/unsupported clears the key. Sessions from
+before the change remain readable; their first clarification has no saved key.
+Registered lookup questions still follow their existing resolver contract.
+
+Intent extraction remains model-dependent. Local enforcement proves agreement
+with the extracted references, not perfect understanding of natural language.
+It does not independently verify extraction of literal filters, dates, ranking
+criteria or the semantics of host-defined measures. Effective period agreement
+is checked locally; extracting the user's intended period remains fallible.
+All stages retain the same permitted-data
+boundary and shared deadline; no result rows or resolved identities are sent.
+
+Planner and reviewer guidance distinguishes reporting periods from output limits.
+An explicit all-data request retains `period="all"` even when the output is the
+latest N monthly groups. Ordering and a row limit select those groups; neither
+today's date nor the limit authorizes an invented date cutoff. This guidance is
+not a deterministic guarantee of business meaning. Report-ready status confirms
+the checked query path, not that a model selected the intended month, measures
+or presentation; the Rahtal demonstration separately verifies its scenario
+acceptance constraints against saved specifications and actual bounds.
 
 1. **Plan:** The backend receives bounded business metadata and conversation
    context, and proposes `ready`, `needs_clarification`, or `unsupported`. A ready
@@ -122,7 +248,13 @@ Changing the live provider does not change those demos into language benchmarks.
    or executable statement.
 2. **Check shape and vocabulary:** Strict decoding rejects invalid JSON,
    duplicate keys, non-finite numbers, extra fields, inconsistent outcomes and
-   unknown IDs/operators. These failures do not trigger semantic repair.
+   unknown IDs/operators. These failures do not trigger semantic repair. A
+   registered ordering field that is absent from the candidate's selected
+   output has one narrow repair path: reject that candidate and send only
+   `specification_validation: invalid_ordering` to the planner within the
+   existing revision budget. This includes an inactive `time_bucket` or
+   `period_label`; wholly unknown ordering IDs still fail immediately. The
+   rejected candidate never reaches review or execution.
 3. **Preview a ready specification:** The orchestrator locally checks registered
    operations, types, periods, filter combinations and presentation constraints.
    It uses the already permitted catalog and a synthetic scope with no row
@@ -130,11 +262,14 @@ Changing the live provider does not change those demos into language benchmarks.
 4. **Review:** A separate model request compares the original business request
    with the checked proposal. Clarification and unsupported proposals also need
    review. The reviewer sees the original public proposal, never a validated
-   physical report or lookup request. Approval returns the proposal unchanged.
+   physical report or lookup request. The extracted intent accompanies planning
+   and review. Approval returns the checked proposal, with internal progress
+   metadata added for intent-aware clarifications.
 5. **Revise within budget:** A semantic rejection supplies bounded business
    feedback to the planner. A local preview rejection supplies only
    `specification_validation: invalid_spec` or
-   `specification_validation: unsupported`; raw validator exceptions and rejected
+   `specification_validation: unsupported`. The ordering repair above supplies
+   only its fixed `invalid_ordering` code; raw validator exceptions and rejected
    specification values are not used as validation feedback. A revised proposal
    undergoes the same checks and review.
 
@@ -156,26 +291,51 @@ execution boundaries.
 
 ## Budgets and safe errors
 
-`max_revisions` is an integer from 0 through 3; its default is 1. Zero still runs
-one planner/reviewer attempt. Ordinary success takes two model requests. Each
-allowed revision can add two more, so the default allows at most four requests
-and the maximum allows at most eight. A rejected local preview skips its reviewer
-request and may therefore consume fewer calls.
+All dated aggregate requests require an effective period, including ordinary
+grouped totals. The live intent schema requires a `period` field: complete
+PeriodSelection when supplied/preserved, null for missing/ambiguous dates.
+Local normalization adds missing `period` if neither a period nor a specific
+year/calendar clarification exists. Same-dataset refinements/answers inherit
+the current period unless a time detail is being clarified; new requests do not
+inherit unrelated dates. Timeless counts and dimension-only listings need no
+period question. Explicit `all` remains supported; absence never defaults to it.
+Ready proposals must preserve effective resolved bounds, with Jalali month
+selections retaining their explicit calendar representation. Invalid periods
+use existing fixed validation feedback and revision budgets. Custom intent-aware
+backends should populate the new period field for supplied dates; legacy
+plan/review-only backends retain their existing contract.
 
-`timeout_seconds` is finite, greater than zero and at most 180 seconds; its
+`max_revisions` is an integer from 0 through 3; its default is 1. Zero still runs
+one planning attempt, with review only if local checks pass. Live agent success
+takes three model requests: intent, planning and review. Each allowed revision
+can add two more, so the default allows at most five requests and the maximum
+allows at most nine. An unavailable intent can finish after one request. Legacy
+two-method backends retain their two/four/eight call budgets. A rejected local preview or known inactive
+ordering skips its reviewer request and may therefore consume fewer calls. An
+ordering repair consumes the same revision allowance as a semantic repair; it
+adds no retry budget and does not reset the deadline.
+
+`timeout_seconds` is finite, greater than zero and at most 600 seconds; its
 default is 30. Every stage consumes the same monotonic deadline, and each remote
 request receives only the remaining time. A revision does not reset the clock.
 The engine's separate overall request deadline also remains in force. Custom
 backends must respect their supplied timeout; the orchestrator cannot forcibly
 terminate a backend that ignores it.
 
+ExecutionLimits accepts an overall request timeout up to 900 seconds while SQL
+query timeout remains independently capped at 300 seconds. Its generic defaults
+remain 60 and 10 seconds, respectively. Longer interpretation budgets do not
+extend each database query or reset the shared deadline after a rejection.
+
 | Error code | Meaning and behavior |
 | --- | --- |
-| `invalid_interpretation` | Malformed/unknown/inconsistent proposal or review; stop without repair or execution. |
+| `invalid_interpretation` | Malformed/unknown/inconsistent proposal or review; stop without repair or execution, except the agent's narrow internal known-but-inactive ordering classification described above. The single interpreter still returns this public code for that invalid ordering. |
 | `provider_failed` | Model transport or unexpected backend failure; stop with a safe retryable error. |
 | `request_timeout` | Shared agent deadline expired; do not start another stage. |
-| `agent_exhausted` | The allowed proposals never passed preview and semantic approval; stop with a safe retryable error. |
+| `agent_exhausted` | The allowed proposals never passed local checks and semantic approval, including exhausted known inactive ordering repairs; stop with a safe retryable error. |
 | `provider_input_limit` | Conversation, metadata, payload or schema bounds were exceeded; do not silently truncate required context. |
+| `intent_mismatch` | A candidate still conflicts with the extracted intent after bounded repair; no query runs and no automatic retry is suggested. |
+| `clarification_stalled` | An answer continuation repeats the same structured missing detail; preserve the prior session state and ask for a complete request instead of repeating the question. |
 
 Additional existing SDK configuration/access errors retain their contracts. The
 engine preserves the last successful report after a failed turn. Retrying an
@@ -212,17 +372,26 @@ or database operations unlimited.
 
 ## Verification
 
+Verification of the intent correction (2026-10-08): 810 offline tests passed,
+one opt-in SQL Server test was skipped, and the synthetic embedding demo, JS
+syntax check, package build and fresh-wheel imports passed. Three unavailable
+conversation turns and a supported identity/name table-to-bar refinement passed
+interpretation-only checks with the configured model after the redundant-axis
+correction. No report SQL ran during those model checks. Details and the failed
+pre-correction attempt are recorded in [ROADMAP.md](ROADMAP.md).
+
 The agent tests use fake transports/backends and synthetic local fixtures. Run:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests/test_sdk_agents.py tests/test_sdk_engine.py tests/test_sdk_provider.py tests/test_sdk_lookups.py tests/test_sdk_sessions.py tests/test_rahtal_sdk.py tests/test_sdk_web.py -q
+.\.venv\Scripts\python.exe -m pytest tests/test_sdk_intent.py tests/test_sdk_agents.py tests/test_sdk_engine.py tests/test_sdk_provider.py tests/test_sdk_jalali_provider.py tests/test_sdk_lookups.py tests/test_sdk_sessions.py tests/test_rahtal_sdk.py tests/test_sdk_web.py -q
 .\.venv\Scripts\python.exe -m pytest -q
 .\.venv\Scripts\python.exe examples/sdk_demo.py
 .\.venv\Scripts\python.exe -m build
 ```
 
 Checks cover generic registered domains, semantic revisions, necessary and
-unnecessary clarification, local code-only feedback, malformed/unknown output,
+unnecessary clarification, local code-only feedback, narrowly repaired inactive
+ordering, malformed/unknown output that still aborts, explicit Jalali selections,
 bounded attempts, shared deadlines, provider failure, physical-data exclusion,
 count-only projected catalogs, policy-bound execution, disabled execution,
 revocation during review, cached retries and persistent refinements. Existing
@@ -236,6 +405,7 @@ smoke passed. See [ROADMAP.md](ROADMAP.md) for the complete verification record.
 Two interpretation-only checks with the existing configured model passed: a
 synthetic full-name daily request selected the registered activity measures and
 last-month daily grouping, and a greeting asked for reporting intent. They
-executed no database queries. Live SQL Server execution with this new flow,
-universal language understanding and real-data report correctness remain
-unverified; those checks establish only the tested model scenarios.
+executed no database queries. Those checks establish only the tested model
+scenarios, not universal language understanding or real-data report correctness.
+Real database demonstrations and their private results are recorded separately
+in ignored local Rahtal report directories.

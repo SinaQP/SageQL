@@ -4,13 +4,25 @@ SageQL is a Python SDK that a developer embeds in their backend to let authorize
 
 The new `sageql.sdk` API includes persistent conversations, clarification, report refinement, revision checks and idempotent retries. SQL Server is the production adapter target; SQLite supplies an offline reference. The [embedding guide](docs/SDK.md) documents installation, configuration, the JSON contract and limits. The [architecture](docs/ARCHITECTURE.md) records the broader design. The existing staged CLI/API and Rahtal real-data pilot remain available.
 
-Live reference hosts use `OpenAIReportAgent`: a planner interprets the request
-from permitted business concepts, a reviewer checks its meaning, and bounded
+Live reference hosts use `OpenAIReportAgent`: independent intent extraction fixes
+the effective measures/grouping, a planner proposes a report, a reviewer checks
+its meaning, and bounded
 feedback can revise the plan or clarification. This path uses no question-specific
 keyword or regex routing. Register another catalog to reuse the same agents.
-Authorization, lookup uniqueness and parameterized SQL execution remain enforced
+Local checks reject unavailable cross-source combinations, silent grouping changes
+and repeated structured clarification after an answer. Intent extraction remains
+model-dependent. Authorization, lookup uniqueness and parameterized SQL execution remain enforced
 by the SDK. See the [agent contract](docs/SDK_AGENTS.md) for configuration, call
 budgets, limitations and custom backends.
+
+The [registered relationship extension](docs/SDK_RELATIONSHIPS.md) supports
+management reports across host-defined dimensional sources: multiple measures,
+multiple related groupings/filters, aggregate thresholds, period comparisons and
+rankings after complete aggregation. The same pipeline works with employee,
+customer, product or organizational catalogs. Models never invent join keys;
+duplicate dimension keys fail closed. Rolling date windows such as the last
+three months resolve locally. Rahtal exposes current job position on activity
+reports through this general registration API.
 
 Persian is the default conversation and report presentation language. The
 reference frontend uses RTL, Persian labels and display digits. Ask naturally,
@@ -18,7 +30,9 @@ for example «نام کارکنان را نشان بده» or «ساعات فع�
 English input remains supported; hosts can explicitly select English output.
 Register Persian business labels for your own datasets; see the
 [language contract](docs/SDK.md#persian-by-default). Dates still use the approved
-Gregorian calendar; Solar Hijri conversion is outside the current scope.
+Gregorian storage and grouping. The [explicit Jalali month extension](docs/SDK_JALALI_MONTHS.md)
+accepts a Persian month and year and resolves date bounds locally; broader Solar
+Hijri grouping and timestamp conversion remain outside its scope.
 
 ## Try the embedded report flow
 
@@ -39,7 +53,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe examples/web/server.py --demo
 ```
 
-Open `http://127.0.0.1:8765`, ask «ساعات فعالیت روزانه در سپتامبر», answer «۲۰۲۶», then request «به تفکیک کارمند نمایش بده». English versions of these requests also work. This uses synthetic data and a deterministic interpreter without credentials or remote calls. The [frontend guide](examples/web/README.md) also covers SQL Server mode. The first SDK slice queries one registered table/view per dataset; reviewed reporting views can contain business joins. Model-selected joins, arbitrary formulas, timestamp/calendar conversion and production authentication are outside this slice.
+Open `http://127.0.0.1:8765`, ask «ساعات فعالیت روزانه در سپتامبر», answer «۲۰۲۶», then request «به تفکیک کارمند نمایش بده». English versions of these requests also work. This uses synthetic data and a deterministic interpreter without credentials or remote calls. The [frontend guide](examples/web/README.md) also covers SQL Server mode. The first SDK slice queries one registered table/view per dataset; reviewed reporting views can contain business joins. Model-selected joins, arbitrary formulas, timestamp conversion, calendars beyond the explicit Jalali month extension and production authentication are outside this slice. The scripted offline demo does not interpret Persian month names; the configured model host supports the extension.
 
 Registered dimension-only reports can list employee names without adding an aggregate. The sections below document the earlier staged workflow. Its experimental model-written SQL API is separate from the SDK engine.
 
@@ -47,6 +61,11 @@ Rahtal also resolves a supplied employee full name before filtering daily
 activity reports. The host registers this lookup explicitly; users do not need
 an employee ID. Duplicate names ask for job position, and each policy-bound read
 still queries one source without joins. See the [lookup scope](docs/SDK_ENTITY_LOOKUPS.md).
+
+Grouped activity reports and employee rankings can also display full names using
+a host-registered `EntityLabelDimension`. The SDK ranks identities first, then
+fetches names locally under profile policies; duplicate profiles cannot multiply
+hours and names never enter model context. See the [display-label scope](docs/SDK_ENTITY_LABELS.md).
 
 ## Inspect planning, SQL, validation, and execution without an API key
 

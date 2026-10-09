@@ -36,6 +36,20 @@ def catalog():
 ACTOR = ActorContext("user-1", "1")
 
 
+def test_longer_request_budget_retains_independent_sql_timeout_bound():
+    limits = ExecutionLimits(request_timeout_seconds=900, query_timeout_seconds=300)
+    assert limits.request_timeout_seconds == 900 and limits.query_timeout_seconds == 300
+    assert ExecutionLimits().request_timeout_seconds == 60
+    with pytest.raises(ValueError):
+        ExecutionLimits(query_timeout_seconds=301)
+
+
+@pytest.mark.parametrize("value", [True, 0, float("nan"), float("inf"), 901])
+def test_extended_request_deadline_remains_finite_and_bounded(value):
+    with pytest.raises(ValueError):
+        ExecutionLimits(request_timeout_seconds=value)
+
+
 def policy(actor):
     if not actor.tenant_id:
         raise SDKError("access_denied", "Tenant identity is required.")
@@ -94,8 +108,9 @@ def database(tmp_path):
 
 
 def engine(database, provider, **options):
+    clock = options.pop("clock", lambda: date(2026, 10, 5))
     return SageQL(catalog=catalog(), database=CountingAdapter(SQLiteAdapter(database)),
-                  provider=provider, policy=policy, clock=lambda: date(2026, 10, 5),
+                  provider=provider, policy=policy, clock=clock,
                   execution="validated", **options)
 
 
@@ -114,6 +129,43 @@ def test_first_report_enforces_scope_and_lossless_frontend_contract(database):
     assert "tenant_id" not in repr(provider.calls[0][2])
     assert "is_deleted" not in repr(provider.calls[0][2])
     assert "Private other tenant" not in json.dumps(payload)
+
+
+def test_jalali_clarification_reaches_result_and_refinement_keeps_month_after_restart(database, tmp_path):
+    with sqlite3.connect(database) as connection:
+        connection.executemany("INSERT INTO activities VALUES (?, ?, ?, ?, ?, ?)", [
+            (7, 1, "Alice", "2026-08-22", 99, 0),
+            (8, 1, "Alice", "2026-08-23", 4, 0),
+            (9, 1, "Alice", "2026-09-22", 3, 0),
+            (10, 1, "Alice", "2026-09-23", 88, 0),
+        ])
+    selected = spec(period=PeriodSelection("jalali_month", year=1405, month=6))
+    def total(messages, current):
+        assert current.period == selected.period
+        return Interpretation("ready", replace(current, time_grain="none", chart="kpi"))
+    provider = Provider(Interpretation("needs_clarification", question="شهریور کدام سال؟"),
+                        Interpretation("ready", selected), total)
+    sessions = SQLiteSessionStore(tmp_path / "jalali-sessions.sqlite")
+    sdk = engine(database, provider, sessions=sessions)
+    created = sdk.create_session(ACTOR)
+    clarification = sdk.submit(created.session_id, "ساعات فعالیت روزانه شهریور", ACTOR, "j1", 0)
+    assert clarification.status == "needs_clarification" and sdk.database.calls == 0
+    daily = sdk.submit(created.session_id, "۱۴۰۵ شمسی", ACTOR, "j2", 1)
+    assert daily.status == "report_ready"
+    assert daily.report.rows == ((date(2026, 8, 23), Decimal("4")), (date(2026, 9, 1), Decimal("12.5")),
+                                 (date(2026, 9, 2), Decimal("3")), (date(2026, 9, 22), Decimal("3")))
+    assert daily.report.provenance["period_start"] == "2026-08-23"
+    assert daily.report.provenance["period_end_exclusive"] == "2026-09-23"
+    assert daily.report.provenance["period_selection"] == {
+        "kind": "jalali_month", "start": None, "end": None, "year": 1405, "month": 6,
+        "count": None, "unit": None}
+    resumed = engine(database, provider, sessions=SQLiteSessionStore(tmp_path / "jalali-sessions.sqlite"),
+                     clock=lambda: date(2027, 4, 1))
+    result = resumed.submit(created.session_id, "مجموع همین ماه را نشان بده", ACTOR, "j3", 2)
+    assert result.status == "report_ready"
+    assert result.report.rows == ((Decimal("22.5"),),)
+    assert result.report.provenance["period_selection"]["kind"] == "jalali_month"
+    assert result.report.provenance["period_end_exclusive"] == "2026-09-23"
 
 
 def test_persian_clarification_unicode_filter_persistence_and_retry(database, tmp_path):
