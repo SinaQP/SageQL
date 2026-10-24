@@ -111,13 +111,15 @@ def resolve_request(
     if result.truncated or len(result.rows) > 1:
         qualifiers = lookup.definition.qualifiers
         detail = qualifiers[0].label if qualifiers else ("نام کامل‌تر" if language == "fa" else "a more specific full name")
-        return None, (f"چند کارمند با این نام در اطلاعات مجاز پیدا شد. لطفاً {detail} را مشخص کنید."
+        label = lookup.definition.label
+        return None, (f"چند مورد برای «{label}» در اطلاعات مجاز پیدا شد. لطفاً {detail} را مشخص کنید."
                       if language == "fa" else
-                      f"Multiple employees match this name. Please specify {detail}.")
+                      f"Multiple matches for {label} were found. Please specify {detail}.")
     if not result.rows or result.rows[0][0] is None:
-        return None, ("کارمندی با این نام در اطلاعات مجاز پیدا نشد. لطفاً نام و نام خانوادگی را کامل‌تر یا با املای دیگری بنویسید."
+        label = lookup.definition.label
+        return None, (f"موردی برای «{label}» در اطلاعات مجاز پیدا نشد. لطفاً نام را کامل‌تر یا با املای دیگری بنویسید."
                       if language == "fa" else
-                      "No reportable employee matches this name. Please check the full name or its spelling.")
+                      f"No authorized match for {label} was found. Please check the full name or its spelling.")
     identity = result.rows[0][0]
     spec = prepared.spec
     concrete = replace(spec, filters=tuple(

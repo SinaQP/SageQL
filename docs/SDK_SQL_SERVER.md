@@ -4,7 +4,26 @@ This is the scope and safety design for the new `sageql.sdk` adapter. It is sepa
 
 ## Supported contract
 
-The host registers a single physical table or trusted reporting view for each dataset. Registration lists physical columns/types, business metric IDs, dimensions, user filters, optional date-only time column, and a contract version. A report selects one dataset and combines registered metrics, dimensions, typed filters, Gregorian date bounds/grains, ordering, and a bounded limit. Comparisons return two labeled periods, not calculated deltas.
+The [matching-day extension](SDK_MATCHING_DAY_COUNTS.md) adds one fixed window
+count to bounded daily entity tables. The canonical SELECT applies aggregate
+conditions before counting filtered daily groups per registered identity/period,
+then applies TOP/LIMIT. It uses the existing fact queries and policy-bound label
+reads, with no new joins or model-selected window/partition expressions. False
+is the additive flag's default, retaining ordinary SQL and result shapes.
+
+The fixed [participant mean](SDK_PARTICIPANT_MEANS.md) registers numeric amount
+and integer/text identity columns on the same physical fact. Its canonical
+aggregate uses a floating SUM, distinct count, guarded division and a missing-ID
+CASE. Both columns remain host-owned and absent from model metadata. It retains
+fact/source policies, registered relationship guards and group-before-limit
+ordering; arbitrary aggregate ratios remain unsupported.
+
+The [manager extension](SDK_MANAGER_REPORTS.md) adds the fixed Rahtal activity-topic
+mapping and date-only Persian periods/monthly grouping. Monthly grouping uses a
+bounded locally generated month-boundary CTE with bound dates; no model-selected
+calendar tables or predicates are permitted. Existing execution guards still apply.
+
+The host registers a single physical table or trusted reporting view for each dataset. Registration lists physical columns/types, business metric IDs, dimensions, user filters, optional date-only time column, and a contract version. A report selects one dataset and combines registered metrics, dimensions, typed filters, Gregorian date bounds/grains, ordering, and a bounded limit. The adapter returns two labeled comparison periods. The bounded [comparison-change extension](SDK_COMPARISON_CHANGES.md) can calculate fixed ungrouped absolute/percentage changes locally afterwards; it adds no SQL expressions or joins.
 
 The [registered relationship extension](SDK_RELATIONSHIPS.md) extends this
 baseline with explicit host-defined dimensional mappings. A fact may import
@@ -24,7 +43,7 @@ A report may also select only registered dimensions: the compiler returns bounde
 
 The separately scoped [registered entity lookup](SDK_ENTITY_LOOKUPS.md) supports
 name-based activity requests. A host-declared full-name equality filter uses fixed
-concatenation and normalization over two to four registered text columns. The
+concatenation and normalization over one to four registered text columns. The
 engine reads up to two distinct candidate identities with current source policies,
 then binds a unique identity to the registered target equality filter. These are
 two separate single-source SELECTs with ordinary adapter bounds and cleanup;
@@ -34,6 +53,12 @@ never select the first row. Lookup rows/IDs do not enter model context.
 The adapter accepts only registered dimensional joins and rejects arbitrary expressions, user-supplied SQL, cross-database names, timestamp timezone conversion, fiscal calendars, and write operations. The [explicit Jalali month extension](SDK_JALALI_MONTHS.md) resolves one supplied month/year locally to ordinary Gregorian date bounds before compilation; it adds no calendar SQL expressions or Jalali time buckets. A developer-provided view can encapsulate reviewed business joins; its aggregate grain is the developer's responsibility. The compiler cannot verify that a view's business formula is correct. Models cannot introduce aggregate fan-out by inventing joins.
 
 ## Inputs and enforcement
+
+The separately scoped [entity-decrease extension](SDK_ENTITY_DECREASES.md) reads
+complete bounded period/identity groups with the host candidate cap, independently
+of the output limit. Source truncation fails closed. Fixed local alignment/loss
+ranking precedes the final output limit and separate policy-bound name reads;
+it adds no SQL formulas, joins or database objects.
 
 The host authenticates the user and supplies `ActorContext`. A required policy callback returns the datasets and concepts this actor may use, plus mandatory row conditions. Missing required identity must be rejected by this callback. User filters and mandatory policy predicates are separate; the interpreter sees only permitted business metadata and messages. Compiler-only columns and policy values are excluded from model metadata.
 

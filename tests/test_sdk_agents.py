@@ -694,7 +694,7 @@ def test_permitted_timeless_count_only_projection_is_valid_without_hidden_column
     decision = ready(ReportSpec("sales", ("sales_count",)))
     provider, client = remote(plan_json(decision), {"approved": True, "feedback": ""})
 
-    assert provider.interpret(MESSAGES, None, visible, TODAY) == decision
+    assert provider.interpret((Message("user", "تعداد فروش را نشان بده"),), None, visible, TODAY) == decision
 
     for call in client.calls:
         serialized = call["messages"][1]["content"]

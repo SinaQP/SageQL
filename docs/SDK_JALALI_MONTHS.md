@@ -1,5 +1,9 @@
 # Explicit Jalali month selections
 
+The [authorized manager extension](SDK_MANAGER_REPORTS.md) supersedes this
+original slice's non-goals for Persian ranges/years, relative periods and bounded
+monthly buckets. Its date-only bounds, conversion boundary and validation apply.
+
 This extension is requested for the second Rahtal company demonstration. It adds
 one date-only period kind, `jalali_month`, to the existing report specification.
 The host resolves its boundaries locally; a model never converts calendar dates.

@@ -34,6 +34,16 @@ receive a generic unavailable-name label, never an unscoped retry or raw ID.
 Sorting by a label dimension is unsupported: sorting before enrichment would
 sort identities, and sorting after top-N would misrepresent the selection.
 
+For intent-based model reports, selecting a label plus a plain dimension over
+the same target identity does not require both display columns. Bar axes retain
+the label. Tables with user-message evidence also retain the label alone unless
+identities were explicitly requested, are preserved from the current report on
+refinement, or supply the selected ordering. Explicit ID removal clears a
+redundant unordered display column. Distinct grouping columns are untouched;
+older provider-neutral canonicalization without message evidence is preserved.
+This is local requested-display normalization, not name grouping or a new data
+permission. The planner must match the normalized intent before execution.
+
 For explicit metric ranking, ties use the registered label's grouping identity
 before remaining category dimensions, after period/time ties. Changing display
 column order therefore preserves tied entity selection. Removing a registered
@@ -50,6 +60,12 @@ start a new chat after upgrading the Rahtal registration.
 Non-goals: name-based grouping/merging, label-based filtering or alphabetical
 top-N, fuzzy matching, arbitrary source relations, model-selected joins,
 production identity/authorization, new tables/views or database writes.
+
+The separately scoped [entity-decrease ranking](SDK_ENTITY_DECREASES.md) aligns
+complete identity aggregates across two periods and ranks absolute loss locally
+before its output limit. This fixed operation resolves labels afterwards using
+the same bounded reads and permissions; ordinary label rankings retain the
+single-report SQL ranking behavior above.
 
 Verification: offline synthetic SQLite results and deterministic SQL Server
 compilation, policy/permission failures, duplicates/conflicts/missing labels,

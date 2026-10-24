@@ -21,8 +21,8 @@ def language_instructions(language: str) -> str:
         "Understand Persian conversation, informal phrasing and multi-turn refinements, "
         "including Persian digits ۰۱۲۳۴۵۶۷۸۹, Arabic-Indic digits ٠١٢٣٤٥٦٧٨٩, "
         "Arabic/Persian letter variants ي/ی and ك/ک, and zero-width non-joiners. "
-        "For example سلام is a greeting, اسم کارکنان را بده requests employee names, "
-        "به تفکیک کارمند refines grouping, and فقط علی requests a filter when registered. "
+        "For example سلام is a greeting; requests for names, category breakdowns "
+        "and literal filters refer only to concepts registered by the host. "
         "Recognize امروز, دیروز and ماه قبل as relative period requests within the "
         "declared calendar. Language never changes calendar semantics. "
         "Keep JSON keys, registered IDs, enum values and ISO dates in their required "
@@ -33,7 +33,7 @@ def language_instructions(language: str) -> str:
 
 
 GRAINS_FA = {"none": "بدون گروه‌بندی زمانی", "day": "روز", "week": "هفته",
-             "month": "ماه", "quarter": "فصل", "year": "سال"}
+             "month": "ماه", "quarter": "فصل", "year": "سال", "jalali_month": "ماه شمسی"}
 PERIODS_FA = {"all": "همه تاریخ‌های موجود", "range": "بازه زمانی", "month": "ماه",
               "rolling": "بازه گذشته تا امروز",
               "jalali_month": "ماه شمسی با سال مشخص",
@@ -50,7 +50,7 @@ def error_text(code: str, original: str, language: str = "fa") -> str:
         return original
     return {
         "access_denied": "دسترسی به این گزارش یا گفت‌وگو برای شما مجاز نیست.",
-        "unsupported": "این گزارش در محدوده قابلیت‌های پشتیبانی‌شده نیست. تاریخ‌ها باید میلادی باشند و درخواست باید از اطلاعات ثبت‌شده استفاده کند.",
+        "unsupported": "این گزارش در محدوده قابلیت‌های پشتیبانی‌شده نیست. درخواست باید از مفاهیم و عملیات ثبت‌شده استفاده کند.",
         "invalid_input": "متن پرسش، شناسه درخواست و نسخه معتبر گفت‌وگو را ارسال کنید.",
         "invalid_spec": "مشخصات گزارش معتبر نیست. پرسش یا بازه زمانی را دقیق‌تر بیان کنید.",
         "invalid_interpretation": "مفسر گزارش پاسخ قابل‌استفاده‌ای نداد. لطفاً دوباره تلاش کنید.",
@@ -64,9 +64,9 @@ def error_text(code: str, original: str, language: str = "fa") -> str:
         "database_unavailable": "اتصال به پایگاه داده برقرار نشد. اتصال شبکه یا VPN و تنظیمات پایگاه داده را بررسی کنید و دوباره تلاش کنید.",
         "execution_failed": "اجرای گزارش انجام نشد. اتصال پایگاه داده را بررسی کنید و دوباره تلاش کنید.",
         "adapter_failed": "نتیجه دریافتی از پایگاه داده معتبر نبود.",
-        "lookup_failed": "جست‌وجوی کارمند نتیجه معتبر نداد. مشخصات کارمند و تنظیمات منبع را بررسی کنید.",
+        "lookup_failed": "جست‌وجوی نام نتیجه معتبر نداد. نام درخواستی و تنظیمات منبع را بررسی کنید.",
         "entity_label_failed": "نام‌های گزارش به‌طور کامل و معتبر دریافت نشد. دامنه گزارش یا تنظیمات منبع نام‌ها را بررسی کنید.",
-        "entity_label_conflict": "برای یک کارمند چند نام متفاوت در اطلاعات مجاز ثبت شده است. میزبان باید اطلاعات پروفایل را بررسی کند.",
+        "entity_label_conflict": "برای یک شناسه چند نام متفاوت در اطلاعات مجاز ثبت شده است. میزبان باید اطلاعات منبع نام‌ها را بررسی کند.",
         "relationship_cardinality": "برای یک کلید ارتباطی چند رکورد در منبع مرتبط ثبت شده است. برای جلوگیری از مجموع یا دسته‌بندی نادرست، گزارش متوقف شد؛ میزبان باید داده‌ها یا تعریف ارتباط را بررسی کند.",
         "schema_mismatch": "ساختار پایگاه داده با تعریف ثبت‌شده گزارش سازگار نیست.",
         "schema_drift": "ساختار پایگاه داده با تعریف ثبت‌شده گزارش سازگار نیست یا در دسترس نیست.",

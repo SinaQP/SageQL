@@ -34,6 +34,7 @@ from sageql.sdk.models import (
 )
 from sageql.sdk.names import NAME_REPLACEMENTS, normalize_name
 from sageql.sdk.semantics import column_type, validate_report
+from sageql.sdk.calendars import jalali_buckets
 from sageql.validation import validate_sql
 
 
@@ -146,7 +147,8 @@ def compile_report(
     if report.comparison_period:
         fields.append(ReportField("period_label", "Period", "text"))
     if spec.time_grain != "none":
-        expression = _bucket(col(dataset.time.column), spec.time_grain, dialect)
+        expression = ("calendar." + _quote("bucket", dialect) if spec.time_grain == "jalali_month"
+                      else _bucket(col(dataset.time.column), spec.time_grain, dialect))
         selections.append(expression + " AS " + _quote("time_bucket", dialect))
         group.append(expression)
         fields.append(ReportField("time_bucket", "Date", "date"))
@@ -168,6 +170,15 @@ def compile_report(
             function = "COUNT_BIG" if dialect == "tsql" else "COUNT"
             expression = f"{function}(DISTINCT {col(metric.column)})"
             output_type = "integer"
+        elif metric.aggregation == "sum_per_participant":
+            function = "COUNT_BIG" if dialect == "tsql" else "COUNT"
+            participant = col(metric.participant_column)
+            amount = col(metric.column)
+            numeric = "float" if dialect == "tsql" else "REAL"
+            expression = (f"CASE WHEN {function}(*) = {function}({participant}) "
+                          f"THEN SUM(CAST({amount} AS {numeric})) / "
+                          f"NULLIF({function}(DISTINCT {participant}), 0) ELSE NULL END")
+            output_type = "number"
         else:
             argument = col(metric.column)
             if metric.aggregation in {"sum", "average"} and family == "integer":
@@ -182,7 +193,8 @@ def compile_report(
     schema = dataset.table.schema or ("dbo" if dialect == "tsql" else "")
     if schema:
         table = _quote(schema, dialect) + "." + table
-    limit = min(spec.limit, limits.max_rows)
+    # Decline ranking needs complete candidates before its local output cap.
+    limit = limits.max_rows if spec.comparison_calculation == "decrease" else min(spec.limit, limits.max_rows)
     parameters: list[object] = [limit + 1] if dialect == "tsql" else []
 
     def bind(value: object, family: str) -> str:
@@ -194,6 +206,20 @@ def compile_report(
     ctes = []
     joins = []
     guards = []
+    if spec.time_grain == "jalali_month":
+        buckets = set(jalali_buckets(report.period.start, report.period.end))
+        if report.comparison_period:
+            buckets.update(jalali_buckets(report.comparison_period.start, report.comparison_period.end))
+        rows = []
+        for start, end in sorted(buckets):
+            rows.append("SELECT " + ("CAST(" + bind(start, "date") + " AS date)" if dialect == "tsql" else bind(start, "date"))
+                        + " AS " + _quote("bucket", dialect) + ", "
+                        + ("CAST(" + bind(end, "date") + " AS date)" if dialect == "tsql" else bind(end, "date"))
+                        + " AS " + _quote("stop", dialect))
+        ctes.append("calendar AS (" + " UNION ALL ".join(rows) + ")")
+        expression = col(dataset.time.column)
+        joins.append("INNER JOIN calendar ON " + expression + " >= calendar." + _quote("bucket", dialect)
+                     + " AND " + expression + " < calendar." + _quote("stop", dialect))
     for index, bound in enumerate(report.related_sources):
         source = bound.source
         if dialect == "sqlite" and (source.table.schema not in {"", "main"}
@@ -229,6 +255,8 @@ def compile_report(
                      for i, (local, _) in enumerate(bound.definition.key_pairs)]
         joins.append(f"LEFT JOIN r{index} ON " + " AND ".join(join_keys))
         guards.append(f"EXISTS (SELECT 1 FROM r{index} WHERE " + _quote("__count", dialect) + " > 1)")
+
+    cte_parameters = len(parameters) - (1 if dialect == "tsql" else 0)
 
     def condition(name: str, operator: str, values: tuple[object, ...]) -> str:
         expression = col(name)
@@ -278,6 +306,16 @@ def compile_report(
         body += "\nUNION ALL\n" + branch("comparison", report.comparison_period)
     # The cap applies to the entire result, including comparison branches.
     projection = ", ".join(_quote(item.id, dialect) for item in fields)
+    if spec.include_matching_day_count:
+        # WHERE below filters complete daily groups before this window; TOP/LIMIT
+        # follows it. Counts therefore cover the entire matching period.
+        identity = _quote(spec.dimension_ids[0], dialect)
+        partitions = ([_quote("period_label", dialect)] if spec.comparison else []) + [identity]
+        function = "COUNT_BIG" if dialect == "tsql" else "COUNT"
+        expression = (f"CASE WHEN {identity} IS NULL THEN NULL ELSE {function}(*) OVER "
+                      f"(PARTITION BY {', '.join(partitions)}) END")
+        projection += f", {expression} AS " + _quote("matching_day_count", dialect)
+        fields.append(ReportField("matching_day_count", "Matching days", "integer", "days"))
     if guards:
         projection += ", CASE WHEN " + " OR ".join(guards) + " THEN 1 ELSE 0 END AS " + _quote("__sageql_relation_guard", dialect)
     sql = ("SELECT TOP (?) " if dialect == "tsql" else "SELECT ") + projection
@@ -302,7 +340,7 @@ def compile_report(
     if aggregate_predicates:
         sql += "\nWHERE " + " AND ".join(aggregate_predicates)
     order: list[str] = []
-    if spec.order_by:
+    if spec.order_by and spec.comparison_calculation != "decrease":
         order.append(_quote(spec.order_by, dialect) + (" DESC" if spec.descending else " ASC"))
     tie_dimensions = list(spec.dimension_ids)
     if spec.order_by in spec.metric_ids:
@@ -322,9 +360,7 @@ def compile_report(
         sql = "WITH " + ",\n".join(ctes) + "\n" + sql
         # CTE policies precede SQL Server's TOP placeholder in textual bind order.
         if dialect == "tsql":
-            source_parameters = sum(len(policy.values) for bound in report.related_sources
-                                    for policy in bound.access.policies)
-            parameters = [*parameters[1:1 + source_parameters], parameters[0], *parameters[1 + source_parameters:]]
+            parameters = [*parameters[1:1 + cte_parameters], parameters[0], *parameters[1 + cte_parameters:]]
     # Conservative portable budgets leave room for ODBC's prepared-call
     # bookkeeping and SQLite builds with the older 999-variable default.
     if len(parameters) > (2_000 if dialect == "tsql" else 900):
@@ -518,9 +554,11 @@ class SQLServerAdapter:
                 error = exc
             if error is None:
                 if connection is None:
-                    error = SDKError("database_unavailable", "The reporting database could not be reached. Check its connection and try again.", retryable=True)
+                    error = SDKError("database_unavailable", "The reporting database could not be reached. Check its connection and try again.", retryable=True,
+                                     stage="database_connection", reason="unavailable")
                 else:
-                    error = SDKError("execution_failed", "SQL Server report execution failed.", retryable=True)
+                    error = SDKError("execution_failed", "SQL Server report execution failed.", retryable=True,
+                                     stage="database_execution", reason="query_failed")
         finally:
             done.set()
             if watcher is not None:
@@ -535,7 +573,8 @@ class SQLServerAdapter:
         if error is not None:
             raise error from None
         if cleanup_failed:
-            raise SDKError("execution_failed", "Report connection cleanup failed.", retryable=True)
+            raise SDKError("execution_failed", "Report connection cleanup failed.", retryable=True,
+                           stage="database_execution", reason="cleanup")
         return result
 
 
@@ -579,7 +618,7 @@ class SQLiteAdapter:
                         and (not arg2 or arg2 in allowed[arg1]) else sqlite3.SQLITE_DENY)
             if action == sqlite3.SQLITE_FUNCTION:
                 return (sqlite3.SQLITE_OK if (arg2 or "").casefold() in
-                        {"sum", "avg", "min", "max", "count", "date", "strftime", "printf", "replace", "coalesce"}
+                        {"sum", "avg", "min", "max", "count", "date", "strftime", "printf", "replace", "coalesce", "nullif"}
                         else sqlite3.SQLITE_DENY)
             return sqlite3.SQLITE_DENY
 

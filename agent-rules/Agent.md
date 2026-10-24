@@ -4,11 +4,11 @@ Read this file before changing code. `AGENTS.md` points here; keep both files in
 
 ## Product contract
 
-SageQL is an installable reporting SDK embedded in a developer's backend. The approved `sageql.sdk` slice separates trusted catalog/infrastructure/authenticated actor policies from end-user messages, asks clarification, resolves date-only Gregorian periods and explicitly supplied Jalali months, validates registered concepts, compiles deterministic SQL Server or SQLite SELECTs over registered facts and optional dimensional relationships, executes only with explicit host opt-in, and returns typed table/chart JSON. Persistent sessions support refinements, ownership, current access checks, revisions and idempotent retries. Read [docs/SDK.md](../docs/SDK.md) and [docs/SDK_SQL_SERVER.md](../docs/SDK_SQL_SERVER.md) for actual API and scope. Model-selected joins, arbitrary formulas, timestamp conversion, calendars beyond the scoped month extension and production HTTP identity are outside this slice.
+SageQL is an installable reporting SDK embedded in a developer's backend. The approved `sageql.sdk` slice separates trusted catalog/infrastructure/authenticated actor policies from end-user messages, asks clarification, resolves date-only Gregorian and scoped Persian business periods, validates registered concepts, compiles deterministic SQL Server or SQLite SELECTs over registered facts and optional dimensional relationships, executes only with explicit host opt-in, and returns typed table/chart JSON. Persistent sessions support refinements, ownership, current access checks, revisions and idempotent retries. Read [docs/SDK.md](../docs/SDK.md), [docs/SDK_SQL_SERVER.md](../docs/SDK_SQL_SERVER.md) and [docs/SDK_MANAGER_REPORTS.md](../docs/SDK_MANAGER_REPORTS.md) for actual API and scope. Model-selected joins, arbitrary formulas, timestamp conversion, unregistered calendar operations and production HTTP identity are outside this slice.
 
 The historical staged API/CLI still begins with a report question and Database/LLM configuration, clarifies understanding/context, discovers user-supplied metadata, builds Step 6 logical plans, renders Step 7 SQLite SQL, validates Step 8, and explicitly executes Step 9 read-only SQLite reports. The isolated Rahtal pilot retains its deterministic T-SQL renderer/executor for approved daily-performance tables. Its ignored local config holds questions/run options and `.env` holds credentials. Step 5 remains undefined; SDK table/chart JSON is independent of that historical step and does not imply a PDF/document export. The earlier model-written SQL proposal API remains experimental and never enters SDK execution.
 
-The local Rahtal frontend explicitly reuses its existing approved activity and employee-profile tables and configured model endpoint. A fixed local reporting principal and separate workspace token protect this loopback demo; it is not production per-employee authorization. Registered dimension-only DISTINCT listings are approved under the same policies and execution bounds. Do not create database objects, add implicit source joins, copy credentials into tracked files, or substitute synthetic data when Rahtal is unreachable.
+The local Rahtal frontend explicitly reuses its registered activity, employee-profile and activity-topic tables and configured model endpoint. A fixed local reporting principal and separate workspace token protect this loopback demo; it is not production per-employee authorization. Registered dimension-only DISTINCT listings are approved under actual source policies and execution bounds. Do not create database objects, add implicit source joins, copy credentials into tracked files, or substitute synthetic data when Rahtal is unreachable.
 
 The approved [registered relationship extension](../docs/SDK_RELATIONSHIPS.md)
 adds host-defined many-to-one equality mappings and explicit dimension/filter
@@ -26,10 +26,36 @@ Registered entity-label dimensions have their own [scope](../docs/SDK_ENTITY_LAB
 
 ## Working rules
 
+The tenth Rahtal request adds the fixed
+[matching-day count](../docs/SDK_MATCHING_DAY_COUNTS.md) for bounded daily entity
+tables. Count complete daily groups after aggregate conditions and before limits,
+partitioned only by the registered label identity/period, then resolve names.
+The false default preserves ordinary reports. Arbitrary window expressions,
+model-selected partitions and filtering the computed count remain unsupported.
+
+The sixth Rahtal request adds the fixed host-registered
+[participant-mean aggregate](../docs/SDK_PARTICIPANT_MEANS.md): a numeric fact sum
+divided by distinct participating identities in the same filtered group. Models
+select a business metric, never numerator/denominator columns or formulas. Missing
+identities make the mean unknown; arbitrary ratios and historical positions are
+not inferred. Existing relationship policies and cardinality guards still apply.
+
+The explicitly requested [comparison-change extension](../docs/SDK_COMPARISON_CHANGES.md)
+adds one fixed local absolute/percentage calculation over two complete ungrouped
+numeric aggregate periods. It retains deterministic SQL and policy checks; models
+select the operation, never formulas or result values. Grouped comparisons and
+arbitrary calculations remain outside this extension. The separately requested
+[entity-decrease extension](../docs/SDK_ENTITY_DECREASES.md) aligns one registered
+label identity across two complete bounded aggregate reads and ranks absolute
+loss locally before the output limit and policy-bound name enrichment.
+
 The explicitly requested [Jalali month extension](../docs/SDK_JALALI_MONTHS.md)
-adds deterministic date-only bounds for a supplied month/year. It does not add
-timestamp conversion, Jalali time buckets or inferred years. The source calendar
-and SQL remain Gregorian; the existing execution and model-data boundaries apply.
+adds deterministic date-only bounds for a supplied month/year. The authorized
+[manager extension](../docs/SDK_MANAGER_REPORTS.md) adds workload definitions,
+the fixed activity-topic relationship, Persian ranges/years/relative periods and
+bounded Persian monthly buckets. It does not add timestamp conversion, inferred
+years in named months, or arbitrary calendar formulas. The source calendar and
+SQL remain Gregorian; existing execution and model-data boundaries apply.
 
 1. Inspect the current tree, Git state, public API, and tests before editing. Preserve user changes.
 2. State the next small deliverable. Implement one vertical slice, run focused checks, and record the result before moving on.
@@ -59,3 +85,5 @@ and SQL remain Gregorian; the existing execution and model-data boundaries apply
 - Unsafe or invalid model SQL fails closed.
 - README documents limitations: developers review registered business definitions/view grain, execution uses deterministic validated SQL, and database permissions/workload limits remain additional enforcement layers. Experimental model-written SQL still requires human review and cannot enter automatic execution.
 - No secrets or sample production data are committed.
+
+Reporting reliability hardening is documented in [docs/REPORTING_RELIABILITY_PHASE3.md](../docs/REPORTING_RELIABILITY_PHASE3.md). Bounded user evidence constrains intent and every final provider specification. Unavailable requested operations return transparent unsupported outcomes; the typed requirement ledger cannot register capabilities. Structured repair is opt-in, shared and bounded; no database operation is automatically retried. Safe stage/reason/field diagnostics exclude rejected values, row data and secrets.

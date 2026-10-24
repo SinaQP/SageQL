@@ -407,7 +407,7 @@ def test_empty_and_truncated_reports_are_explicit(database):
     empty = sdk.submit(session.session_id, "hours in 2000", ACTOR, "r1", 0)
     assert empty.report.rows == ()
     assert empty.report.provenance["completeness"] == "empty"
-    truncated = sdk.submit(session.session_id, "September hours", ACTOR, "r2", 1)
+    truncated = sdk.submit(session.session_id, "September 2026 hours", ACTOR, "r2", 1)
     assert len(truncated.report.rows) == 1
     assert truncated.report.truncated
     assert truncated.report.provenance["completeness"] == "truncated"

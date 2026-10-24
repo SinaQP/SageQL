@@ -16,7 +16,8 @@ import re
 
 from sageql.schema import Column, Table
 from sageql.sdk.names import normalize_name
-from sageql.sdk.calendars import jalali_month_bounds
+from sageql.sdk.calendars import (jalali_month_bounds, jalali_to_gregorian,
+                                  gregorian_to_jalali, jalali_buckets)
 from sageql.sdk.models import (
     AccessScope, AggregateFilter, DatasetAccess, DatasetDefinition, DimensionDefinition,
     EntityLabelDimension, EntityLookupDefinition, FilterDefinition, FullNameFilterDefinition, LookupQualifier,
@@ -27,9 +28,9 @@ from sageql.sdk.models import (
 )
 
 
-_AGGREGATIONS = {"sum", "count_rows", "count_distinct", "average", "minimum", "maximum"}
+_AGGREGATIONS = {"sum", "count_rows", "count_distinct", "average", "minimum", "maximum", "sum_per_participant"}
 _OPERATORS = {"eq", "neq", "gt", "gte", "lt", "lte", "in", "is_null", "is_not_null"}
-_GRAINS = {"none", "day", "week", "month", "quarter", "year"}
+_GRAINS = {"none", "day", "week", "month", "quarter", "year", "jalali_month"}
 _FAMILIES = {
     "integer": {"int", "integer", "tinyint", "smallint", "bigint"},
     "decimal": {"decimal", "numeric", "money", "smallmoney"},
@@ -39,7 +40,7 @@ _FAMILIES = {
     "date": {"date"},
     "datetime": {"datetime", "datetime2", "smalldatetime", "datetimeoffset"},
 }
-_RESERVED_IDS = {"time_bucket", "period_label", "__sageql_relation_guard"}
+_RESERVED_IDS = {"time_bucket", "period_label", "__sageql_relation_guard", "matching_day_count"}
 
 
 def _fail(code: str, message: str) -> None:
@@ -107,6 +108,18 @@ def _validate_dataset(dataset: DatasetDefinition) -> None:
     _id(dataset.id, code)
     _text(dataset.label, code, "Dataset labels must be bounded text.")
     _text(dataset.version, code, "A dataset version is required.", maximum=100)
+    if not isinstance(dataset.description, str) or len(dataset.description) > 2000 or "\x00" in dataset.description:
+        _fail(code, "A dataset description must be bounded business text.")
+    _tuple(dataset.default_metric_ids, code, "Default metrics must be bounded.", maximum=16)
+    _tuple(dataset.metrics, code, "Metrics must be bounded.", maximum=256)
+    if any(not isinstance(metric, MetricDefinition) for metric in dataset.metrics):
+        _fail(code, "A registered metric definition is required.")
+    for metric in dataset.metrics:
+        _id(metric.id, code)
+    if (any(not isinstance(key, str) or key not in {m.id for m in dataset.metrics}
+            for key in dataset.default_metric_ids)
+            or len(set(dataset.default_metric_ids)) != len(dataset.default_metric_ids)):
+        _fail(code, "Default metrics must be distinct registered measures.")
     _text(dataset.table.name, code, "A valid physical table name is required.", maximum=128)
     if not isinstance(dataset.table.schema, str) or len(dataset.table.schema) > 128 or "\x00" in dataset.table.schema or not isinstance(dataset.table.kind, str) or dataset.table.kind not in {"TABLE", "VIEW"}:
         _fail(code, "A dataset must register one table or view.")
@@ -149,13 +162,27 @@ def _validate_dataset(dataset: DatasetDefinition) -> None:
             elif not isinstance(definition.column, str) or definition.column not in columns:
                 _fail(code, "Reporting definitions must reference registered physical columns.")
             if kind is MetricDefinition:
+                if not isinstance(definition.description, str) or len(definition.description) > 1000 or "\x00" in definition.description:
+                    _fail(code, "Metric descriptions must be bounded business text.")
+                for terms in (definition.selection_terms, definition.ranking_terms):
+                    _tuple(terms, code, "Measure terms must be bounded.", maximum=16)
+                    for term in terms:
+                        _text(term, code, "Measure terms must be bounded business phrases.", maximum=100)
                 if definition.column in dataset.related_columns:
                     _fail(code, "Measures must retain the physical fact grain.")
                 if not isinstance(definition.aggregation, str) or definition.aggregation not in _AGGREGATIONS or not isinstance(definition.unit, str) or len(definition.unit) > 100 or "\x00" in definition.unit:
                     _fail(code, "A metric has an unsupported aggregate or unit.")
+                if definition.aggregation == "sum_per_participant":
+                    if (not isinstance(definition.participant_column, str)
+                            or definition.participant_column not in columns
+                            or definition.participant_column in dataset.related_columns
+                            or column_type(columns[definition.participant_column].data_type) not in {"integer", "text"}):
+                        _fail(code, "Participant means require a physical integer or text identity column.")
+                elif definition.participant_column is not None:
+                    _fail(code, "Only participant means may declare a participant column.")
                 if definition.column is not None:
                     family = column_type(columns[definition.column].data_type)
-                    if definition.aggregation in {"sum", "average"} and family not in {"integer", "decimal", "number"}:
+                    if definition.aggregation in {"sum", "average", "sum_per_participant"} and family not in {"integer", "decimal", "number"}:
                         _fail(code, "Numeric aggregates require numeric source columns.")
                     if definition.aggregation in {"minimum", "maximum"} and family == "boolean":
                         _fail(code, "Boolean minimum and maximum are unsupported.")
@@ -181,14 +208,14 @@ def _validate_dataset(dataset: DatasetDefinition) -> None:
                     _fail(code, "A filter has unsupported operators.")
                 if isinstance(definition, FullNameFilterDefinition):
                     _tuple(definition.name_columns, code, "Name columns must be a bounded tuple.", maximum=4)
-                    if (not 2 <= len(definition.name_columns) <= 4
+                    if (not 1 <= len(definition.name_columns) <= 4
                             or definition.operators != ("eq",)
                             or definition.column != definition.name_columns[0]
                             or any(not isinstance(name, str) or name not in columns
                                    or column_type(columns[name].data_type) != "text"
                                    for name in definition.name_columns)
                             or len(set(definition.name_columns)) != len(definition.name_columns)):
-                        _fail(code, "Full-name filters require two to four distinct text columns and equality only.")
+                        _fail(code, "Full-name filters require one to four distinct text columns and equality only.")
     if not dataset.metrics and not dataset.dimensions:
         _fail(code, "A dataset must register at least one metric or dimension.")
     if dataset.time is not None:
@@ -209,6 +236,11 @@ def validate_catalog(catalog: ReportingCatalog) -> None:
     if not isinstance(catalog, ReportingCatalog):
         _fail("invalid_catalog", "A reporting catalog is required.")
     _text(catalog.version, "invalid_catalog", "A catalog version is required.", maximum=100)
+    if not isinstance(catalog.preferred_calendar, str) or catalog.preferred_calendar not in {"gregorian", "jalali"}:
+        _fail("invalid_catalog", "The preferred reporting calendar is unsupported.")
+    _tuple(catalog.ambiguous_ranking_terms, "invalid_catalog", "Ranking terms must be bounded.", maximum=16)
+    for term in catalog.ambiguous_ranking_terms:
+        _text(term, "invalid_catalog", "Ranking terms must be bounded business phrases.", maximum=100)
     _tuple(catalog.datasets, "invalid_catalog", "Catalog datasets must be a bounded tuple.", maximum=100)
     if not catalog.datasets:
         _fail("invalid_catalog", "At least one dataset must be registered.")
@@ -427,11 +459,14 @@ def permitted_catalog(catalog: ReportingCatalog, scope: AccessScope) -> Reportin
                         if (access.filter_ids is None or item.id in access.filter_ids)
                         and related_allowed(dataset.id, item.id))
         needed = {item.column for item in (*metrics, *dimensions, *filters) if item.column is not None}
+        needed.update(item.participant_column for item in metrics if item.participant_column is not None)
         needed.update(name for item in filters if isinstance(item, FullNameFilterDefinition)
                       for name in item.name_columns)
         if dataset.time:
             needed.add(dataset.time.column)
         permitted.append(replace(dataset, metrics=metrics, dimensions=dimensions, filters=filters,
+                                 default_metric_ids=tuple(key for key in dataset.default_metric_ids
+                                                          if key in {m.id for m in metrics}),
                                  columns=tuple(column for column in dataset.columns if column.name in needed),
                                  row_key=(), related_columns=()))
     by_id = {item.id: item for item in permitted}
@@ -461,7 +496,9 @@ def permitted_catalog(catalog: ReportingCatalog, scope: AccessScope) -> Reportin
         qualifiers = tuple(item for item in lookup.qualifiers
                            if item.source_filter_id in {definition.id for definition in source.filters})
         lookups.append(replace(lookup, qualifiers=qualifiers))
-    return ReportingCatalog(tuple(permitted), catalog.version, tuple(lookups))
+    return ReportingCatalog(tuple(permitted), catalog.version, tuple(lookups),
+                            preferred_calendar=catalog.preferred_calendar,
+                            ambiguous_ranking_terms=catalog.ambiguous_ranking_terms)
 
 
 def _month(year: int, month: int) -> ResolvedPeriod:
@@ -477,13 +514,58 @@ def resolve_period(period: PeriodSelection, today: date) -> ResolvedPeriod:
     if not isinstance(period, PeriodSelection) or not isinstance(period.kind, str) or type(today) is not date:
         _fail("invalid_spec", "A period selection and business date are required.")
     supplied = {name for name in ("start", "end", "year", "month", "count", "unit") if getattr(period, name) is not None}
-    required = {"range": {"start", "end"}, "month": {"year", "month"},
+    required = {"range": {"start", "end"}, "jalali_range": {"start", "end"},
+                "jalali_year": {"year"}, "month": {"year", "month"},
                 "jalali_month": {"year", "month"}, "year": {"year"},
-                "rolling": {"count", "unit"}}.get(period.kind, set())
+                "rolling": {"count", "unit"}, "jalali_rolling": {"count", "unit"}}.get(period.kind, set())
     if supplied != required:
         _fail("invalid_spec", "A period selection contains missing or contradictory fields.")
     if period.kind == "all":
         return ResolvedPeriod(None, None)
+    if period.kind == "jalali_range":
+        def persian_date(value):
+            if not isinstance(value, str) or not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value):
+                raise ValueError
+            return jalali_to_gregorian(*map(int, value.split("-")))
+        try:
+            start, last = persian_date(period.start), persian_date(period.end)
+            if start > last:
+                raise ValueError
+            return ResolvedPeriod(start, last + timedelta(days=1))
+        except ValueError:
+            _fail("invalid_spec", "A Jalali range needs valid inclusive Persian start/end dates.")
+    if period.kind == "jalali_year":
+        try:
+            start = jalali_month_bounds(period.year, 1)[0]
+            end = jalali_month_bounds(period.year, 12)[1]
+            return ResolvedPeriod(start, end)
+        except ValueError:
+            _fail("invalid_spec", "A Jalali year requires an integer year from 1300 through 1499.")
+    if period.kind in {"this_jalali_month", "last_jalali_month", "this_jalali_year", "last_jalali_year", "jalali_rolling"}:
+        try:
+            year, month, day = gregorian_to_jalali(today)
+            if period.kind.endswith("jalali_month"):
+                if period.kind == "last_jalali_month":
+                    year, month = (year - 1, 12) if month == 1 else (year, month - 1)
+                return ResolvedPeriod(*jalali_month_bounds(year, month))
+            if period.kind.endswith("jalali_year"):
+                year -= period.kind == "last_jalali_year"
+                return ResolvedPeriod(jalali_month_bounds(year, 1)[0], jalali_month_bounds(year, 12)[1])
+            if (type(period.count) is not int or not 1 <= period.count <= 1200
+                    or not isinstance(period.unit, str) or period.unit not in {"day", "week", "month", "quarter", "year"}):
+                raise ValueError
+            end = today + timedelta(days=1)
+            if period.unit in {"day", "week"}:
+                start = end - timedelta(days=period.count * (7 if period.unit == "week" else 1))
+                gregorian_to_jalali(start)
+            else:
+                count = period.count * {"month": 1, "quarter": 3, "year": 12}[period.unit]
+                shifted_year, shifted_month = divmod(year * 12 + month - 1 - count, 12)
+                bounds = jalali_month_bounds(shifted_year, shifted_month + 1)
+                start = bounds[0] + timedelta(days=min(day, (bounds[1] - bounds[0]).days) - 1)
+            return ResolvedPeriod(start, end)
+        except (ValueError, OverflowError):
+            _fail("invalid_spec", "The relative Jalali period is outside supported date/count bounds.")
     if period.kind == "range":
         start, end = _iso_date(period.start, "invalid_spec"), _iso_date(period.end, "invalid_spec")
         if start >= end:
@@ -504,7 +586,7 @@ def resolve_period(period: PeriodSelection, today: date) -> ResolvedPeriod:
     try:
         if period.kind == "rolling":
             if (type(period.count) is not int or not 1 <= period.count <= 1200
-                    or period.unit not in {"day", "week", "month", "quarter", "year"}):
+                    or not isinstance(period.unit, str) or period.unit not in {"day", "week", "month", "quarter", "year"}):
                 _fail("invalid_spec", "A rolling period requires a bounded positive count and registered unit.")
             end = today + timedelta(days=1)
             if period.unit in {"day", "week"}:
@@ -570,6 +652,8 @@ def validate_report(dataset: DatasetDefinition, spec: ReportSpec, access: Datase
         seen_aggregates.add(key)
         metric = metrics[condition.metric_id]
         family = "integer" if metric.aggregation in {"count_rows", "count_distinct"} else column_type(_columns(dataset)[metric.column].data_type)
+        if metric.aggregation == "sum_per_participant":
+            family = "number"
         if metric.aggregation in {"sum", "average"} and family == "integer":
             family = "decimal"
         output_type = {"integer": "bigint", "number": "float", "decimal": "decimal",
@@ -611,19 +695,41 @@ def validate_report(dataset: DatasetDefinition, spec: ReportSpec, access: Datase
         _fail("invalid_spec", "A report requires a bounded row limit and explicit sort direction.")
     period = resolve_period(spec.period, today)
     comparison = resolve_period(spec.comparison, today) if spec.comparison is not None else None
-    if (any(selection is not None and selection.kind == "jalali_month"
+    if (any(selection is not None and "jalali" in selection.kind
             for selection in (spec.period, spec.comparison))
-            and spec.time_grain not in {"none", "day"}):
-        _fail("unsupported", "A Jalali month supports totals or daily dates; Jalali calendar buckets are not registered.")
+            and spec.time_grain not in {"none", "day", "jalali_month"}):
+        _fail("unsupported", "Use daily dates or explicit Jalali monthly grouping for Persian periods.")
+    if spec.time_grain == "jalali_month":
+        try:
+            buckets = set(jalali_buckets(period.start, period.end))
+            if comparison is not None:
+                buckets.update(jalali_buckets(comparison.start, comparison.end))
+            if len(buckets) > 120:
+                raise ValueError
+        except ValueError:
+            _fail("unsupported", "Jalali monthly grouping needs bounded periods spanning at most 120 months.")
     if (period.start is not None or spec.time_grain != "none" or comparison is not None) and dataset.time is None:
         _fail("unsupported", "This dataset has no configured date field.")
     if comparison is not None and (period.start is None or comparison.start is None):
         _fail("invalid_spec", "Comparisons require two explicit bounded periods.")
+    if type(spec.include_matching_day_count) is not bool:
+        _fail("invalid_spec", "Matching-day count selection must be boolean.")
+    if spec.include_matching_day_count:
+        labels = [item for item in dataset.dimensions
+                  if isinstance(item, EntityLabelDimension) and item.id in spec.dimension_ids]
+        if (spec.time_grain != "day" or spec.chart != "table" or not spec.metric_ids
+                or len(spec.dimension_ids) != 1 or len(labels) != 1
+                or period.start is None or spec.comparison_calculation != "none"):
+            _fail("unsupported", "Matching-day counts require bounded daily entity tables without fixed change calculations.")
     fields = {*spec.metric_ids, *spec.dimension_ids}
     if spec.time_grain != "none":
         fields.add("time_bucket")
     if comparison is not None:
         fields.add("period_label")
+    if spec.comparison_calculation == "decrease":
+        fields.add("absolute_decrease")
+    if spec.include_matching_day_count:
+        fields.add("matching_day_count")
     if spec.order_by is not None and (not isinstance(spec.order_by, str) or spec.order_by not in fields):
         _fail("invalid_spec", "Sorting must reference a selected report field.")
     if spec.chart != "table":
@@ -635,4 +741,6 @@ def validate_report(dataset: DatasetDefinition, spec: ReportSpec, access: Datase
             _fail("unsupported", "A line chart requires a date series without additional dimensions.")
         if spec.chart == "bar" and len(spec.dimension_ids) + (spec.time_grain != "none") != 1:
             _fail("unsupported", "A bar chart requires one category or date grouping.")
+    from sageql.sdk.comparisons import validate_comparison_calculation
+    validate_comparison_calculation(spec, dataset)
     return ValidatedReport(dataset, spec, access, period, comparison, today)

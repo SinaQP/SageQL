@@ -1,7 +1,8 @@
-# Registered employee-name resolution
+# Registered entity-name resolution
 
-User outcome: an activity request naming an employee resolves that person from
-the approved profile source, without asking the user for an internal ID.
+User outcome: a report naming an entity resolves it from the approved source,
+without asking the user for an internal ID. Rahtal registers employee names;
+other hosts can register product names, book titles or other full entity names.
 
 This scoped extension permits one host-registered entity lookup per report:
 an equality match on a registered full-name filter, optionally narrowed by
@@ -11,10 +12,12 @@ objects, arbitrary expressions, fuzzy matching or model-written SQL.
 
 The host declares the source dataset, identity dimension, full-name filter,
 optional qualifier filters and the target equality filter. Source/target scalar
-types must agree. A full-name filter combines two to four registered text
+types must agree. A full-name filter combines one to four registered text
 columns in declared order and uses fixed whitespace/ZWNJ and Persian/Arabic
 letter normalization. Its entire normalized name is compared for equality;
-no substring or approximate match selects a person.
+no substring or approximate match selects an entity. A single text column is
+supported for stored full names/titles; no schema change or artificial name
+splitting is necessary. Existing multi-column registrations retain their behavior.
 
 The model receives permitted business labels and virtual name/qualifier filter
 IDs. It returns literal user names in ordinary UserFilters. It never receives
@@ -22,8 +25,9 @@ lookup result rows or the resolved identity. Original name filters remain in
 conversation specifications and report display metadata; the concrete identity
 filter stays in the internal execution/saved validation specification.
 
-A named activity request with a period defaults to the registered daily measures
-and a table when the user has not selected a particular measure. The request
+Host dataset descriptions and default measures define broad-report behavior.
+Rahtal registers daily activity measures and table presentation for its named
+activity requests. The request
 already permits the registered name lookup; prior assistant questions do not
 create a requirement for an internal ID or permission to search. The configured
 interpreter recognizes ID/search-confirmation questions in Persian and English

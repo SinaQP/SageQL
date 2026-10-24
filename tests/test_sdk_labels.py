@@ -7,6 +7,7 @@ import json
 import sqlite3
 from threading import Event
 from types import SimpleNamespace
+from uuid import UUID
 
 import pytest
 
@@ -373,7 +374,13 @@ def test_text_identities_can_be_labeled_without_numeric_coercion(database):
     assert sdk.database.calls[1].spec.filters[0].values == ("001",)
 
 
-def test_name_filter_and_display_labels_use_independent_policy_bound_reads(database):
+@pytest.mark.parametrize("runtime_id", [
+    "00000000000000000000000000000101",
+    "00000000000000000000000000000999",
+])
+def test_name_filter_and_display_labels_use_independent_policy_bound_reads(database, monkeypatch, runtime_id):
+    # Report/session UUIDs may contain the same digits as a resolved row identity.
+    monkeypatch.setattr("sageql.sdk.engine.uuid4", lambda: UUID(hex=runtime_id))
     registration = catalog()
     target, source = registration.datasets
     target = replace(target, filters=(FilterDefinition("person_filter", "فروشنده", "person_key"),))
@@ -390,7 +397,13 @@ def test_name_filter_and_display_labels_use_independent_policy_bound_reads(datab
     assert [report.dataset.id for report in sdk.database.calls] == ["people", "orders", "people"]
     assert reply.report.provenance["filters"] == [
         {"filter_id": "person_name_filter", "operator": "eq", "values": ["کیان نمونه"]}]
-    assert "101" not in json.dumps(reply.report.to_dict())
+    serialized = reply.report.to_dict()
+    assert serialized["id"] == runtime_id and serialized["session_id"] == runtime_id
+    business_payload = {key: value for key, value in serialized.items()
+                        if key not in {"id", "session_id", "provenance"}}
+    business_payload["provenance"] = {key: value for key, value in serialized["provenance"].items()
+                                     if key != "generated_at"}
+    assert "101" not in json.dumps(business_payload)
 
 
 def test_sql_server_compilation_still_groups_and_limits_identities_without_joins():

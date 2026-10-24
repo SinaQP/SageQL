@@ -23,6 +23,7 @@
     .status{font-size:12px;color:#75847b;min-height:18px;padding:0 24px 10px}.status.error{color:#a04b34}.footer{font-size:11px;color:#80907f;max-width:1420px;margin:0 auto;padding:0 4% 30px;line-height:1.7}
     dialog{border:1px solid #cbd9c9;border-radius:18px;max-width:420px;padding:28px;background:#fff;color:#17312b}dialog::backdrop{background:#17312b55}dialog p{font-size:14px;line-height:1.7;margin:12px 0 20px}dialog input{width:100%;padding:11px;border:1px solid #cbd9c9;border-radius:8px;margin-bottom:16px}dialog .error{color:#a04b34;font-size:13px}
     @media(max-width:900px){main{grid-template-columns:1fr;margin-top:22px}.chat-panel{min-height:560px}.messages{height:280px}.report-panel{min-height:460px}header{height:68px}.empty{min-height:330px}}
+    thead th{white-space:normal}
   </style>
   <style>
     [hidden]{display:none!important}
@@ -51,7 +52,7 @@
     <section class="panel chat-panel" aria-label="گفت‌وگوی گزارش">
       <div class="panel-head"><div><h1>دستیار گزارش‌گیری شما</h1><p class="subtitle">پرسش خود را بنویسید و گزارش را در ادامه دقیق‌تر کنید.</p></div><button id="new-chat" type="button">گفت‌وگوی تازه</button></div>
       <div id="messages" class="messages" aria-live="polite"></div>
-      <div class="suggestions"><button type="button">ساعات فعالیت روزانه در سپتامبر</button><button type="button">به تفکیک کارمند نمایش بده</button><button id="management-example" type="button" hidden data-question="مجموع ساعات فعالیت و تعداد فعالیت‌های ثبت‌شده در شهریور ۱۴۰۵ را با مرداد ۱۴۰۵ به تفکیک سمت شغلی فعلی کارکنان مقایسه کن. در جدول نشان بده و بر اساس مجموع ساعات از بیشترین به کمترین مرتب کن.">مقایسه ماهانه حجم کار</button></div>
+      <div class="suggestions"><button type="button">مجموع ساعات و تعداد فعالیت‌ها در ماه قبل</button><button id="topic-example" type="button" hidden>سهم هر کارمند روی هر موضوع در یک ماه گذشته</button><button id="trend-example" type="button" hidden>روند مجموع ساعات در شش ماه گذشته، ماه به ماه شمسی</button><button id="management-example" type="button" hidden data-question="مجموع ساعات فعالیت و تعداد فعالیت‌های ثبت‌شده در شهریور ۱۴۰۵ را با مرداد ۱۴۰۵ به تفکیک سمت شغلی فعلی کارکنان مقایسه کن. در جدول نشان بده و بر اساس مجموع ساعات از بیشترین به کمترین مرتب کن.">مقایسه ماهانه حجم کار</button></div>
       <div id="status" class="status" role="status"></div>
       <form id="chat-form" class="compose"><label for="message" class="hint">پرسش شما</label><textarea id="message" maxlength="8000" placeholder="چه چیزی می‌خواهید بدانید؟" required></textarea><div class="send-row"><span class="hint">Enter برای ارسال · Shift + Enter برای خط جدید</span><button id="retry" class="retry" type="button">تلاش دوباره</button><button id="send" class="primary" type="submit">ارسال ←</button></div></form>
     </section>
@@ -72,15 +73,37 @@
     const el = id => document.getElementById(id);
     let session = null, busy = false, pending = null;
     const persianDigits = value => String(value).replace(/[0-9]/g, digit => '۰۱۲۳۴۵۶۷۸۹'[Number(digit)]);
+    function persianDate(value) {
+      if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(String(value))) return persianDigits(value);
+      const date = new Date(value + 'T00:00:00Z');
+      if (!Number.isFinite(date.getTime())) return persianDigits(value);
+      return new Intl.DateTimeFormat('fa-IR-u-ca-persian', {year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'UTC'}).format(date);
+    }
+    function displayPercent(value) {
+      // Round calculated decimal text for display without changing precise JSON.
+      const match = /^(-?)(\d+)(?:\.(\d*))?(?:[eE]([+-]?\d+))?$/.exec(String(value));
+      if (!match || String(value).length > 850) return persianDigits(value);
+      const fraction = match[3] || '', exponent = Number(match[4] || 0);
+      if (!Number.isSafeInteger(exponent) || Math.abs(exponent) > 1000) return persianDigits(value);
+      const coefficient = BigInt(match[2] + fraction), shift = 2 + exponent - fraction.length;
+      const divisor = shift < 0 ? 10n ** BigInt(-shift) : 1n;
+      const rounded = shift < 0 ? (coefficient + divisor / 2n) / divisor : coefficient * 10n ** BigInt(shift);
+      const digits = rounded.toString().padStart(3, '0');
+      const whole = digits.slice(0, -2), decimals = digits.slice(-2).replace(/0+$/, '');
+      return persianDigits((match[1] && rounded !== 0n ? '−' : '') + whole) + (decimals ? '٫' + persianDigits(decimals) : '');
+    }
     function displayValue(value, field, report) {
       if (value === null) return '—';
+      if (['percent_change', 'percent_decrease'].includes(field.id)) return displayPercent(value);
       if (field.id === 'period_label') return persianDigits(report?.provenance?.period_labels?.[value] || {base: 'دوره اصلی', comparison: 'دوره مقایسه'}[value] || String(value));
+      if (field.type === 'date' && report?.provenance?.display_calendar === 'jalali') return persianDate(value);
+      if (field.type === 'number' && typeof value === 'number') return new Intl.NumberFormat('fa-IR', {maximumFractionDigits: 2}).format(value);
       return ['integer', 'decimal', 'number', 'date'].includes(field.type) ? persianDigits(value) : String(value);
     }
     let traces = [], selectedTrace = -1;
     const traceStatuses = {report_ready: 'گزارش آماده است', needs_clarification: 'نیاز به پاسخ تکمیلی', failed: 'ناموفق', blocked: 'مسدود', unsupported: 'پشتیبانی نمی‌شود'};
     const stepStatuses = {started: 'شروع شد', complete: 'تکمیل شد', failed: 'ناموفق', cached: 'پاسخ ذخیره‌شده'};
-    const stageLabels = {request: 'بررسی درخواست و پاسخ', interpretation: 'تفسیر پرسش', validation: 'اعتبارسنجی مفاهیم، تاریخ‌ها و سیاست‌ها', compilation: 'تولید قطعی SQL', database: 'اجرای پایگاه داده', connection: 'اتصال به SQL Server', metadata: 'بررسی منبع ثبت‌شده', metadata_sql: 'خواندن ساختار منبع', sql_execution: 'اجرای SQL گزارش', fetch: 'دریافت نتایج محدود', rollback: 'بازگردانی تراکنش خواندن', connection_close: 'بستن اتصال', retry: 'استفاده از پاسخ ذخیره‌شده'};
+    const stageLabels = {request: 'بررسی درخواست و پاسخ', interpretation: 'تفسیر پرسش', agent_intent: 'تشخیص خواستهٔ گزارش', agent_plan: 'طراحی گزارش', intent_check: 'تطبیق گزارش با خواسته', agent_review: 'بازبینی گزارش', business_check: 'بررسی معیار گزارش', validation: 'اعتبارسنجی مفاهیم، تاریخ‌ها و سیاست‌ها', compilation: 'تولید قطعی SQL', database: 'اجرای پایگاه داده', connection: 'اتصال به SQL Server', metadata: 'بررسی منبع ثبت‌شده', metadata_sql: 'خواندن ساختار منبع', sql_execution: 'اجرای SQL گزارش', fetch: 'دریافت نتایج محدود', rollback: 'بازگردانی تراکنش خواندن', connection_close: 'بستن اتصال', retry: 'استفاده از پاسخ ذخیره‌شده'};
     function selectReportTab(id, focus = false) {
       for (const tabId of ['result-tab', 'logs-tab']) {
         const active = tabId === id, tab = el(tabId);
@@ -185,6 +208,9 @@
         el('provenance').append(label, from, ' تا پیش از ', until);
       }
       const comparing = provenance.comparison_start && provenance.comparison_end_exclusive;
+      if (provenance.period_caption) {
+        el('provenance').append(persianDigits(provenance.period_caption), document.createElement('br'));
+      }
       if (start && end) appendBounds(comparing ? 'بازه میلادی دوره اصلی: ' : 'بازه میلادی: ', start, end);
       else el('provenance').textContent = 'همه تاریخ‌های موجود';
       if (comparing) {
@@ -194,7 +220,7 @@
       el('warning').hidden = !report.truncated && report.rows.length > 0;
       el('warning').textContent = report.truncated ? `نتیجه به ${persianDigits(report.rows.length)} ردیف محدود شده است؛ ردیف‌های بیشتری مطابق شرایط وجود دارد.` : 'داده‌ای مطابق این گزارش یافت نشد.';
       const table = document.createElement('table'), head = document.createElement('thead'), headRow = document.createElement('tr');
-      report.fields.forEach(field => { const cell = document.createElement('th'); cell.scope = 'col'; cell.textContent = field.label + (field.unit ? ` (${field.unit})` : ''); headRow.append(cell); }); head.append(headRow);
+      report.fields.forEach(field => { const cell = document.createElement('th'); cell.scope = 'col'; const label = ['comparison_value', 'base_value'].includes(field.id) ? persianDigits(field.label) : field.label; cell.textContent = label + (field.unit ? ` (${field.unit})` : ''); headRow.append(cell); }); head.append(headRow);
       const body = document.createElement('tbody'); report.rows.forEach(row => { const tr = document.createElement('tr'); row.forEach((value, index) => { const cell = document.createElement('td'); cell.dir = ['integer', 'decimal', 'number', 'date'].includes(report.fields[index].type) ? 'ltr' : 'auto'; cell.textContent = displayValue(value, report.fields[index], report); tr.append(cell); }); body.append(tr); });
       table.append(head, body); el('table').replaceChildren(table); renderChart(report);
     }
@@ -251,11 +277,10 @@
         if (config.mode === 'demo') el('footer').textContent = 'نمونه آزمایشی · ساعات فعالیت سپتامبر ۲۰۲۶ میلادی · داده آزمایشی همان فضای نمونه · بدون اتصال به مدل یا داده واقعی';
         if (config.mode === 'rahtal') {
           el('workspace-tabs').hidden = false;
-          el('footer').textContent = 'رهتال · کارکنان و ساعات فعالیت · فضای گزارش‌گیری محلی';
-          const suggestions = document.querySelectorAll('.suggestions button');
-          suggestions[0].textContent = "نام کارکنان را نشان بده";
-          suggestions[1].textContent = 'ساعات فعالیت روزانه در سپتامبر';
+          el('footer').textContent = 'رهتال · مجموع فعالیت‌ها به تفکیک کارمند و موضوع · تاریخ شمسی';
           el('management-example').hidden = false;
+          el('topic-example').hidden = false;
+          el('trend-example').hidden = false;
         }
         if (config.requires_auth) { await newSession(); if (!session) el('login').showModal(); }
         else await newSession();

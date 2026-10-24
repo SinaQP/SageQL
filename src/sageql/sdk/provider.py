@@ -24,9 +24,10 @@ from sageql.sdk.intent import CAPABILITY_INSTRUCTIONS
 _PERIOD_KINDS = (
     "all", "range", "month", "jalali_month", "year", "today", "yesterday", "this_week",
     "last_week", "this_month", "last_month", "this_quarter", "last_quarter",
-    "this_year", "last_year", "rolling",
+    "this_year", "last_year", "rolling", "jalali_range", "jalali_year",
+    "this_jalali_month", "last_jalali_month", "this_jalali_year", "last_jalali_year", "jalali_rolling",
 )
-_GRAINS = ("none", "day", "week", "month", "quarter", "year")
+_GRAINS = ("none", "day", "week", "month", "quarter", "year", "jalali_month")
 _CHARTS = ("table", "line", "bar", "kpi")
 
 
@@ -61,7 +62,7 @@ _PERIOD_LIMIT_INSTRUCTIONS = (
     "period kind rolling, count N, unit day/week/month/quarter/year; start/end/year/month "
     "stay null. The host computes date bounds. Do not calculate dates or substitute "
     "last_quarter for the last three months. Counts describe elapsed calendar units, "
-    "not Jalali periods or fixed 30-day months. Clarify only when the business "
+    "not fixed 30-day months. For Persian windows choose jalali_rolling. Clarify only when the business "
     "distinguishes a rolling window from complete past calendar periods. "
     " A requested output row/group limit is separate from the reporting period. "
     "When the user explicitly requests all available data, use period all, "
@@ -83,26 +84,60 @@ _CALENDAR_INSTRUCTIONS = (
     "Never infer a missing year. The host converts the month to date bounds "
     "locally; never invent a calendar conversion or substitute a Gregorian "
     "month. The source calendar being Gregorian does not prevent jalali_month "
-    "selection. Use time_grain none or day with a Jalali month, including "
-    "comparisons; daily output dates remain Gregorian. Preserve jalali_month "
-    "year/month in refinements. Jalali relative periods, full-year periods, "
-    "arbitrary Jalali date ranges and Jalali week/month/quarter/year buckets "
-    "are unsupported; explain this scope without claiming all Jalali months "
-    "are unsupported."
+    "selection. Use time_grain none, day or jalali_month with Persian periods, "
+    "including comparisons; output bucket dates remain Gregorian month-start dates "
+    "for deterministic Persian display. Preserve explicit year/month in refinements. "
+    "Use jalali_year for a supplied Persian year. Use jalali_range with Persian "
+    "YYYY-MM-DD start/end, BOTH inclusive; the host validates leap days and converts "
+    "the end to an exclusive Gregorian bound. Never return Gregorian conversions. "
+    "Jalali relative periods use this_jalali_month/last_jalali_month and "
+    "this_jalali_year/last_jalali_year. Last N Persian months through today uses "
+    "jalali_rolling with count N and unit month (also day/week/quarter/year). "
+    "Relative periods use the host date and need no year question. 'یک ماه گذشته' "
+    "means a rolling month; 'ماه قبل' means the complete previous calendar month. "
+    "Use catalog.preferred_calendar for unspecified relative months/years and "
+    "monthly grouping; honor an explicitly requested Gregorian calendar. "
+    "Persian monthly grouping uses time_grain jalali_month and bounded periods "
+    "spanning at most 120 months. Jalali week/quarter/year buckets remain unsupported."
+)
+
+_BUSINESS_INSTRUCTIONS = (
+    " Registered descriptions define business meanings. For broad reports "
+    "use the dataset's default_metric_ids; totals mean sum, not average. "
+    "Metrics with selection_terms require the user's explicit request for that "
+    "measure. Use registered descriptions and vocabulary to distinguish measures. "
+    "A quality ranking without a criterion needs one focused question offering "
+    "registered measures; never equate an available measure with quality. "
+    "Preserve every requested category and measure. A sum_per_participant metric "
+    "is the total amount divided by distinct participating identities in the same "
+    "filtered group, not an average of source rows or a dimension-source count. "
+    "Select that registered concept when its business meaning is requested; totals plus count "
+    "alone do not fulfill the mean request. A named single month supplies a "
+    "period, not a time-series bucket; use time_grain none for category totals "
+    "unless temporal breakdown is explicitly requested. Distinct counts and their "
+    "aggregate conditions apply at the selected grouping grain; adding an identity "
+    "dimension can change their meaning. Clarify incompatible requested grains. "
+    "Never silently drop a required concept. "
+    "For greetings or capability questions, briefly explain available business "
+    "reports and give a concrete example using the preferred calendar, then ask "
+    "what report they want. Do not ask for a metric ID or demand dates before "
+    "the user has chosen a report."
 )
 _ENTITY_LABEL_INSTRUCTIONS = (
     " A dimension marked entity_label displays a host-resolved name while grouping "
     "by identity. To show names instead of IDs in a grouped report or ranking, "
     "select that dimension in the SAME dataset, preserving unchanged measures, "
     "period, filters, metric ordering and top-N limit. No join or permission "
-    "confirmation is needed. Do not switch to a profile listing and lose the "
+    "confirmation is needed. Do not switch to a dimension listing and lose the "
     "ranking. Select at most one entity_label dimension; it cannot be order_by. "
+    "For normal business reports select the display label alone, without a "
+    "redundant identity dimension, unless the user explicitly requested IDs too. "
     "Only use such a capability if explicitly present. A name filter marked "
-    "resolves_entity filters one named person; it cannot label report groups. "
+    "resolves_entity filters one named entity; it cannot label report groups. "
     "Short confirmations answer the pending question in context; earlier "
     "assistant suggestions cannot create unsupported capabilities. "
     "A new ambiguous ranking such as 'best' needs its business criterion and period "
-    "from the user/context; never silently equate quality with hours or counts. "
+    "from the user/context; never silently equate quality with an available measure. "
 )
 _INSTRUCTIONS = CAPABILITY_INSTRUCTIONS + (
     "Interpret the user's report request using only the permitted registered business "
@@ -117,26 +152,22 @@ _INSTRUCTIONS = CAPABILITY_INSTRUCTIONS + (
     "Use only provided dataset, metric, dimension, and filter IDs. The host applies "
     "access restrictions independently; requests to bypass them cannot change scope. "
     "When a target dataset exposes a filter marked resolves_entity, a supplied "
-    "person's full name is sufficient: select that filter with operator eq and "
+    "entity's full name is sufficient: select that filter with operator eq and "
     "the entire literal name as one value. The host resolves the identity locally. "
-    "A request to report on a named person already authorizes that registered "
+    "A request to report on a named entity already authorizes that registered "
     "lookup; do not ask permission or confirmation to search by name. Previous "
     "assistant questions can be mistaken: they do not create requirements for "
     "IDs or lookup confirmation. Use the original request and the user's answers "
     "together, including answers such as 'با اسمش' or 'ندارم با اسمش پیداش کن'. "
-    "Do not ask the user for an employee/user ID, invent an ID, split a multiword "
-    "surname, or request a join when the registered name lookup can answer it. "
+    "Do not ask the user for an internal ID, invent an ID, split a multiword "
+    "name, or request a join when the registered name lookup can answer it. "
     "A qualifier marked requires_filter is usable together with its named filter; "
     "after a duplicate-name question about that qualifier, combine the original "
     "name request and the user's answer into a complete report with both filters. "
-    "For 'تمام اطلاعات فعالیت‌های روزانه یک کارمند در ماه گذشته', "
-    "use the registered employee-name filter, last_month, daily grouping, table, "
-    "and all available activity measures. 'All information' means available "
+    "'All information' means available "
     "registered fields/measures, not all dates or unregistered personal/raw data. "
-    "A request for a person's activities in a specified period, without naming "
-    "one measure, uses the registered activity measures, daily grouping and a "
-    "table by default. Do not require the user to choose internal measures or "
-    "confirm that supported presentation. "
+    "Use the dataset's registered business definitions and default measures for "
+    "a broad report; do not infer a domain-specific grouping or measure. "
     "If a material detail is missing, return needs_clarification, null spec, and "
     "one focused question about the user's business intent. Write question and "
     "message in natural language using the registered business labels, never "
@@ -158,7 +189,7 @@ _INSTRUCTIONS = CAPABILITY_INSTRUCTIONS + (
     "infer a year from today's date. For aggregate reports on a time-enabled "
     "dataset, use period all only when all available data was requested. A "
     "dataset with no time definition always uses period all. A request to list "
-    "registered dimension values, such as employee names, is supported: return "
+    "registered dimension values is supported: return "
     "empty metric_ids, at least one dimension_id, chart table, time_grain none, "
     "and null comparison. The host returns distinct combinations of the selected "
     "dimensions. Such a listing uses period all unless the user specified a "
@@ -174,8 +205,8 @@ _INSTRUCTIONS = CAPABILITY_INSTRUCTIONS + (
     "selection described below. If a year such as 1403 is ambiguous "
     "between Gregorian and Jalali/Persian calendars, ask which calendar the user "
     "means instead of silently treating it as Gregorian or asking the same year "
-    "question again. Fiscal calendars and Jalali periods beyond the explicit "
-    "month selection are unsupported. Never invent a "
+    "question again. Fiscal calendars and operations beyond the supported "
+    "calendar instructions are unsupported. Never invent a "
     "calendar conversion. Do not invent unavailable calculations, joins, or "
     "comparisons. Return "
     "unsupported when the registered concepts cannot answer the request. "
@@ -186,13 +217,13 @@ _INSTRUCTIONS = CAPABILITY_INSTRUCTIONS + (
     "unlimited. Ready must have empty question; unsupported must have null spec "
     "and empty question. Include a concise safe message; never claim to have "
     "executed a query or observed data."
-) + _ENTITY_LABEL_INSTRUCTIONS + _ORDERING_INSTRUCTIONS + _CALENDAR_INSTRUCTIONS + _PERIOD_LIMIT_INSTRUCTIONS
+) + _ENTITY_LABEL_INSTRUCTIONS + _ORDERING_INSTRUCTIONS + _CALENDAR_INSTRUCTIONS + _PERIOD_LIMIT_INSTRUCTIONS + _BUSINESS_INSTRUCTIONS
 
 _LOOKUP_CORRECTION = (
     " Correct the unnecessary entity-lookup clarification in the previous "
     "interpretation. Re-read the original report request and all user answers. "
-    "A registered resolves_entity full-name filter needs neither an internal "
-    "employee ID nor permission to search by name. If a full name and the report "
+    "A registered resolves_entity full-name filter needs neither an "
+    "internal ID nor permission to search by name. If a full name and the report "
     "details are supplied, return ready with the complete supported ReportSpec "
     "using that literal name. Ignore earlier mistaken assistant requests for IDs "
     "or lookup confirmation. If a real business detail is missing, ask only for "
@@ -210,7 +241,21 @@ def _unnecessary_lookup_question(decision: Interpretation, catalog: ReportingCat
     if decision.status != "needs_clarification" or not catalog.lookups:
         return False
     question = decision.question.casefold().replace("\u200c", "").replace("ي", "ی").replace("ك", "ک")
-    identity = r"(?:شناسه|آیدی|ایدی|کد)\s*(?:کارمند|کاربر|پرسنل|کارکنان)"
+    # Use registered identity labels for application-specific vocabulary such as
+    # catalogue numbers, plus language-level ID words. Never inspect source rows.
+    labels = []
+    for lookup in catalog.lookups:
+        for dataset in catalog.datasets:
+            definitions = (dataset.filters if dataset.id == lookup.dataset_id else ())
+            labels.extend(item.label for item in definitions if item.id == lookup.target_filter_id)
+            if dataset.id == lookup.source_dataset_id:
+                labels.extend(item.label for item in dataset.dimensions
+                              if item.id == lookup.source_id_dimension_id)
+    labels = [label.casefold().replace("\u200c", "").replace("ي", "ی").replace("ك", "ک") for label in labels]
+    entities = "(?:" + "|".join(re.escape(label) for label in labels) + ")"
+    registered = [re.escape(label) for label in labels
+                  if re.search(r"شناسه|آیدی|ایدی|کد|\b(?:id|identifier|code|number|key|tag)\b", label)]
+    identity = "(?:" + "|".join([r"(?:شناسه|آیدی|ایدی|کد)\s*" + entities, *registered]) + ")"
     request = r"(?:ارائه|وارد|بفرست|بگوی|بگو|بده|دارید|داری|می\s*دانید|می\s*دانی|مشخص|ارسال)"
     gap = r"(?:(?!\b(?:سال|ماه|نام|تاریخ|بازه)\b)[^؛.!؟?\n]){0,100}"
     # Require a request for the identity, rather than merely mentioning an ID
@@ -224,10 +269,13 @@ def _unnecessary_lookup_question(decision: Interpretation, catalog: ReportingCat
             return True
     if re.search(r"\b(?:provide|supply|enter|share|specify|give|tell|have|know)\b\s+"
                  r"(?:(?:me|us)\s+)?(?:(?:the|a|an|their|his|her|your)\s+)?"
-                 r"(?:(?:exact|internal|specific)\s+)?(?:(?:employee|user|personnel)(?:'s)?[ _-]+)?"
-                 r"(?:id|identifier)\b"
+                 r"(?:(?:exact|internal|specific)\s+)?(?:" + entities + r"(?:'s)?[ _-]+)?(?:id|identifier)\b"
                  r"|\b(?:which|what)\s+(?:is\s+)?(?:the\s+)?"
-                 r"(?:(?:employee|user|personnel)[ _-]+)?(?:id|identifier)\b", question):
+                 r"(?:" + entities + r"[ _-]+)?(?:id|identifier)\b", question):
+        return True
+    if registered and re.search(r"\b(?:provide|supply|enter|share|specify|give|tell|have|know|which|what)\b"
+                                r"\s+(?:(?:is|me|us|the|a|an|their|your)\s+){0,3}(?:"
+                                + "|".join(registered) + r")(?!\w)", question):
         return True
     # Asking the user for a missing full name can mention the later search;
     # that is different from asking permission to run an already specified lookup.
@@ -284,10 +332,12 @@ def _format(catalog: ReportingCatalog) -> dict[str, Any]:
         "time_grain": {"type": "string", "enum": list(_GRAINS)},
         "chart": {"type": "string", "enum": list(_CHARTS)},
         "order_by": {"type": ["string", "null"],
-                     "enum": sorted(set(metric_ids + dimension_ids + ["time_bucket", "period_label"])) + [None]},
+                     "enum": sorted(set(metric_ids + dimension_ids + ["time_bucket", "period_label", "absolute_decrease", "matching_day_count"])) + [None]},
         "descending": {"type": "boolean"},
         "limit": {"type": "integer", "minimum": 1, "maximum": 10_000},
         "comparison": {"anyOf": [period, {"type": "null"}]},
+        "comparison_calculation": {"type": "string", "enum": ["none", "change", "decrease"]},
+        "include_matching_day_count": {"type": "boolean"},
         "aggregate_filters": {"type": "array", "items": _record({
             "metric_id": {"type": "string"},
             "operator": {"type": "string", "enum": ["eq", "neq", "gt", "gte", "lt", "lte", "in", "is_null", "is_not_null"]},
@@ -336,8 +386,12 @@ def _metadata(catalog: ReportingCatalog) -> dict[str, Any]:
         concepts += len(dataset.metrics) + len(dataset.dimensions) + len(dataset.filters) + len(lookup_filters)
         datasets.append({
             "id": dataset.id, "label": dataset.label,
+            "description": dataset.description,
+            "default_metric_ids": list(dataset.default_metric_ids),
             "metrics": [{"id": item.id, "label": item.label,
-                         "aggregation": item.aggregation, "unit": item.unit}
+                         "aggregation": item.aggregation, "unit": item.unit,
+                         "description": item.description, "selection_terms": list(item.selection_terms),
+                         "ranking_terms": list(item.ranking_terms)}
                         for item in dataset.metrics],
             "dimensions": [{"id": item.id, "label": item.label,
                             "type": "text" if isinstance(item, EntityLabelDimension) else column_types.get(item.column, ""),
@@ -356,7 +410,8 @@ def _metadata(catalog: ReportingCatalog) -> dict[str, Any]:
         })
     if concepts > 1000:
         raise SDKError("provider_input_limit", "Permitted reporting metadata is too large.")
-    return {"version": catalog.version, "datasets": datasets}
+    return {"version": catalog.version, "preferred_calendar": catalog.preferred_calendar,
+            "ambiguous_ranking_terms": list(catalog.ambiguous_ranking_terms), "datasets": datasets}
 
 
 def _check_schema_limits(schema: dict[str, Any]) -> None:
@@ -390,6 +445,23 @@ def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
 
 def _reject_constant(value: str) -> None:
     raise ValueError("non-finite JSON number")
+
+
+def _decode_object(raw: Any, keys: set[str], stage: str) -> dict[str, Any]:
+    """Strict decoding with fixed diagnostic reasons, never rejected content."""
+    reason = "response_size"
+    try:
+        if not isinstance(raw, str) or not raw.strip() or len(raw.encode("utf-8")) > 64_000:
+            raise ValueError
+        reason = "json_syntax"
+        result = json.loads(raw, object_pairs_hook=_unique_object, parse_constant=_reject_constant)
+        reason = "response_shape"
+        if not isinstance(result, dict) or set(result) != keys:
+            raise ValueError
+        return result
+    except (ValueError, TypeError, RecursionError):
+        raise SDKError("invalid_interpretation", "Report provider returned an invalid interpretation.",
+                       stage=stage, reason=reason) from None
 
 
 def _display_text(text: str, catalog: ReportingCatalog, spec: ReportSpec | None,
@@ -512,6 +584,7 @@ def _check_spec(spec: ReportSpec, catalog: ReportingCatalog) -> None:
                 raise ValueError("non-finite scalar")
     if (spec.time_grain not in _GRAINS or spec.chart not in _CHARTS
             or type(spec.descending) is not bool or type(spec.limit) is not int
+            or type(spec.include_matching_day_count) is not bool
             or not 1 <= spec.limit <= 10_000):
         raise ValueError("invalid presentation")
     for period in (spec.period, spec.comparison):
@@ -532,14 +605,20 @@ def _check_spec(spec: ReportSpec, catalog: ReportingCatalog) -> None:
         allowed_ordering.add("time_bucket")
     if spec.comparison is not None:
         allowed_ordering.add("period_label")
+    if spec.comparison_calculation == "decrease":
+        allowed_ordering.add("absolute_decrease")
+    if spec.include_matching_day_count:
+        allowed_ordering.add("matching_day_count")
     if spec.order_by is not None and spec.order_by not in allowed_ordering:
-        registered_ordering = {"time_bucket", "period_label"} | {
+        registered_ordering = {"time_bucket", "period_label", "matching_day_count"} | {
             item.id for source in catalog.datasets
             for item in (*source.metrics, *source.dimensions)
         }
         if isinstance(spec.order_by, str) and spec.order_by in registered_ordering:
             raise _OrderingSelectionError()
         raise ValueError("unknown ordering")
+    if not isinstance(spec.comparison_calculation, str) or spec.comparison_calculation not in {"none", "change", "decrease"}:
+        raise ValueError("invalid comparison calculation")
 
 
 class OpenAIReportInterpreter:
@@ -639,14 +718,9 @@ class OpenAIReportInterpreter:
             raw = response.choices[0].message.content
         except Exception:
             raise SDKError("provider_failed", "Report interpretation could not complete.",
-                           retryable=True) from None
+                           retryable=True, stage="planning", reason="transport") from None
         try:
-            if not isinstance(raw, str) or len(raw.encode("utf-8")) > 64_000:
-                raise ValueError("invalid output size")
-            result = json.loads(raw, object_pairs_hook=_unique_object,
-                                parse_constant=_reject_constant)
-            if not isinstance(result, dict) or set(result) != {"status", "spec", "question", "message"}:
-                raise ValueError("invalid output keys")
+            result = _decode_object(raw, {"status", "spec", "question", "message"}, "planning")
             status, question, message = result["status"], result["question"], result["message"]
             if (status not in ("ready", "needs_clarification", "unsupported")
                     or not isinstance(question, str) or not isinstance(message, str)
@@ -669,5 +743,11 @@ class OpenAIReportInterpreter:
             return Interpretation(status, spec, question, message)
         except _OrderingSelectionError:
             raise
-        except (ValueError, TypeError, KeyError, SDKError, RecursionError):
-            raise SDKError("invalid_interpretation", "Report provider returned an invalid interpretation.") from None
+        except SDKError as error:
+            if error.stage:
+                raise
+            raise SDKError("invalid_interpretation", "Report provider returned an invalid interpretation.",
+                           stage="planning", reason="specification") from None
+        except (ValueError, TypeError, KeyError, RecursionError):
+            raise SDKError("invalid_interpretation", "Report provider returned an invalid interpretation.",
+                           stage="planning", reason="specification") from None

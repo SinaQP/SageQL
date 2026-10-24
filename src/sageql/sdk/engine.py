@@ -23,15 +23,25 @@ from sageql.sdk.semantics import permitted_catalog, validate_catalog, validate_r
 from sageql.sdk.sessions import InMemorySessionStore, SessionStore
 from sageql.sdk.lookups import prepare_request, resolve_request
 from sageql.sdk.labels import resolve_labels
-from sageql.sdk.calendars import JALALI_MONTH_NAMES
+from sageql.sdk.calendars import JALALI_MONTH_NAMES, gregorian_to_jalali
 
 
-def _period_caption(selection: PeriodSelection, bounds: ResolvedPeriod, language: str) -> str:
+def _period_caption(selection: PeriodSelection, bounds: ResolvedPeriod, language: str,
+                    calendar: str = "gregorian") -> str:
     """Describe resolved periods locally without changing comparison row keys."""
     if selection.kind == "jalali_month":
         return (f"{JALALI_MONTH_NAMES[selection.month - 1]} {selection.year}" if language == "fa"
                 else f"Jalali {selection.year}-{selection.month:02d}")
     if bounds.start is not None:
+        if calendar == "jalali" or "jalali" in selection.kind:
+            from datetime import timedelta
+            try:
+                first, last = gregorian_to_jalali(bounds.start), gregorian_to_jalali(bounds.end - timedelta(days=1))
+                return (f"{first[0]:04d}/{first[1]:02d}/{first[2]:02d} تا {last[0]:04d}/{last[1]:02d}/{last[2]:02d} (شمسی)"
+                        if language == "fa" else
+                        f"Jalali {first[0]:04d}-{first[1]:02d}-{first[2]:02d} through {last[0]:04d}-{last[1]:02d}-{last[2]:02d}")
+            except ValueError:
+                pass  # Gregorian reports outside the conversion interval still work.
         return (f"{bounds.start.isoformat()} تا پیش از {bounds.end.isoformat()}" if language == "fa"
                 else f"[{bounds.start.isoformat()}, {bounds.end.isoformat()})")
     return "همه تاریخ‌های موجود" if language == "fa" else "All available dates"
@@ -194,8 +204,13 @@ class SageQL:
         status = "unsupported" if error.code == "unsupported" else (
             "failed" if error.retryable or error.code.endswith("failed") else "blocked"
         )
-        return Reply(session_id, revision, status, error_text(error.code, str(error), self.language),
-                     error={"code": error.code, "retryable": error.retryable})
+        text = (str(error) if error.code == "unsupported" and error.stage == "semantic_validation"
+                and error.reason == "requirements" else error_text(error.code, str(error), self.language))
+        return Reply(session_id, revision, status, text,
+                     error={"code": error.code, "retryable": error.retryable,
+                            **({"stage": error.stage} if error.stage else {}),
+                            **({"reason": error.reason} if error.reason else {}),
+                            **({"field": error.field} if error.field else {})})
 
     def submit(
         self, session_id: str, message: str, actor: ActorContext,
@@ -301,6 +316,8 @@ class SageQL:
                 if not isinstance(decision.spec, ReportSpec) or decision.question:
                     raise SDKError("invalid_interpretation", "Provider returned an invalid report specification.")
                 prepared, lookup = prepare_request(self.catalog, decision.spec, scope, today)
+                from sageql.sdk.evidence import final_evidence_check
+                final_evidence_check(messages, visible, decision.spec, today, self.language)
                 if self.execution != "validated":
                     raise SDKError("execution_disabled", "The developer has not enabled report execution.")
                 if lookup is not None:
@@ -395,11 +412,11 @@ class SageQL:
                 state["last_report_id"] = artifact.id
                 # Refinements preserve effective dates across a day/month change.
                 # The saved report still records the original period selection.
-                frozen_period = (spec.period if spec.period.kind == "jalali_month" else
+                frozen_period = (spec.period if spec.period.kind in {"jalali_month", "jalali_year", "jalali_range"} else
                                  PeriodSelection("range", prepared.period.start.isoformat(),
                                                  prepared.period.end.isoformat())
                                  if prepared.period.start is not None else spec.period)
-                frozen_comparison = (spec.comparison if spec.comparison is not None and spec.comparison.kind == "jalali_month" else
+                frozen_comparison = (spec.comparison if spec.comparison is not None and spec.comparison.kind in {"jalali_month", "jalali_year", "jalali_range"} else
                                      PeriodSelection("range", prepared.comparison_period.start.isoformat(),
                                                      prepared.comparison_period.end.isoformat())
                                      if prepared.comparison_period else None)
@@ -409,7 +426,13 @@ class SageQL:
                 state["pending_origin"] = None
                 state["pending_clarification_key"] = None
                 state["pending_clarification_keys"] = []
-                reply = Reply(session_id, revision + 1, "report_ready", artifact.title, report=artifact)
+                caption = _period_caption(spec.period, prepared.period, self.language, self.catalog.preferred_calendar)
+                text = artifact.title + ("؛ بازه: " if self.language == "fa" else "; period: ") + caption
+                if spec.order_by in spec.metric_ids:
+                    metric = next(item for item in prepared.dataset.metrics if item.id == spec.order_by)
+                    text += (("؛ مرتب‌شده بر اساس " + metric.label + (" از بیشترین به کمترین" if spec.descending else " از کمترین به بیشترین"))
+                             if self.language == "fa" else "; sorted by " + metric.label + (" descending" if spec.descending else " ascending"))
+                reply = Reply(session_id, revision + 1, "report_ready", text, report=artifact)
             else:
                 raise SDKError("invalid_interpretation", "Provider returned an unsupported status.")
             state["revision"] = reply.revision
@@ -443,17 +466,25 @@ class SageQL:
     def _make_report(self, session_id, revision, prepared, result, scope) -> ReportArtifact:
         spec, dataset = prepared.spec, prepared.dataset
         if (not isinstance(result, AdapterResult) or type(result.truncated) is not bool
-                or len(result.rows) > min(spec.limit, self.limits.max_rows)):
+                or len(result.rows) > (self.limits.max_rows if spec.comparison_calculation == "decrease"
+                                      else min(spec.limit, self.limits.max_rows))):
             raise SDKError("adapter_failed", "Database adapter returned an invalid report result.")
         expected_ids = (("period_label",) if spec.comparison else ()) + (
             ("time_bucket",) if spec.time_grain != "none" else ()) + spec.dimension_ids + spec.metric_ids
+        if spec.include_matching_day_count:
+            expected_ids += ("matching_day_count",)
         if (tuple(item.id for item in result.fields) != expected_ids
                 or any(len(row) != len(result.fields) for row in result.rows)):
             raise SDKError("adapter_failed", "Database adapter returned invalid report columns.")
+        if spec.include_matching_day_count:
+            from sageql.sdk.day_counts import validate_matching_day_result
+            validate_matching_day_result(prepared, result)
         metric_defs = {item.id: item for item in dataset.metrics}
         dimension_defs = {item.id: item for item in dataset.dimensions}
         separator = "، " if self.language == "fa" else ", "
         title = separator.join(metric_defs[key].label for key in spec.metric_ids)
+        if spec.include_matching_day_count:
+            title += separator + ("تعداد روزهای مطابق شرایط" if self.language == "fa" else "Matching days")
         grain = GRAINS_FA.get(spec.time_grain, spec.time_grain) if self.language == "fa" else spec.time_grain
         labels = ([grain] if spec.time_grain != "none" else []) + [
             dimension_defs[key].label for key in spec.dimension_ids]
@@ -463,13 +494,15 @@ class SageQL:
             title += (" به تفکیک " if self.language == "fa" else " by ") + separator.join(labels)
         if spec.period.kind == "jalali_month" or prepared.comparison_period is not None:
             title += (" در " if self.language == "fa" else " in ") + _period_caption(
-                spec.period, prepared.period, self.language)
+                spec.period, prepared.period, self.language, self.catalog.preferred_calendar)
         if prepared.comparison_period is not None:
             title += (" در مقایسه با " if self.language == "fa" else " compared with ") + _period_caption(
-                spec.comparison, prepared.comparison_period, self.language)
+                spec.comparison, prepared.comparison_period, self.language, self.catalog.preferred_calendar)
         report_fields = tuple(
-            replace(item, label={"time_bucket": "تاریخ", "period_label": "دوره"}[item.id])
-            if self.language == "fa" and item.id in {"time_bucket", "period_label"} else item
+            replace(item, label={"time_bucket": "ماه شمسی" if spec.time_grain == "jalali_month" else "تاریخ",
+                                 "period_label": "دوره", "matching_day_count": "تعداد روزهای مطابق شرایط"}[item.id],
+                    **({"unit": "روز"} if item.id == "matching_day_count" else {}))
+            if self.language == "fa" and item.id in {"time_bucket", "period_label", "matching_day_count"} else item
             for item in result.fields
         )
         visualization: dict[str, Any] = {"kind": spec.chart}
@@ -488,6 +521,8 @@ class SageQL:
             "comparison_start": json_value(prepared.comparison_period.start) if prepared.comparison_period else None,
             "comparison_end_exclusive": json_value(prepared.comparison_period.end) if prepared.comparison_period else None,
             "time_grain": spec.time_grain,
+            "display_calendar": self.catalog.preferred_calendar,
+            "period_caption": _period_caption(spec.period, prepared.period, self.language, self.catalog.preferred_calendar),
             "metrics": [{"id": key, "label": metric_defs[key].label,
                          "aggregation": metric_defs[key].aggregation, "unit": metric_defs[key].unit}
                         for key in spec.metric_ids],
@@ -498,14 +533,26 @@ class SageQL:
                               for bound in prepared.related_sources],
             "completeness": "truncated" if result.truncated else ("empty" if not result.rows else "complete"),
         }
-        if any(selection is not None and selection.kind == "jalali_month"
+        if any(selection is not None and "jalali" in selection.kind
                for selection in (spec.period, spec.comparison)):
             provenance.update(period_selection=json_value(spec.period),
                               comparison_selection=json_value(spec.comparison))
+        if spec.include_matching_day_count:
+            provenance["matching_day_count"] = {
+                "scope": "per_entity_per_period", "after_aggregate_filters": True, "before_output_limit": True,
+            }
         if prepared.comparison_period is not None:
             provenance["period_labels"] = {
-                "base": _period_caption(spec.period, prepared.period, self.language),
-                "comparison": _period_caption(spec.comparison, prepared.comparison_period, self.language),
+                "base": _period_caption(spec.period, prepared.period, self.language, self.catalog.preferred_calendar),
+                "comparison": _period_caption(spec.comparison, prepared.comparison_period, self.language, self.catalog.preferred_calendar),
             }
-        return ReportArtifact(uuid4().hex, session_id, revision, title, report_fields, result.rows,
-                              visualization, provenance, result.truncated)
+        artifact = ReportArtifact(uuid4().hex, session_id, revision, title, report_fields, result.rows,
+                                  visualization, provenance, result.truncated)
+        if spec.comparison_calculation == "change":
+            from sageql.sdk.comparisons import make_change_report
+            artifact = make_change_report(artifact, spec, language=self.language, max_rows=self.limits.max_rows)
+        elif spec.comparison_calculation == "decrease":
+            from sageql.sdk.decreases import make_decrease_report
+            artifact = make_decrease_report(artifact, spec, dataset, language=self.language,
+                                            max_rows=self.limits.max_rows)
+        return artifact

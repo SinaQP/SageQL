@@ -307,7 +307,7 @@ def test_paraphrased_repeated_missing_detail_stops_after_persistent_restart(data
     first_agent, _ = provider(intent(missing=("year",)), planned(question="کدام سال؟"), APPROVED)
     sdk = engine(database, first_agent, sessions=SQLiteSessionStore(path))
     session = sdk.create_session(ACTOR)
-    first = sdk.submit(session.session_id, "ساعات ماه سپتامبر", ACTOR, "first", 0)
+    first = sdk.submit(session.session_id, "گزارش ساعات دورهٔ انتخابی", ACTOR, "first", 0)
     assert first.status == "needs_clarification"
     second_agent, client = provider(intent(missing=("year",), turn_kind="answer"),
                                     planned(question="لطفاً سال گزارش را مشخص کنید؟"), APPROVED)
@@ -329,7 +329,7 @@ def test_successive_missing_details_and_new_request_with_same_slot_remain_allowe
     )
     sdk = engine(database, agent)
     session = sdk.create_session(ACTOR)
-    for index, text in enumerate(("سپتامبر", "۲۰۲۶", "گزارش جدیدی برای تقویم نامشخص", "میلادی")):
+    for index, text in enumerate(("دوره", "۲۰۲۶", "گزارش جدیدی برای تقویم نامشخص", "میلادی")):
         reply = sdk.submit(session.session_id, text, ACTOR, str(index), index)
         assert reply.status == ("report_ready" if index == 3 else "needs_clarification"), reply.to_dict()
     assert sdk.sessions.get(session.session_id, (ACTOR.subject, ACTOR.tenant_id))["pending_clarification_key"] is None
@@ -356,7 +356,7 @@ def test_alternating_clarification_cycle_is_also_blocked(database):
     )
     sdk = engine(database, agent)
     session = sdk.create_session(ACTOR)
-    for index, text in enumerate(("سپتامبر", "۲۰۲۶", "میلادی")):
+    for index, text in enumerate(("دوره", "۲۰۲۶", "میلادی")):
         reply = sdk.submit(session.session_id, text, ACTOR, str(index), index)
     assert reply.error["code"] == "clarification_stalled" and reply.revision == 2
     assert sdk.database.calls == []
@@ -378,7 +378,7 @@ def test_count_only_permitted_catalog_works_through_all_three_stages():
     ReportIntent(), intent(metrics=(ConceptRef("unknown", "hours"),)),
     intent(dimensions=(ConceptRef("activities", "job_position"),)),
     intent(missing=("permission_to_join",)), intent(missing=("year", "year")),
-    intent(turn_kind="run_sql"), intent(chart="pie"), intent(time_grain="jalali_month"),
+    intent(turn_kind="run_sql"), intent(chart="pie"), intent(time_grain="jalali_week"),
     intent(metrics=(ConceptRef("activities", "hours"),) * 2),
     intent(unsupported_reason="x" * 2001), intent(missing=["year"]),
     intent(period="all"), intent(period=PeriodSelection("unsupported")),

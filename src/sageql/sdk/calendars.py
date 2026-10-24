@@ -1,7 +1,7 @@
-"""Bounded date-only Persian calendar conversion for explicit month selections.
+"""Bounded date-only Persian business calendar operations.
 
 The supported Solar Hijri years are 1300 through 1499. Report SQL still receives
-Gregorian dates; this module does not convert timestamps or implement grouping.
+Gregorian dates; no operation converts timestamps.
 """
 
 from datetime import date, timedelta
@@ -106,3 +106,28 @@ def gregorian_to_jalali(value: date) -> tuple[int, int, int]:
         return year, offset // 31 + 1, offset % 31 + 1
     offset -= 186
     return year, offset // 30 + 7, offset % 30 + 1
+
+
+def jalali_to_gregorian(year: int, month: int, day: int) -> date:
+    """Validate a Persian date before resolving its Gregorian date-only value."""
+    start, end = jalali_month_bounds(year, month)
+    if type(day) is not int or not 1 <= day <= (end - start).days:
+        raise ValueError("Jalali day is outside its month.")
+    return start + timedelta(days=day - 1)
+
+
+def jalali_buckets(start: date, end: date) -> tuple[tuple[date, date], ...]:
+    """Return at most 120 Persian months intersecting a bounded date range."""
+    if type(start) is not date or type(end) is not date or start >= end:
+        raise ValueError("Monthly grouping requires a bounded date range.")
+    year, month, _ = gregorian_to_jalali(start)
+    gregorian_to_jalali(end - timedelta(days=1))
+    result = []
+    while True:
+        bounds = jalali_month_bounds(year, month)
+        result.append(bounds)
+        if len(result) > 120:
+            raise ValueError("Monthly grouping is limited to 120 Persian months.")
+        if bounds[1] >= end:
+            return tuple(result)
+        year, month = (year + 1, 1) if month == 12 else (year, month + 1)

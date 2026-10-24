@@ -1,5 +1,111 @@
 # SageQL roadmap
 
+## Application-independent reporting (2026-10-15)
+
+Outcome: integrate independent business applications through host configuration,
+without editing the reusable engine. Preserve all existing working changes and
+the Rahtal integration. Baseline: 1,225 offline tests passed, one opt-in SQL Server
+test skipped.
+
+Acceptance: shared interpretation, clarification and result text derive business
+meaning from permitted registrations; no employee/activity defaults in reusable
+prompts or repair logic. Demonstrate retail and library reporting with different
+schemas, registered relationships, policy restrictions, clarification/refinement,
+canonical SQL, actual read-only SQLite execution and table/chart JSON. Verify SQL
+Server compilation, failures, permission changes, lookup ambiguity and installable
+package boundaries. Keep models isolated from physical schema, policies and rows.
+
+Design: retain the existing catalog/provider/policy/adapter contracts. Move
+Rahtal semantics into its existing dataset descriptions and metric vocabulary.
+Generalize local vocabulary repairs and entity messages; no application switch,
+new service or arbitrary expression interface is required.
+
+Non-goals: new database engines, formulas/joins/calendars, production identity,
+live private data access or claims of model accuracy from scripted offline tests.
+Record focused and final verification in `docs/APPLICATION_INDEPENDENCE.md`.
+
+Implemented generic shared instructions, host-derived measure/identity vocabulary,
+neutral/registered-label replies, and one-to-four-column full-name registration.
+Rahtal retains its business rules in its catalog. Added standalone retail/library
+hosts and 42 acceptance cases covering real agents with fake transport, both SQL
+compilers, actual read-only SQLite execution, authorization, lookup ambiguity,
+labels, refinements/retries, persistence, schema/cardinality failures and payload
+isolation. See [the implementation report](APPLICATION_INDEPENDENCE.md).
+
+Verification: 1,267 tests passed; one optional SQL Server test skipped. Existing
+and multi-domain demos, Chrome frontend regressions, source/wheel builds using
+installed build dependencies, and fresh installed-wheel host runs passed. The
+fresh environment reused existing required dependency distributions; full remote
+dependency resolution remains unverified because PyPI downloads failed. Imports
+and host runs required no Rahtal, Django, OpenAI or ODBC installation and no network.
+Diff whitespace checks passed. No commit was made.
+
+Suggested commit message:
+`refactor: make reporting interpretation application independent`
+
+## Matching daily workload groups and prior-question regression (2026-10-15)
+
+Outcome: run the exact tenth question on configured Rahtal model/data; show each
+qualifying employee/date/total with that employee's full matching-day count.
+Recheck the previously requested organization totals, monthly comparison, decline
+ranking, top-ten ranking and position means; preserve existing working changes.
+
+Baseline: intent extracted the daily employee totals, but planning repeatedly
+asked unnecessary clarification or failed review because the matching-day count
+has no registered operation. The final result was blocked with intent_mismatch.
+
+Design: the separately scoped [matching-day operation](SDK_MATCHING_DAY_COUNTS.md)
+adds a false-by-default typed flag to daily entity tables. Group first, apply
+ordinary aggregate conditions, window-count matching groups per identity/period,
+then order/limit and resolve names. No special question/table/threshold routing.
+
+Acceptance: strict > threshold on complete daily sums, count before output caps,
+separate identities with equal names, unknown IDs/nulls, current policies and
+labels, persistent refinements/removal/retries, safe strict/legacy schemas, both
+dialects and exact source verification. Existing report SQL/results must retain
+their behavior while the flag is false. Keep real evidence ignored locally.
+
+Non-goals: arbitrary windows/formulas/partitions, additional source relationships,
+timestamp conversion, computed-count filtering, database objects/writes, model SQL
+or result transmission to models. Counted long days do not prove productivity.
+
+Implemented the additive strict/legacy specification flag, optional intent
+constraint and shared user-evidence check, scoped semantic validation, canonical
+window count, typed adapter-result checks and post-limit label enrichment. Active
+computed-count ordering is validated locally. Ordinary specifications default to
+false and retain their previous SQL/result columns.
+
+The configured Rahtal model/SQL Server rerun completed. An independent bounded
+fact read, separate policy-bound name read and local daily aggregation matched
+every qualifying identity/date/total and the per-entity matching-day count.
+No live rows or identities are recorded in tracked files.
+
+The five earlier exact questions (organization totals, monthly change, employee
+decline, top-ten employees and position means) were rerun through the real
+configured model and independently checked against current source rows. The
+rolling question correctly uses the new business date. One initial decline
+attempt failed closed on an invalid planner response after review; its rerun
+completed and matched the source. This is recorded separately from numerical
+correctness and does not establish deterministic model availability or latency.
+
+Added 37 synthetic cases spanning separate domains, variable measures/thresholds,
+complete daily sums, strict boundaries, equal names, unknown identities/durations,
+both compilers, comparisons, count-before-limit, permissions, invalid adapter
+counts, ordering, strict/legacy schemas and persisted retries/removal/refinements.
+The existing prior-question scenarios remain in the complete suite. Browser
+coverage checks Persian dates, four visible columns, complete counts on truncated
+detail rows and unchanged JSON precision. The verified live JSON was also rendered
+and visually inspected.
+
+Verification: 1,225 Python tests passed; one optional synthetic SQL Server test was
+skipped. Browser regressions, source/wheel builds, final installed-wheel imports
+and count compilation, and `git diff --check` passed. No commit was created.
+
+Focused command: `.venv/Scripts/python.exe -m pytest tests/test_sdk_matching_day_counts.py -q`.
+
+Suggested commit message:
+`feat: add filtered daily entity counts`
+
 ## Intent and clarification consistency correction (2026-10-08)
 
 Outcome: a requested grouping change must be applied or explicitly reported as
@@ -628,3 +734,325 @@ rows were added to tracked files. Existing changes were preserved; no commit.
 
 Suggested commit message:
 `feat: add verified Rahtal workload reports and preserve SDK intent`
+
+## Manager-friendly activity reports (2026-10-11)
+
+Requested outcome: managers can report total recorded work by employee and
+activity topic, compare periods, and use Persian business dates naturally.
+Register the existing TitleActivity source through a fixed many-to-one mapping;
+do not discover arbitrary sources or create database objects. Add distinct
+participant counts for topic totals. Register workload defaults and require an
+explicit request before selecting average duration. Friendly capability answers
+and locally generated report summaries must explain the measure and period.
+
+Extend the date-only contract to explicit Jalali ranges/years, relative Persian
+months/years and rolling Persian months, and bounded Jalali monthly grouping.
+The host computes conversions and month boundaries; models select typed calendar
+operations only. Missing years in named months remain clarifications. Relative
+periods freeze on success. Verify leap days, year rollover, aggregation before
+ranking, policies and relationship cardinality, persistence, strict provider
+schemas and frontend Persian date rendering with synthetic offline coverage.
+
+Non-goals: inferred productivity scores, arbitrary formulas, model-selected
+joins, timestamp conversion, unbounded calendar grouping, production employee
+identity, or transmitting database rows to the model.
+
+Implemented the registered activity-topic relationship, total-hour/activity-count
+defaults and explicit-average/ranking vocabulary checks. Capability and vague
+quality questions now receive immediate local replies. Added local Persian
+range/year/relative resolution and bounded monthly SQL buckets in both adapters;
+saved regroupings keep their dates, explicit date changes take precedence, and
+rolling window counts cannot silently become time-series row limits. The Rahtal
+frontend shows Persian dates, exact execution bounds and manager examples.
+Private diagnostics now distinguish intent, planning, review and business checks
+using validated business selections and fixed error codes, without model prose
+or result values.
+
+Verification (2026-10-11): 1,042 offline Python tests passed and one opt-in
+synthetic SQL Server test was skipped. Chrome/Playwright frontend regressions
+passed, including Persian dates, precise decimal strings, rounded float display,
+topic/trend examples, history/retries and mobile layout. Source and wheel builds
+passed; an isolated wheel installation imported the public SDK and new local
+calendar helpers successfully.
+
+Live checks used the existing configured model and SQL Server: the capability
+reply, topic/employee contributions, topic-only refinement, focused quality
+clarification and six-month Persian monthly chart succeeded. Contribution and
+regrouped totals, and the sum of the monthly chart, matched independent scalar
+source queries. The chart retained all seven intersecting Persian months without
+truncation. Initial live failures exposed rolling-period/full-month confusion,
+date drift during regrouping, and Gregorian/Persian grain disagreement; local
+evidence checks and regression tests now cover those specific cases. This does
+not establish universal language understanding. Private results remain ignored.
+
+The follow-up quality conversation also completed after the user selected total
+hours: the original six-month Persian window was retained and the top person's
+recorded-hours measure matched a separate identity-grouped ranking query. The
+configured model initially mislabeled that short answer as a new request; the
+known local criterion question now preserves its conversation context. Local
+capability/criterion replies took under one second; the tested model-backed
+reports still took approximately 47–64 seconds.
+
+The updated authenticated frontend runs at http://127.0.0.1:8771 with separate
+local state under `.venv/rahtal-manager-web/`; other hosts were preserved. No
+database objects or writes were added. No commit was created.
+
+Suggested commit message:
+`feat: add topic-aware managerial reports and Persian calendar support`
+
+## Verify organization totals for Shahrivar 1405 (2026-10-11)
+
+Outcome: submit the exact requested organization summary through the configured
+Rahtal interpreter and check recorded hours, activity rows and distinct active
+participants separately against a bounded, policy-bound source read.
+
+Acceptance: all three requested activity metrics, no employee/topic grouping or
+extra user filter, the supplied Persian month/year with Gregorian boundaries
+2026-08-23 inclusive and 2026-09-23 exclusive, and one complete aggregate row.
+Count participants by distinct non-null activity identities, including repeat
+activities only once per person; employee-profile counts are a different measure.
+Test deleted/out-of-period rows, null durations/identities and equal profile names
+with synthetic fixtures. Inspect the displayed result and preserve float data
+while rounding presentation. Correct product behavior only if evidence shows a
+defect. Keep all live rows, transcripts and source checks in ignored local state.
+
+Non-goals: new organization authorization, new sources, database writes/objects,
+model SQL, productivity scores or sending source rows to the model.
+
+Result: the configured real interpreter returned all three requested measures
+at organization grain for the correct month. A bounded host-only DISTINCT read
+of existing activity row/actor/date/hour columns matched each measure through
+independent Python summation, row counting and a non-null identity set. No
+reporting defect was found for this request; real outputs remain ignored locally.
+
+Added seven synthetic acceptance cases for organization totals, source policies,
+month boundaries, null/empty aggregates, participant identity semantics and
+planner repair before execution. Frontend coverage checks all three labels,
+rounded float presentation and unchanged JSON precision. A full-suite run also
+exposed an existing flaky identity-redaction assertion that confused random UUID
+digits with a resolved source identity. It now checks business payloads while
+explicitly exercising UUIDs with and without the colliding digits.
+
+Verification: 1,050 Python tests passed; one opt-in synthetic SQL Server test was
+skipped. Chrome frontend regressions and source/wheel builds passed.
+
+Focused command: `.venv/Scripts/python.exe -m pytest tests/test_rahtal_organization.py tests/test_sdk_labels.py -q`.
+Browser command: `node tests/web_tabs.cjs` with the bundled Node packages on
+`NODE_PATH` when Playwright is not locally installed. No commit was created.
+
+Suggested commit message:
+`test: verify Rahtal organization totals and stabilize identity checks`
+
+## Monthly absolute and percentage change (2026-10-11)
+
+Outcome: the exact second manager question returns Shahrivar 1405 versus Mordad
+1405 total hours/activity counts and each absolute/percentage change. The current
+contract lacks this calculation and planner/reviewer revisions cannot repair it.
+Implement the bounded [comparison-change contract](SDK_COMPARISON_CHANGES.md):
+a typed fixed operation over two complete ungrouped numeric aggregate rows,
+calculated locally after the existing policy-bound deterministic SELECT.
+
+Acceptance: correct two month bounds and reference direction, both requested
+measures, no fabricated percent or silent omission, null/zero/negative reference
+semantics, precise decimal calculations, safe limits, persisted refinements and
+retries, strict model schemas, and readable percentage presentation. Verify live
+period values independently from bounded source rows before calculating changes.
+
+Non-goals: model formulas/SQL, grouped/time-series alignment, new sources/joins,
+database writes, production authorization or result transmission to a model.
+
+Result: the original configured-model attempt exhausted planner/reviewer
+revisions because the contract could return two totals but had no percentage
+operation. Added `comparison_calculation=change`, strict provider/intent fields,
+semantic validation and a fixed local result transformation. A subsequent live
+failure also exposed whole-period monthly wording becoming monthly buckets;
+bounded local evidence retains explicit percentage requests and whole-period
+grain while preserving requested breakdowns. Unsupported shapes now reach
+semantic feedback for normal planner repair instead of failing interpretation.
+
+The final configured interpreter and existing SQL Server execution returned both
+requested months/measures and each absolute/percentage change. A separate bounded
+host-only source read independently matched all period totals and changes without
+truncation. The reference is the comparison month and calculations precede
+rounding. Real values/transcripts remain in ignored local run artifacts.
+
+Forty synthetic comparison cases cover numeric/reference edge cases, malformed
+adapter results, strict/legacy specifications, policies/month boundaries, planner
+repair, conversation refinements, persisted receipts and idempotent retries.
+Arithmetic has its own bounded Decimal context, including precision, rounding
+and traps. Browser regressions cover exact decimal percentage rounding, signs,
+large/exponent values, undefined zero-reference results and Persian headers.
+
+Verification: 1,090 Python tests passed; one opt-in synthetic SQL Server test was
+skipped. Chrome frontend regressions, source/wheel builds and isolated imports
+from a freshly installed wheel passed. `git diff --check` passed. No commit was
+created.
+
+Suggested commit message:
+`feat: add deterministic period comparison changes`
+
+## Employee activity declines (2026-10-11)
+
+Outcome: run the exact third question against configured Rahtal model/data and
+verify each employee's two month totals, absolute hour loss and percent loss.
+Initial live plans selected employee label plus comparison change, which the
+ungrouped contract rejects. Add [entity-decrease scope](SDK_ENTITY_DECREASES.md).
+
+Acceptance: identity alignment, largest absolute loss before output limits and
+name enrichment, positive percent against reference, missing-month/null handling,
+same real policies, complete finite candidate reads, strict intent/specification,
+persistence/refinement/retry behavior, no results in model requests. Independently
+check real source rows and names; private evidence stays ignored locally.
+
+Non-goals: percentage ranking, arbitrary formulas/grouping, new sources/joins,
+database writes, profile universe or production authorization.
+
+Result: the baseline ended with `intent_mismatch` after repeatedly proposing an
+unsupported grouped change. Implemented the separate fixed `decrease` operation,
+strict spec/intent/schema support, complete identity candidates under host caps,
+local precise absolute-loss ranking before output limits, and existing label
+enrichment afterwards. Missing groups are zero only for additive measures;
+existing nulls remain unknown. Candidate truncation and malformed groups fail
+closed. The ordinary output default prevents two periods being mistaken for a
+two-entity cap; explicit percentage-ranking wording cannot silently become
+absolute ranking.
+
+Two subsequent real configured-model/SQL Server executions produced the same
+complete ranking. Independent bounded source reads and separate policy-bound
+profile reads matched every displayed name, both month totals, absolute/percent
+loss and order. No private values or identities are recorded here; evidence
+remains in ignored per-run artifacts. Live model latency varied substantially
+between those successful runs, so this verifies correctness, not a latency SLA.
+
+Added 33 synthetic cases for identity alignment, absolute versus percentage
+ordering, exact decimal ties, missing/unknown values, count measures, same names,
+conflicting/denied profiles, access changes, complete candidate caps, malformed
+results, planner repair, persistent retrieval/refinement and cached retries.
+Browser coverage verifies Persian period headings, positive percent loss,
+unaltered JSON precision, separate equal-name rows and all five columns visible
+at desktop width. Visual review exposed wide nowrap headers hiding the percent
+column; headers now wrap while table cells retain horizontal scrolling as needed.
+
+Verification: 1,123 Python tests passed; one optional synthetic SQL Server test
+was skipped. Browser regressions, screenshot inspection, source/wheel builds,
+fresh installed-wheel imports and `git diff --check` passed. No commit was made.
+
+Focused command: `.venv/Scripts/python.exe -m pytest tests/test_sdk_entity_decreases.py tests/test_sdk_comparison_changes.py -q`.
+
+Suggested commit message:
+`feat: add verified employee activity decline rankings`
+
+## Top recorded-hour employees over three months (2026-10-11)
+
+Outcome: submit the exact fourth question through the configured Rahtal model
+and SQL Server, independently verify the top ten identities, total recorded
+hours, activity count, average recorded duration and policy-bound names. Correct
+only defects established by the run or meaningful acceptance checks.
+
+Acceptance: the host's three-month rolling Persian period through its business
+date, one employee label dimension, all three explicitly requested metrics,
+descending total-hour order with stable identity ties, limit ten after grouping,
+names fetched afterwards, no topic/position/date grouping or comparison. Verify
+boundaries, deleted rows, averages/null durations, equal names, more/fewer than
+ten identities, and planner repair before execution. Keep live evidence ignored.
+
+Non-goals: new sources, authorization, joins/formulas, productivity claims,
+database writes or transmitting source identities/rows/names to the model.
+
+Observed defect: the first live result had correct three metrics/window/top-ten
+ordering but selected both the registered employee label and its underlying plain
+identity dimension, displaying an unrequested identity column. Existing intent
+canonicalization removes this redundant grouping only for bar charts. Extend it
+to table intent with actual user-message evidence: preserve explicit ID requests,
+current identity columns on unchanged refinements and identity ordering; otherwise
+retain the label alone when both map to the same registered target column. This
+changes requested display selection, not identity aggregation or permissions.
+
+The corrected configured-model/SQL Server run produced one label and all three
+requested measures with the same complete ordering. A separate bounded host-only
+read matched every name, sum, count and average against all in-scope activity
+rows. Fewer than ten active identities were correctly returned without invented
+employees. The saved rolling period spans three Persian months through the host
+business date; refinements preserve those resolved bounds. Private results and
+source evidence remain in ignored local artifacts.
+
+Added sixteen synthetic acceptance cases for group-before-limit selection,
+total-hour versus count/average ranking, stable boundary ties, separate equal-name
+identities, null durations, date/policy boundaries, more/fewer/empty results,
+wrong-plan repair, explicit ID display/removal, and persistent retries/refinements.
+Browser coverage checks four Persian columns, rounding without JSON mutation,
+ten-row truncation and fewer-row completeness, and the exact date caption.
+
+Verification: 1,139 Python tests passed; one opt-in synthetic SQL Server test was
+skipped. Browser regressions and screenshot inspection, source/wheel builds,
+freshly installed-wheel isolated imports and `git diff --check` passed. No commit
+was created.
+
+Focused command: `.venv/Scripts/python.exe -m pytest tests/test_rahtal_employee_ranking.py -q`.
+
+Suggested commit message:
+`fix: omit unrequested employee IDs from ranking tables`
+
+## Workload by current job position (2026-10-11)
+
+Outcome: run the exact sixth question for Shahrivar 1405 through the configured
+Rahtal model and SQL Server. Verify each current job position's total hours and
+mean hours per distinct participating employee against independent source reads.
+
+Observed failure: the baseline returned totals and participant counts but omitted
+the explicitly requested mean, even after review. It also added a monthly bucket
+to a single-month position report. The existing average metric describes activity
+duration, not a mean over employees. Define the separately scoped, host-registered
+sum-per-participant aggregate before adding its Rahtal business concept.
+
+Acceptance: deterministic sum divided by the distinct participating identities
+in the same filtered fact group; no average of activity durations or profile
+headcount. Keep existing policies, registered current-position relationship and
+duplicate-source guard. Group before filters/order/limits. Missing identities or
+an undefined denominator yield unknown, not a fabricated mean. Explicit user
+evidence must preserve the requested mean and avoid an unrequested time bucket.
+Verify unequal contributions, inactive/deleted profiles, nulls, boundaries,
+permission failures, model payload isolation and persistent conversations.
+
+Non-goals: arbitrary ratios/formulas, new source relationships or database objects,
+historical positions, missing-employee universe expansion, model SQL or result data
+in model context. Private live evidence remains ignored locally.
+
+Implemented [the fixed registered aggregate](SDK_PARTICIPANT_MEANS.md) with a
+host-only participant column, numeric/fact-grain validation, permitted catalog
+projection, typed aggregate filtering and deterministic guarded compilation in
+both dialects. The output is explicitly approximate numeric arithmetic; missing
+identities/undefined counts produce null. Existing sums/averages and relationship
+guards retain their behavior. Rahtal's catalog version changes; stale reports
+remain subject to the existing compatibility checks.
+
+Host phrase evidence plus an averaging word retains the requested business
+concept even when intent extraction drops it. A generic activity average cannot
+replace it; explicitly requested additional averages and temporal breakdowns are
+preserved. Latest removal wording overrides older clarification evidence. No
+new permission or model-provided expression is introduced.
+
+The corrected configured-model/SQL Server run returned the requested two measures
+per current position with no unnecessary month column. Independent bounded reads
+of fact rows and policy-visible profile counts/positions matched every total,
+distinct participating count and mean. The baseline independently failed the
+mean-completeness checks. All live source rows/results remain ignored locally.
+
+Added 49 synthetic cases covering unequal participation, activity versus entity
+means, unknown/zero/negative amounts, unknown identities, integer division,
+schema/permission rejection, imported-column rejection, complete grouping before
+ranking/filtering, duplicate profile guards, exact date boundaries, planner
+repair, explicit comparison/monthly denominators and persistent retries/refinements.
+Browser regressions verify labeled units, display rounding without JSON mutation,
+unknown values and visible column widths. The verified live report JSON was also
+rendered and visually inspected in the frontend.
+
+Verification: 1,188 Python tests passed; one opt-in synthetic SQL Server test was
+skipped. Browser regressions, source/wheel builds, isolated imports/compilation
+from the freshly installed final wheel and `git diff --check` passed. No commit
+was created.
+
+Focused command: `.venv/Scripts/python.exe -m pytest tests/test_sdk_participant_means.py tests/test_rahtal_position_workload.py -q`.
+
+Suggested commit message:
+`feat: add verified workload means per participating employee`

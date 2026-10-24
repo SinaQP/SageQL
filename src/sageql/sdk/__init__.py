@@ -15,6 +15,7 @@ from sageql.sdk.provider import OpenAIReportInterpreter
 from sageql.sdk.agents import AgentReportInterpreter, AgentReview, OpenAIReportAgent, ReportAgentBackend
 from sageql.sdk.sessions import InMemorySessionStore, SQLiteSessionStore, SessionStore
 from sageql.sdk.intent import ConceptRef, ReportIntent
+from sageql.sdk.evidence import UnsupportedRequirement
 from sageql.sdk.relationships import register_relationships
 
 __all__ = [
@@ -27,7 +28,7 @@ __all__ = [
     "SageQL", "SQLServerAdapter", "SQLiteAdapter", "OpenAIReportInterpreter",
     "InMemorySessionStore", "SQLiteSessionStore", "SessionStore",
     "AgentReportInterpreter", "AgentReview", "OpenAIReportAgent", "ReportAgentBackend",
-    "ConceptRef", "ReportIntent",
+    "ConceptRef", "ReportIntent", "UnsupportedRequirement",
     "RelatedDimension", "RelatedFilter", "RelationshipDefinition", "register_relationships",
     "AggregateFilter",
 ]

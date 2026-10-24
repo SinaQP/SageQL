@@ -41,6 +41,10 @@ const {chromium} = require('playwright');
     await page.waitForFunction(() => !document.getElementById('send').disabled);
     assert.equal(await page.locator('html').getAttribute('lang'), 'fa');
     assert.equal(await page.locator('html').getAttribute('dir'), 'rtl');
+    await page.locator('#topic-example').click();
+    assert.match(await page.locator('#message').inputValue(), /هر کارمند روی هر موضوع/);
+    await page.locator('#trend-example').click();
+    assert.match(await page.locator('#message').inputValue(), /ماه به ماه شمسی/);
     await page.getByRole('tab', {name: 'مراحل و جزئیات اجرا', exact: true}).click();
     assert.equal(await page.locator('#diagnostics-empty').isVisible(), true);
     assert.equal(await page.locator('#result-view').isVisible(), false);
@@ -85,6 +89,144 @@ const {chromium} = require('playwright');
     assert.deepEqual(await page.locator('#table td').allTextContents(), ['۲۰۲۶-۰۹-۰۱', '۱۲۳۴۵۶۷۸۹۰۱۲۳۴۵۶۷۸۹۰.۱۲۳۴۵۶۷۸۹', 'علي‌۱۲']);
     assert.equal(precise.rows[0][1], '12345678901234567890.123456789');
     assert.match(await page.locator('#provenance').textContent(), /بازه میلادی/);
+    const persian = {...precise,
+      fields: [{id: 'time_bucket', label: 'ماه', type: 'date'}, {id: 'hours', label: 'ساعات', type: 'number'}],
+      rows: [['2026-08-23', 14.583333333333334]],
+      provenance: {display_calendar: 'jalali', period_caption: 'شهریور 1405', period_start: '2026-08-23', period_end_exclusive: '2026-09-23'}};
+    await page.evaluate(data => renderReport(data), persian);
+    assert.deepEqual(await page.locator('#table td').allTextContents(), ['۱۴۰۵/۰۶/۰۱', '۱۴٫۵۸']);
+    assert.match(await page.locator('#provenance').textContent(), /شهریور ۱۴۰۵/);
+    assert.match(await page.locator('#provenance').textContent(), /۲۰۲۶-۰۸-۲۳/);
+    const organization = {...persian, title: 'گزارش کلی سازمان آزمایشی',
+      fields: [{id: 'activity_hours', label: 'مجموع ساعات فعالیت', type: 'number', unit: 'ساعت'},
+        {id: 'activity_count', label: 'تعداد فعالیت‌های ثبت‌شده', type: 'integer'},
+        {id: 'participant_count', label: 'تعداد کارکنان مشارکت‌کننده', type: 'integer'}],
+      rows: [[6.136666666666667, 5, 3]], truncated: false};
+    await page.evaluate(data => renderReport(data), organization);
+    assert.deepEqual(await page.locator('#table td').allTextContents(), ['۶٫۱۴', '۵', '۳']);
+    assert.deepEqual(await page.locator('#table th').allTextContents(),
+      ['مجموع ساعات فعالیت (ساعت)', 'تعداد فعالیت‌های ثبت‌شده', 'تعداد کارکنان مشارکت‌کننده']);
+    assert.equal(await page.locator('#warning').isVisible(), false);
+    assert.equal(await page.locator('#chart').isVisible(), false);
+    assert.equal(organization.rows[0][0], 6.136666666666667);
+    const dailyMatches = {...persian, title: 'روزهای مطابق شرایط آزمایشی',
+      fields: [{id: 'time_bucket', label: 'تاریخ', type: 'date'},
+        {id: 'employee_name', label: 'نام کامل کارمند', type: 'text'},
+        {id: 'activity_hours', label: 'مجموع ساعات فعالیت', type: 'number', unit: 'ساعت'},
+        {id: 'matching_day_count', label: 'تعداد روزهای مطابق شرایط', type: 'integer', unit: 'روز'}],
+      rows: [['2026-09-21', 'نام آزمایشی', 12.3456789, 3], ['2026-09-22', 'نام آزمایشی', 11.25, 3]],
+      truncated: true, provenance: {...persian.provenance, matching_day_count: {
+        scope: 'per_entity_per_period', after_aggregate_filters: true, before_output_limit: true}}};
+    await page.evaluate(data => renderReport(data), dailyMatches);
+    assert.deepEqual(await page.locator('#table td').allTextContents(),
+      ['۱۴۰۵/۰۶/۳۰', 'نام آزمایشی', '۱۲٫۳۵', '۳', '۱۴۰۵/۰۶/۳۱', 'نام آزمایشی', '۱۱٫۲۵', '۳']);
+    assert.deepEqual(await page.locator('#table th').allTextContents(),
+      ['تاریخ', 'نام کامل کارمند', 'مجموع ساعات فعالیت (ساعت)', 'تعداد روزهای مطابق شرایط (روز)']);
+    assert.equal(dailyMatches.rows[0][2], 12.3456789);
+    assert.equal(await page.locator('#warning').isVisible(), true);
+    const dailyBounds = await page.locator('#table th').evaluateAll(headers => headers.map(header => {
+      const box = header.getBoundingClientRect(), wrap = header.closest('.table-wrap').getBoundingClientRect();
+      return box.left >= wrap.left && box.right <= wrap.right;
+    }));
+    assert.ok(dailyBounds.every(Boolean), 'All daily matching fields must remain visible.');
+    dailyMatches.truncated = false;
+    dailyMatches.rows = [['2026-09-22', 'نام آزمایشی', 11.25, 1]];
+    await page.evaluate(data => renderReport(data), dailyMatches);
+    assert.equal(await page.locator('#warning').isVisible(), false);
+    assert.equal(await page.locator('#table tbody tr').count(), 1);
+    const positions = {...persian, title: 'توزیع حجم کار سمت‌های آزمایشی',
+      fields: [{id: 'job_position', label: 'سمت شغلی فعلی', type: 'text'},
+        {id: 'activity_hours', label: 'مجموع ساعات فعالیت', type: 'number', unit: 'ساعت'},
+        {id: 'participant_count', label: 'تعداد کارکنان مشارکت‌کننده', type: 'integer'},
+        {id: 'average_participant_hours', label: 'میانگین ساعات به‌ازای کارمند مشارکت‌کننده', type: 'number', unit: 'ساعت'}],
+      rows: [['سمت آزمایشی', 14.583333333333334, 2, 7.291666666666667], [null, 5, 1, null]], truncated: false};
+    await page.evaluate(data => renderReport(data), positions);
+    assert.deepEqual(await page.locator('#table td').allTextContents(),
+      ['سمت آزمایشی', '۱۴٫۵۸', '۲', '۷٫۲۹', '—', '۵', '۱', '—']);
+    assert.deepEqual(await page.locator('#table th').allTextContents(),
+      ['سمت شغلی فعلی', 'مجموع ساعات فعالیت (ساعت)', 'تعداد کارکنان مشارکت‌کننده',
+        'میانگین ساعات به‌ازای کارمند مشارکت‌کننده (ساعت)']);
+    assert.equal(positions.rows[0][3], 7.291666666666667);
+    assert.equal(await page.locator('#warning').isVisible(), false);
+    const positionBounds = await page.locator('#table th').evaluateAll(headers => headers.map(header => {
+      const bounds = header.getBoundingClientRect(), wrap = header.closest('.table-wrap').getBoundingClientRect();
+      return bounds.left >= wrap.left && bounds.right <= wrap.right;
+    }));
+    assert.ok(positionBounds.every(Boolean), 'All position workload headers must remain visible.');
+    const ranking = {...persian, title: 'رتبه‌بندی ساعات کارکنان آزمایشی',
+      fields: [{id: 'employee_name', label: 'نام کامل کارمند', type: 'text'},
+        {id: 'activity_hours', label: 'مجموع ساعات فعالیت', type: 'number', unit: 'ساعت'},
+        {id: 'activity_count', label: 'تعداد فعالیت‌های ثبت‌شده', type: 'integer'},
+        {id: 'average_activity_hours', label: 'میانگین ساعات هر فعالیت', type: 'number', unit: 'ساعت'}],
+      rows: Array.from({length: 10}, (_, index) => [index < 2 ? 'نام آزمایشی مشترک' : `کارمند آزمایشی ${index + 1}`,
+        123.456789 - index * 5, 71 + index, (123.456789 - index * 5) / (71 + index)]),
+      provenance: {display_calendar: 'jalali', period_caption: '1405/04/19 تا 1405/07/19 (شمسی)',
+        period_start: '2026-07-10', period_end_exclusive: '2026-10-12'}, truncated: true};
+    await page.evaluate(data => renderReport(data), ranking);
+    assert.equal(await page.locator('#table tbody tr').count(), 10);
+    assert.deepEqual(await page.locator('#table th').allTextContents(),
+      ['نام کامل کارمند', 'مجموع ساعات فعالیت (ساعت)', 'تعداد فعالیت‌های ثبت‌شده', 'میانگین ساعات هر فعالیت (ساعت)']);
+    assert.deepEqual(await page.locator('#table tbody tr').first().locator('td').allTextContents(),
+      ['نام آزمایشی مشترک', '۱۲۳٫۴۶', '۷۱', '۱٫۷۴']);
+    assert.equal(ranking.rows[0][1], 123.456789);
+    assert.equal(await page.locator('#warning').isVisible(), true);
+    assert.match(await page.locator('#provenance').textContent(), /۱۴۰۵\/۰۴\/۱۹/);
+    assert.equal(await page.evaluate(() => {
+      const wrap = document.getElementById('table').getBoundingClientRect();
+      return [...document.querySelectorAll('#table th')].every(cell => {
+        const bounds = cell.getBoundingClientRect();
+        return bounds.left >= wrap.left && bounds.right <= wrap.right;
+      });
+    }), true);
+    ranking.rows = ranking.rows.slice(0, 6); ranking.truncated = false;
+    await page.evaluate(data => renderReport(data), ranking);
+    assert.equal(await page.locator('#table tbody tr').count(), 6);
+    assert.equal(await page.locator('#warning').isVisible(), false);
+    if (process.env.SAGEQL_RANKING_SCREENSHOT) await page.screenshot({path: process.env.SAGEQL_RANKING_SCREENSHOT, fullPage: true});
+    const comparison = {...persian, title: 'تغییر مطلق و درصدی آزمایشی',
+      fields: [{id: 'metric_label', label: 'شاخص', type: 'text'},
+        {id: 'comparison_value', label: 'مرداد 1405', type: 'number'},
+        {id: 'base_value', label: 'شهریور 1405', type: 'number'},
+        {id: 'absolute_change', label: 'تغییر', type: 'number'},
+        {id: 'percent_change', label: 'درصد تغییر', type: 'number', unit: '%'},
+        {id: 'change_status', label: 'وضعیت تغییر', type: 'text'}],
+      rows: [['ساعات (ساعت)', 20, 30, 10, '50.00000000000000000000001', 'افزایش'],
+        ['تعداد', 40, 30, '-10', '-25', 'کاهش']],
+      provenance: {...persian.provenance, comparison_start: '2026-07-23', comparison_end_exclusive: '2026-08-23'}, truncated: false};
+    await page.evaluate(data => renderReport(data), comparison);
+    assert.deepEqual(await page.locator('#table th').allTextContents(),
+      ['شاخص', 'مرداد ۱۴۰۵', 'شهریور ۱۴۰۵', 'تغییر', 'درصد تغییر (%)', 'وضعیت تغییر']);
+    assert.deepEqual(await page.locator('#table td').allTextContents(),
+      ['ساعات (ساعت)', '۲۰', '۳۰', '۱۰', '۵۰', 'افزایش', 'تعداد', '۴۰', '۳۰', '-۱۰', '−۲۵', 'کاهش']);
+    assert.equal(comparison.rows[0][4], '50.00000000000000000000001');
+    assert.equal(await page.evaluate(() => displayPercent('2.345')), '۲٫۳۵');
+    assert.equal(await page.evaluate(() => displayPercent('-0.00001')), '۰');
+    assert.equal(await page.evaluate(() => displayPercent('1.23456E+2')), '۱۲۳٫۴۶');
+    assert.equal(await page.evaluate(() => displayPercent('12345678901234567890.125')), '۱۲۳۴۵۶۷۸۹۰۱۲۳۴۵۶۷۸۹۰٫۱۳');
+    comparison.rows = [['ساعات (ساعت)', 0, 10, 10, null, 'مبنای صفر؛ درصد تعریف نمی‌شود']];
+    await page.evaluate(data => renderReport(data), comparison);
+    assert.equal(await page.locator('#table td').nth(4).textContent(), '—');
+    assert.match(await page.locator('#table td').nth(5).textContent(), /مبنای صفر/);
+    const decline = {...comparison, title: 'بیشترین افت ساعت آزمایشی',
+      fields: [{id: 'employee_name', label: 'نام کامل کارمند', type: 'text'},
+        {id: 'comparison_value', label: 'مرداد 1405', type: 'number', unit: 'ساعت'},
+        {id: 'base_value', label: 'شهریور 1405', type: 'number', unit: 'ساعت'},
+        {id: 'absolute_decrease', label: 'کاهش مطلق', type: 'number', unit: 'ساعت'},
+        {id: 'percent_decrease', label: 'درصد افت', type: 'number', unit: '%'}],
+      rows: [['نام مشترک', 100, 50, 50, '50.00000000000001'], ['نام مشترک', 40, 0, 40, '100']], truncated: false};
+    await page.evaluate(data => renderReport(data), decline);
+    assert.deepEqual(await page.locator('#table th').allTextContents(),
+      ['نام کامل کارمند', 'مرداد ۱۴۰۵ (ساعت)', 'شهریور ۱۴۰۵ (ساعت)', 'کاهش مطلق (ساعت)', 'درصد افت (%)']);
+    assert.deepEqual(await page.locator('#table td').allTextContents(),
+      ['نام مشترک', '۱۰۰', '۵۰', '۵۰', '۵۰', 'نام مشترک', '۴۰', '۰', '۴۰', '۱۰۰']);
+    assert.equal(decline.rows[0][4], '50.00000000000001');
+    assert.equal(await page.evaluate(() => {
+      const wrap = document.getElementById('table').getBoundingClientRect();
+      return [...document.querySelectorAll('#table th')].every(cell => {
+        const bounds = cell.getBoundingClientRect();
+        return bounds.left >= wrap.left && bounds.right <= wrap.right;
+      });
+    }), true); // All decline columns, including the percent, fit at desktop width.
     if (process.env.SAGEQL_TEST_SCREENSHOT) await page.screenshot({path: process.env.SAGEQL_TEST_SCREENSHOT, fullPage: true});
     await page.setViewportSize({width: 390, height: 844});
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);

@@ -24,10 +24,28 @@ Scalar = str | int | float | bool | Decimal | date | None
 class SDKError(Exception):
     """A safe SDK error with a stable code, never raw driver/model details."""
 
-    def __init__(self, code: str, message: str, *, retryable: bool = False) -> None:
+    def __init__(self, code: str, message: str, *, retryable: bool = False,
+                 stage: str = "", reason: str = "", field: str = "") -> None:
         super().__init__(message)
         self.code = code
         self.retryable = retryable
+        # Only bounded SDK vocabulary can become public diagnostic metadata.
+        self.stage = stage if stage in {
+            "intent", "planning", "review", "semantic_validation",
+            "database_connection", "database_execution",
+        } else ""
+        self.reason = reason if reason in {
+            "response_size", "json_syntax", "response_shape", "concept_reference",
+            "period_selection", "conditions", "intent_constraints", "specification",
+            "review_shape", "requirements", "request_evidence", "repeated_conflict",
+            "revision_limit", "transport", "unavailable", "cleanup", "query_failed",
+        } else ""
+        self.field = field if field in {
+            "intent", "turn_kind", "unsupported_reason", "chart", "time_grain", "metrics", "dimensions",
+            "comparison_calculation", "include_matching_day_count", "period", "comparison",
+            "comparison_specified", "filters", "aggregate_filters", "conditions", "order_by",
+            "ordering_specified", "descending", "limit", "missing", "unsupported_requirements",
+        } else ""
 
 
 def json_value(value: Any) -> Any:
@@ -81,6 +99,10 @@ class MetricDefinition:
     aggregation: str
     column: str | None = None
     unit: str = ""
+    description: str = ""
+    selection_terms: tuple[str, ...] = ()
+    ranking_terms: tuple[str, ...] = ()
+    participant_column: str | None = None
 
 
 @dataclass(frozen=True)
@@ -118,7 +140,7 @@ class FilterDefinition:
 
 @dataclass(frozen=True)
 class FullNameFilterDefinition(FilterDefinition):
-    """Exact normalized name equality over host-declared text columns only."""
+    """Exact normalized full-name equality over one to four declared text columns."""
 
     name_columns: tuple[str, ...] = ()
 
@@ -165,6 +187,8 @@ class DatasetDefinition:
     version: str = "1"
     row_key: tuple[str, ...] = ()
     related_columns: tuple[str, ...] = ()
+    description: str = ""
+    default_metric_ids: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -201,6 +225,8 @@ class ReportingCatalog:
     version: str = "1"
     lookups: tuple[EntityLookupDefinition, ...] = ()
     relationships: tuple[RelationshipDefinition, ...] = ()
+    preferred_calendar: str = "gregorian"
+    ambiguous_ranking_terms: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -272,6 +298,8 @@ class ReportSpec:
     limit: int = 100
     comparison: PeriodSelection | None = None
     aggregate_filters: tuple[AggregateFilter, ...] = ()
+    comparison_calculation: str = "none"
+    include_matching_day_count: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return json_value(self)
@@ -283,8 +311,12 @@ class ReportSpec:
             names = {item.name for item in fields(kind)}
             if kind is PeriodSelection and isinstance(raw, dict) and set(raw) == names - {"count", "unit"}:
                 raw = {**raw, "count": None, "unit": None}
-            if kind is ReportSpec and isinstance(raw, dict) and set(raw) == names - {"aggregate_filters"}:
-                raw = {**raw, "aggregate_filters": []}
+            if kind is ReportSpec and isinstance(raw, dict):
+                # Only these additive fields may be absent in legacy receipts.
+                optional = {"aggregate_filters": [], "comparison_calculation": "none",
+                            "include_matching_day_count": False}
+                if set(raw) <= names and names - set(raw) <= set(optional):
+                    raw = {**{key: default for key, default in optional.items() if key not in raw}, **raw}
             if not isinstance(raw, dict) or set(raw) != names:
                 raise SDKError("invalid_spec", "Report specification has invalid fields.")
             return dict(raw)

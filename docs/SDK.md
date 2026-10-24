@@ -1,6 +1,15 @@
 # Embed SageQL in an application
 
+Reporting correctness and bounded recovery are documented in the [Phase 3 reliability report](REPORTING_RELIABILITY_PHASE3.md). Unsupported requirements produce transparent outcomes; request evidence also constrains custom providers before execution.
+
+
 The implemented `sageql.sdk` slice creates and refines reports over one registered SQL Server table or trusted view per dataset. The developer supplies configuration and authentication in their backend; the frontend submits messages, session IDs, request IDs, and revisions. Existing stage APIs and the Rahtal pilot remain available.
+
+The [application integration guide](APPLICATION_INDEPENDENCE.md) maps host and
+package responsibilities and includes independent retail/library examples. Host
+dataset descriptions, default measures and selection/ranking terms supply domain
+meaning. Shared prompts and clarifications use permitted business concepts.
+Full-name lookups support one stored title/name or up to four name components.
 
 Datasets can additionally expose explicit related dimensions and filters through
 the [registered relationship contract](SDK_RELATIONSHIPS.md). Register the mapping
@@ -29,12 +38,39 @@ keys stop the report. Compound equality keys and several independent relationshi
 are supported. Historical position joins, recursive relationship paths,
 fact-to-fact aggregation and arbitrary calculated formulas are not inferred.
 
+Hosts can also register the fixed [mean per participating entity](SDK_PARTICIPANT_MEANS.md):
+
+```python
+from sageql.sdk import MetricDefinition
+
+# Both physical columns must be declared on the same fact dataset.
+mean = MetricDefinition("mean_participant_hours", "Mean hours per participant",
+                        "sum_per_participant", "hours", "hours",
+                        participant_column="employee_id")
+# Include `mean` in DatasetDefinition.metrics and grant its ID in DatasetAccess.
+```
+
+This divides the filtered group's sum by distinct participating identities,
+producing an approximate number without integer division. Unknown identities,
+all-null amounts or an undefined denominator return null. It does not add
+arbitrary formulas or profile headcount; models receive neither source column.
+
+For a bounded daily table with one `EntityLabelDimension`, set
+`include_matching_day_count=True` to add the integer `matching_day_count` field.
+It counts daily groups remaining after the report's ordinary aggregate conditions,
+per identity and comparison period, before ordering/output limits. Names still
+resolve afterwards. Counts remain complete when detail rows are truncated; null
+identities have unknown counts. Use false (the default) for ordinary reports.
+The [scope](SDK_MATCHING_DAY_COUNTS.md) documents strict/legacy serialization,
+supported shapes, the reserved ordering field and adapter validation. Models
+cannot supply partitions or arbitrary window expressions.
+
 ## Install and try it
 
-Python 3.10+ is required. Install the local checkout into your backend environment:
+Python 3.10+ is required. From the SageQL checkout, install into your backend environment:
 
 ```powershell
-python -m pip install "E:\Coding\SageQL[openai,odbc]"
+python -m pip install ".[openai,odbc]"
 ```
 
 During development use `python -m pip install -e ".[openai,odbc,dev]"` from this repository. SQL Server also requires an installed Microsoft ODBC driver. The driver and connection string belong to the host configuration.
@@ -72,10 +108,14 @@ to both the engine and interpreter and register English business labels.
 
 The reference browser uses RTL and displays Persian digits without changing JSON
 keys, concept IDs, typed numbers, decimal strings, ISO dates or result values.
-Stored dates, daily buckets, relative periods and Monday weeks remain **Gregorian**.
+Stored dates, daily bucket values and Monday weeks remain **Gregorian**.
 The scoped [explicit Jalali month extension](SDK_JALALI_MONTHS.md) accepts a Persian
 month and year from 1300 through 1499, resolving its bounds locally. Missing years
-still require clarification; Jalali relative periods and calendar buckets are unsupported.
+still require clarification. The [manager extension](SDK_MANAGER_REPORTS.md) adds
+Persian date ranges, years, relative periods and bounded Persian monthly buckets,
+plus host-registered workload defaults and explicit measure/ranking vocabulary.
+`ReportingCatalog.preferred_calendar` controls the business default and date
+presentation without changing stored Gregorian date-only values.
 Previously saved replies/reports keep their original text while their catalog
 and access rules still match. Changing catalog labels changes its fingerprint;
 older report/retry access still undergoes the existing compatibility checks.
@@ -220,9 +260,28 @@ under current scope. Lookup results and derived identity binds are excluded from
 provider specifications. Start a new chat after upgrading Rahtal's catalog;
 old reports/receipts still require matching catalog and access fingerprints.
 
-Each report selects one registered fact table/view with optional host-defined dimensional relationships. Model-selected joins, arbitrary formulas, timestamp timezone conversion, fiscal calendars, Jalali time buckets beyond the explicit month-selection extension, calculated comparison deltas, exports and production HTTP authentication remain future work. The SQLite reference uses ISO date storage and SQLite numeric affinity; it does not guarantee SQL Server fixed-point arithmetic. SQL Server cancellation is cooperative and driver-dependent; row caps do not bound source aggregation work.
+Each report selects one registered fact table/view with optional host-defined dimensional relationships. Model-selected joins, arbitrary formulas, timestamp timezone conversion, fiscal calendars, general grouped comparison deltas, exports and production HTTP authentication remain future work. Fixed ungrouped absolute/percentage changes are supported by the [comparison-change contract](SDK_COMPARISON_CHANGES.md); fixed one-entity absolute-loss rankings are supported by the [entity-decrease contract](SDK_ENTITY_DECREASES.md). The SQLite reference uses ISO date storage and SQLite numeric affinity; it does not guarantee SQL Server fixed-point arithmetic. SQL Server cancellation is cooperative and driver-dependent; row caps do not bound source aggregation work.
+
+For a change table, select two bounded periods and
+`comparison_calculation="change"` with numeric metrics, `chart="table"`, no
+dimensions/time grouping/aggregate filters and a limit that fits both periods
+and all metric rows. The host reads the existing two period totals, then returns
+one row per metric with reference/current values, absolute change, percentage
+change and a localized status. Percentage uses the comparison period as its
+denominator, before display rounding. Null/zero/negative reference conditions
+have explicit unavailable-percent statuses. Results never enter model context.
 
 ## Registered display names
+
+For largest employee/entity declines, use
+`comparison_calculation="decrease"`, one registered entity-label dimension,
+one numeric sum/count metric, two bounded periods, `chart="table"`, no time
+grouping/aggregate filters, `order_by="absolute_decrease"`, `descending=True`.
+The host requires complete candidate groups within `limits.max_rows`, aligns
+identities, ranks positive absolute loss before the output limit, then resolves
+names. Missing period groups are zero; existing null aggregates remain unknown.
+Output includes both period values and positive absolute/percentage loss. See
+[SDK_ENTITY_DECREASES.md](SDK_ENTITY_DECREASES.md) for limits and exclusions.
 
 For grouped reports that need a display name from another approved source,
 register an `EntityLabelDimension` instead of an ordinary dimension. For example,

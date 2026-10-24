@@ -2,6 +2,12 @@
 
 Architecture and implementation path, 2026-10-05. The first embedded SDK slice is now implemented in `sageql.sdk`: trusted catalog/policy configuration, sessions, deterministic single-source SQL Server execution, typed report JSON, and a reference frontend. See the [implemented API guide](SDK.md) and [adapter scope](SDK_SQL_SERVER.md) for the actual contracts. Broader capabilities and illustrative APIs below remain design targets. This work does not expand the Rahtal executor or define the historical Step 5.
 
+The 2026-10-15 [application independence implementation](APPLICATION_INDEPENDENCE.md)
+records the current host contracts and independent retail/library verification.
+Registered dimensional relationships and fixed calculations now have their own
+scoped designs linked from the API guide. Expression trees, timestamp conversion
+and other broader proposals below remain unimplemented design targets.
+
 ## Product outcome
 
 A developer installs SageQL in a Python backend, registers the SQL Server data and business rules that their application exposes, supplies database and model infrastructure, and connects their frontend to their own authenticated backend. An end user asks for reports, answers material clarification questions, receives a table or chart, and can refine that report in the same conversation.

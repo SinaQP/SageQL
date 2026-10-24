@@ -1,5 +1,23 @@
 # Bounded agent planning for the embedded SDK
 
+The [Phase 3 reliability contract](REPORTING_RELIABILITY_PHASE3.md) adds bounded
+request evidence, a typed unavailable-requirement ledger, one optional structured
+repair allowance and one reconsideration of repeatedly conflicting intent.
+Explicit evidence constrains extraction and also gates every provider's final
+specification before database reads. These checks do not prove arbitrary natural
+language understanding.
+
+Business defaults and domain vocabulary belong to host registrations. Shared
+intent/planning/review prompts describe supported operations and consume permitted
+dataset descriptions and metric terms. See the [application integration guide](APPLICATION_INDEPENDENCE.md)
+for retail/library evidence and the Rahtal compatibility considerations.
+
+The [manager extension](SDK_MANAGER_REPORTS.md) adds host business descriptions,
+default measures, conservative explicit selection/ranking guards, local relative
+period evidence and capability replies, and optional private stage observation.
+Normal report decisions still run intent/planning/review; common capability
+questions and missing explicit criteria can return clarification locally.
+
 The [registered relationship extension](SDK_RELATIONSHIPS.md) exposes related
 attributes on the fact's business catalog. Intent extraction, planning and review
 can combine these with fact measures without selecting physical keys. Locally,
@@ -81,6 +99,7 @@ The following types are exported from `sageql.sdk`:
 | `ReportAgentBackend` | Replaceable `plan` and `review` interface, suitable for fake offline backends or another configured model transport. |
 | `AgentReview` | Immutable semantic judgment with `approved: bool` and bounded `feedback: str`. Approval requires empty feedback; rejection requires nonempty feedback. |
 | `ConceptRef` | A permitted dataset/concept pair, never a physical mapping or resolved identity. |
+| `UnsupportedRequirement` | An unavailable operation code and a bounded literal quotation from the user's request. It cannot register a capability or authorize execution. |
 | `ReportIntent` | Complete effective measures/grouping and period, missing business details, turn kind, and optional constraints on presentation, comparison, row/aggregate filters, ordering and result limit. |
 
 Use the same trusted `LLMConfig` that the host already supplies:
@@ -92,6 +111,7 @@ provider = OpenAIReportAgent(
     config,                  # Host-owned LLMConfig; never browser input.
     timeout_seconds=30,     # Shared across planning, review and revisions.
     max_revisions=1,
+    max_structured_repairs=0,  # Opt in with 1 for one repair shared by all stages.
     max_output_tokens=4096,
     language="fa",
 )
@@ -104,6 +124,14 @@ Transport retries are disabled. The planner and reviewer use separate requests
 to the same configured model and endpoint; no additional remote service is
 introduced. The requests are separate, but their mistakes can be correlated
 because they use the same model.
+
+`ReportIntent.unsupported_requirements` defaults to an empty tuple for existing
+typed backends. The live strict schema requires this array and supports
+`time_grain="jalali_month"` directly. Each unavailable requirement must quote
+user text; assistant suggestions and invented evidence are rejected. A checked
+unavailable operation returns `unsupported` without asking the reviewer to veto
+it or executing a supported subset. Recognized fa/en operation phrases can stop
+before any model call. The ledger is model-dependent for other wording/languages.
 
 To supply another backend, construct
 `AgentReportInterpreter(backend, timeout_seconds=30, max_revisions=1)`. The
@@ -143,6 +171,13 @@ def plan(messages, current_spec, catalog, today, *, feedback, timeout_seconds, i
 def review(messages, current_spec, catalog, today, decision, *, timeout_seconds, intent):
     ...
 ```
+
+An intent-aware backend may also implement
+reconsider(messages, current_spec, catalog, today, *, feedback, timeout_seconds)
+to return a new ReportIntent after repeated local conflicts. Feedback contains
+only a fixed conflict code. The same original permitted context and remaining
+deadline apply; request evidence and capability checks are reapplied. This method
+is optional and is called at most once within the existing planning budget.
 
 Two-method custom backends retain their original plan/review behavior; they do
 not gain independent intent enforcement automatically. `OpenAIReportInterpreter`
@@ -309,7 +344,14 @@ plan/review-only backends retain their existing contract.
 one planning attempt, with review only if local checks pass. Live agent success
 takes three model requests: intent, planning and review. Each allowed revision
 can add two more, so the default allows at most five requests and the maximum
-allows at most nine. An unavailable intent can finish after one request. Legacy
+allows at most nine without structured repair. Reconsideration can replace a
+skipped review after two repeated local intent conflicts; it happens at most
+once within the same planning budget. An unavailable intent can finish after
+one request, or recognized unsupported evidence can finish without model calls.
+The optional max_structured_repairs=1 adds at most one request across all stages
+and keeps the original deadline. It defaults to zero; Rahtal explicitly enables
+one. Empty/oversized output, invalid requirement evidence, transport failures
+and database operations are never automatically retried. Legacy
 two-method backends retain their two/four/eight call budgets. A rejected local preview or known inactive
 ordering skips its reviewer request and may therefore consume fewer calls. An
 ordering repair consumes the same revision allowance as a semantic repair; it
@@ -329,7 +371,7 @@ extend each database query or reset the shared deadline after a rejection.
 
 | Error code | Meaning and behavior |
 | --- | --- |
-| `invalid_interpretation` | Malformed/unknown/inconsistent proposal or review; stop without repair or execution, except the agent's narrow internal known-but-inactive ordering classification described above. The single interpreter still returns this public code for that invalid ordering. |
+| `invalid_interpretation` | Malformed/unknown/inconsistent proposal or review; fail closed unless the host opted into one shared structured repair. Empty/oversized output and requirement evidence are never repaired. Existing narrow ordering repair remains available; the agent's narrow internal known-but-inactive ordering classification described above. The single interpreter still returns this public code for that invalid ordering. |
 | `provider_failed` | Model transport or unexpected backend failure; stop with a safe retryable error. |
 | `request_timeout` | Shared agent deadline expired; do not start another stage. |
 | `agent_exhausted` | The allowed proposals never passed local checks and semantic approval, including exhausted known inactive ordering repairs; stop with a safe retryable error. |

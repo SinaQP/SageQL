@@ -172,7 +172,7 @@ def test_gregorian_comparison_has_resolved_english_period_labels(database):
     sdk = SageQL(catalog=catalog(), database=SQLiteAdapter(database), provider=Provider(),
                  policy=policy, clock=lambda: AS_OF, execution="validated", language="en")
     session = sdk.create_session(ACTOR)
-    reply = sdk.submit(session.session_id, "Compare September with August", ACTOR, "comparison", 0)
+    reply = sdk.submit(session.session_id, "Compare September 2026 with August", ACTOR, "comparison", 0)
     assert reply.status == "report_ready"
     assert reply.report.provenance["period_labels"] == {
         "base": "[2026-09-01, 2026-10-01)",

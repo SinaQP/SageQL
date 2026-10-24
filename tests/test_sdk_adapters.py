@@ -310,6 +310,7 @@ def test_factory_failure_is_sanitized():
         SQLServerAdapter(fail).execute(report(), ExecutionLimits())
     assert failure.value.code == "database_unavailable"
     assert failure.value.retryable
+    assert failure.value.stage == "database_connection" and failure.value.reason == "unavailable"
     assert "secret" not in str(failure.value)
     assert failure.value.__cause__ is None
 

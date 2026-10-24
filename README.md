@@ -1,5 +1,8 @@
 # SageQL
 
+Reporting correctness and bounded recovery are documented in the [Phase 3 reliability report](docs/REPORTING_RELIABILITY_PHASE3.md). Unsupported requirements produce transparent outcomes; request evidence also constrains custom providers before execution.
+
+
 SageQL is a Python SDK that a developer embeds in their backend to let authorized users create and refine reports through chat. The host registers SQL Server tables or trusted reporting views, approved metrics/dimensions/filters, model infrastructure, and per-user access policies. SageQL interprets a report specification, validates it, generates parameterized SQL itself, and returns a typed table/chart payload for your frontend.
 
 The new `sageql.sdk` API includes persistent conversations, clarification, report refinement, revision checks and idempotent retries. SQL Server is the production adapter target; SQLite supplies an offline reference. The [embedding guide](docs/SDK.md) documents installation, configuration, the JSON contract and limits. The [architecture](docs/ARCHITECTURE.md) records the broader design. The existing staged CLI/API and Rahtal real-data pilot remain available.
@@ -7,8 +10,10 @@ The new `sageql.sdk` API includes persistent conversations, clarification, repor
 Live reference hosts use `OpenAIReportAgent`: independent intent extraction fixes
 the effective measures/grouping, a planner proposes a report, a reviewer checks
 its meaning, and bounded
-feedback can revise the plan or clarification. This path uses no question-specific
-keyword or regex routing. Register another catalog to reuse the same agents.
+feedback can revise the plan or clarification. Registered vocabulary checks
+locally preserve explicit business measures and supported period selections;
+the shared agents still plan and review reports. Register another catalog to
+reuse the same pipeline.
 Local checks reject unavailable cross-source combinations, silent grouping changes
 and repeated structured clarification after an answer. Intent extraction remains
 model-dependent. Authorization, lookup uniqueness and parameterized SQL execution remain enforced
@@ -23,6 +28,18 @@ customer, product or organizational catalogs. Models never invent join keys;
 duplicate dimension keys fail closed. Rolling date windows such as the last
 three months resolve locally. Rahtal exposes current job position on activity
 reports through this general registration API.
+
+The fixed [participant-mean metric](docs/SDK_PARTICIPANT_MEANS.md) supports a
+registered amount divided by distinct participating identities in the same group.
+For example, Rahtal uses it for average recorded hours per participating employee,
+while ordinary average activity duration keeps its own meaning.
+Only trusted hosts register the source columns; models choose the business ID.
+
+[Matching-day counts](docs/SDK_MATCHING_DAY_COUNTS.md) can accompany daily entity
+reports: group registered measures, apply typed aggregate conditions, count the
+remaining days per identity/period, then sort/limit and resolve names. Thresholds
+and periods remain report inputs. The additive flag defaults to false, preserving
+organization totals, comparisons, rankings and per-participant means.
 
 Persian is the default conversation and report presentation language. The
 reference frontend uses RTL, Persian labels and display digits. Ask naturally,
@@ -42,7 +59,7 @@ To use the **existing Rahtal SQL Server database and real model**, run:
 .\.venv\Scripts\python.exe sageql_rahtal/web.py --env-file E:\Coding\rahtal-be\.env --port 8766
 ```
 
-Open `http://127.0.0.1:8766`. The server saves a local workspace token in `.venv/rahtal-web/host-token.txt`; use it in the sign-in dialog. This mode reads the approved existing employee/profile and activity tables and never falls back to synthetic data. See the [Rahtal frontend instructions](sageql_rahtal/README.md#local-frontend-on-the-real-database). VPN access to the configured SQL Server is required when it is on the internal network.
+Open `http://127.0.0.1:8766`. The server saves a local workspace token in `.venv/rahtal-web/host-token.txt`; use it in the sign-in dialog. This mode reads the registered existing employee/profile, activity and activity-topic tables and never falls back to synthetic data. It defaults to total recorded work and Persian business dates, including bounded monthly trends. See the [Rahtal frontend instructions](sageql_rahtal/README.md#local-frontend-on-the-real-database) and [manager reporting contract](docs/SDK_MANAGER_REPORTS.md). VPN access to the configured SQL Server is required when it is on the internal network.
 
 The following offline commands exercise the same SDK using synthetic data and a scripted interpreter:
 
@@ -50,12 +67,20 @@ The following offline commands exercise the same SDK using synthetic data and a 
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e ".[openai,odbc,dev]"
 .\.venv\Scripts\python.exe examples/sdk_demo.py
+.\.venv\Scripts\python.exe examples/multi_domain.py
 .\.venv\Scripts\python.exe examples/web/server.py --demo
 ```
 
 Open `http://127.0.0.1:8765`, ask «ساعات فعالیت روزانه در سپتامبر», answer «۲۰۲۶», then request «به تفکیک کارمند نمایش بده». English versions of these requests also work. This uses synthetic data and a deterministic interpreter without credentials or remote calls. The [frontend guide](examples/web/README.md) also covers SQL Server mode. The first SDK slice queries one registered table/view per dataset; reviewed reporting views can contain business joins. Model-selected joins, arbitrary formulas, timestamp conversion, calendars beyond the explicit Jalali month extension and production authentication are outside this slice. The scripted offline demo does not interpret Persian month names; the configured model host supports the extension.
 
 Registered dimension-only reports can list employee names without adding an aggregate. The sections below document the earlier staged workflow. Its experimental model-written SQL API is separate from the SDK engine.
+
+The [application integration guide](docs/APPLICATION_INDEPENDENCE.md) documents
+the reviewed boundaries and executable retail/library fixtures. Each host supplies
+its own schema, business definitions, relationships and authenticated policies.
+The same SDK produces sales totals, borrowing counts and loan-duration reports;
+single-column product names/book titles and multi-column personal names use the
+same bounded lookup contract. The offline examples use scripted providers.
 
 Rahtal also resolves a supplied employee full name before filtering daily
 activity reports. The host registers this lookup explicitly; users do not need
