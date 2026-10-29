@@ -4,7 +4,8 @@ Each setup runs the same cohort through the shared Phase 06 runner, budget,
 journal and scorer. Only gpt-5-nano and gpt-5-mini may be selected. Unlike the
 Phase 08/14 assessment gate, a wrong synthetic report is scored and the run
 continues so both setups cover every turn; isolation failures and denied reads
-still stop the batch.
+still stop the batch. A dropped provider connection fails only its turn (never
+retried); its full reservation stays in every budget limit.
 """
 import argparse
 from collections import defaultdict
@@ -58,7 +59,7 @@ def prepare(cases, directory, setup, authorization_id, observed_at):
     value.update(authorized=True, authorization_id=authorization_id, accepts_billing_uncertainty=True,
                  capture_responses=True, call_timeout_seconds=120, turn_timeout_seconds=240,
                  max_requests=110, max_input_tokens=3000000, max_output_tokens=600000,
-                 max_total_tokens=3600000, max_seconds=3000, max_cost_usd='0.50',
+                 max_total_tokens=3600000, max_seconds=3000, max_cost_usd='0.45',
                  per_call_output_tokens=8192)
     return value
 
@@ -68,7 +69,7 @@ def run(cases, directory, setup, approval, **options):
     return run_evaluation(cases, directory, mode='live', endpoint=ENDPOINT, model=BASE_MODEL,
                           approval=approval, corpus_root=root, corpus_version=version,
                           accounting_mode='exploratory', turn_hook=comparison_check,
-                          **settings(setup), **options)
+                          stop_on_transport_failure=False, **settings(setup), **options)
 
 
 def usage_by_stage(directory):

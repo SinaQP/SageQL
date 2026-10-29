@@ -179,7 +179,7 @@ def artifact(cases, journal, budget, config):
 def run(cases, directory, *, mode='offline', endpoint=None, model=None, approval=None,
         resume=False, max_cases=None, live_client_factory=None, turn_hook=None,
         corpus_root=None, corpus_version='v4', accounting_mode='strict', max_structured_repairs=0,
-        stage_models=None, reasoning_effort=None):
+        stage_models=None, reasoning_effort=None, stop_on_transport_failure=True):
     if mode not in ('offline', 'protocol', 'live'):
         raise ValueError('Unknown evaluation mode')
     if mode == 'live' and any(not c['live_eligible'] for c in cases):
@@ -195,12 +195,14 @@ def run(cases, directory, *, mode='offline', endpoint=None, model=None, approval
     manifest = {**{k: v for k, v in config.items() if k != 'endpoint'},
                 'endpoint_sha256': sha256(endpoint.encode()).hexdigest() if endpoint else None,
                 'transport_test_injected': live_client_factory is not None,
-                'approval_sha256': sha256(json.dumps(approval, sort_keys=True).encode()).hexdigest() if approval else None}
+                'approval_sha256': sha256(json.dumps(approval, sort_keys=True).encode()).hexdigest() if approval else None,
+                **({} if stop_on_transport_failure else {'stop_on_transport_failure': False})}
     with run_lock(directory):
         journal = Journal(directory, manifest, resume=resume)
         if resume:
             journal.abandon_active()  # Never replay a possibly dispatched turn.
-        budget = Budget(approval, journal) if mode == 'live' else None
+        budget = (Budget(approval, journal, stop_on_transport_failure=stop_on_transport_failure)
+                  if mode == 'live' else None)
         client = None
         try:
             if mode == 'live' and not budget.exhausted:

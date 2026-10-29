@@ -223,8 +223,11 @@ def usage_metadata(response):
 
 
 class Budget:
-    def __init__(self, approval, journal, *, clock=time.time):
+    def __init__(self, approval, journal, *, clock=time.time, stop_on_transport_failure=True):
         self.approval, self.journal, self.clock = approval, journal, clock
+        # When False, an uncertain call keeps its full reservation in every
+        # limit; the failed turn is scored and later turns may still run.
+        self.stop_on_transport_failure = stop_on_transport_failure
         self.input_price = _money(approval['pricing']['input_usd_per_million'])
         self.output_price = _money(approval['pricing']['output_usd_per_million'])
         # Approved models only: the configured model plus reviewed stage models.
@@ -320,7 +323,7 @@ class Budget:
                         cost=str((usage['input'] * input_price + usage['output'] * output_price) / 1000000))
         if invalid:
             self.state['stop_reason'] = 'invalid_usage'
-        elif self.exploratory and (failed or usage is None):
+        elif self.exploratory and (failed or usage is None) and self.stop_on_transport_failure:
             self.state['stop_reason'] = 'transport_failure' if failed else 'missing_usage'
         call['status'] = 'failed' if failed else 'observed' if usage is not None else 'usage_unavailable'
         self.journal.save()

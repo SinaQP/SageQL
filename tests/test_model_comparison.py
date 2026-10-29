@@ -79,6 +79,21 @@ def test_budget_prices_each_call_by_its_model_and_rejects_others(tmp_path):
     assert budget.state['stop_reason'] == 'model_changed'
 
 
+@pytest.mark.parametrize('stop', [True, False])
+def test_transport_failure_keeps_reservation_and_stops_only_when_requested(tmp_path, stop):
+    cases, approval = packet(tmp_path, 'A')
+    budget = Budget(approval, Journal(tmp_path, approval['configuration']), stop_on_transport_failure=stop)
+    request = {'messages': [{'role': 'user', 'content': 'synthetic'}], 'max_completion_tokens': 1000,
+               'model': 'gpt-5-nano', 'response_format': {'json_schema': {'name': 'sageql_report_intent'}}}
+    ticket = budget.reserve(dict(request))
+    reserved = budget.state['calls'][ticket]['cost']
+    budget.settle(ticket, None, failed=True)
+    assert budget.state['calls'][ticket]['status'] == 'failed'
+    assert budget.state['calls'][ticket]['cost'] == reserved
+    assert budget.accounting()['uncertain_requests'] == 1
+    assert budget.exhausted is stop
+
+
 class Recording(ProtocolClient):
     def __init__(self, *args):
         super().__init__(*args)
