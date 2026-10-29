@@ -18,10 +18,11 @@ from sageql.localization import GRAINS_FA, error_text, validate_language
 from sageql.sdk.models import (
     AccessScope, ActorContext, AdapterResult, DatabaseAdapter, ExecutionLimits,
     Interpretation, PeriodSelection, Reply, ReportArtifact, ReportField, ReportingCatalog, ResolvedPeriod,
-    ReportPolicy, ReportProvider, ReportSpec, SDKError, json_value,
+    ReportPolicy, ReportProvider, ReportSpec, SDKError, UserFilter, json_value,
 )
 from sageql.sdk.semantics import permitted_catalog, validate_catalog, validate_report, validate_scope
 from sageql.sdk.sessions import InMemorySessionStore, SessionStore
+from sageql.sdk.saved import MAX_NAME_CHARS, InMemorySavedReportStore, SavedReportStore
 from sageql.sdk.lookups import prepare_request, resolve_request
 from sageql.sdk.labels import resolve_labels
 from sageql.sdk.calendars import JALALI_MONTH_NAMES, gregorian_to_jalali
@@ -174,6 +175,7 @@ class SageQL:
         sessions: SessionStore | None = None, clock: Callable[[], date] | None = None,
         limits: ExecutionLimits | None = None, execution: str = "disabled",
         language: str = "fa", read_consistency: str = "compatibility",
+        saved_reports: SavedReportStore | None = None,
     ) -> None:
         self.language = validate_language(language)
         validate_catalog(catalog)
@@ -197,6 +199,7 @@ class SageQL:
         self.provider = provider
         self._policy = policy
         self.sessions = sessions if sessions is not None else InMemorySessionStore()
+        self.saved_reports = saved_reports if saved_reports is not None else InMemorySavedReportStore()
         self._clock = clock or (lambda: datetime.now(timezone.utc).date())
         self.limits = limits if limits is not None else ExecutionLimits()
         self.execution = execution
@@ -459,17 +462,11 @@ class SageQL:
                 # Recheck after read cleanup, before accepting publication state.
                 if _digest(self._scope(actor)) != scope_key:
                     raise SDKError("access_denied", "Report access changed during this request.")
-                if prepared.spec.filters != spec.filters:
-                    # Name/qualifier inputs belong in the public report context.
-                    # The resolved identity stays out of provider specifications.
-                    artifact = replace(artifact, provenance={
-                        **artifact.provenance, "filters": json_value(spec.filters),
-                        "interpretation": _interpretation(replace(prepared.spec, filters=spec.filters),
-                                                          prepared.dataset, self.catalog, self.language)})
+                artifact = self._public_artifact(artifact, prepared, spec)
                 # Verify the public JSON contract before accepting session mutation.
                 artifact_json = artifact.to_dict()
                 state["reports"][artifact.id] = {
-                    "artifact": artifact_json, "spec": _typed(prepared.spec),
+                    "artifact": artifact_json, "spec": _typed(prepared.spec), "request_spec": _typed(spec),
                     "scope_key": scope_key, "catalog_key": _digest(self.catalog),
                     "as_of": today.isoformat(),
                 }
@@ -528,6 +525,125 @@ class SageQL:
             return self._error(session_id, revision, SDKError(
                 "storage_failed", "Session storage is unavailable.", retryable=True))
         return reply
+
+    def _public_artifact(self, artifact, prepared, spec):
+        if prepared.spec.filters == spec.filters:
+            return artifact
+        # Name/qualifier inputs belong in the public report context.
+        # The resolved identity stays out of provider specifications.
+        return replace(artifact, provenance={
+            **artifact.provenance, "filters": json_value(spec.filters),
+            "interpretation": _interpretation(replace(prepared.spec, filters=spec.filters),
+                                              prepared.dataset, self.catalog, self.language)})
+
+    @staticmethod
+    def _saved_summary(record: dict[str, Any]) -> dict[str, Any]:
+        spec = record["spec"]
+        return {"id": record["id"], "name": record["name"], "created_at": record["created_at"],
+                "dataset_id": spec["dataset_id"], "period": _untyped(spec["period"]),
+                "has_comparison": spec.get("comparison") is not None}
+
+    @staticmethod
+    def _override(spec: ReportSpec, period: PeriodSelection | None,
+                  filters: tuple[UserFilter, ...] | None) -> ReportSpec:
+        if period is not None:
+            if not isinstance(period, PeriodSelection):
+                raise SDKError("invalid_input", "Provide the period as a PeriodSelection.")
+            if spec.comparison is not None:
+                raise SDKError("invalid_input", "Comparison reports keep their saved periods.")
+            spec = replace(spec, period=period)
+        if filters is not None:
+            if not isinstance(filters, tuple) or any(not isinstance(item, UserFilter) for item in filters):
+                raise SDKError("invalid_input", "Provide filters as a tuple of UserFilter values.")
+            spec = replace(spec, filters=filters)
+        return spec
+
+    def save_report(self, session_id: str, report_id: str, actor: ActorContext, name: str, *,
+                    period: PeriodSelection | None = None) -> dict[str, Any]:
+        """Save a conversation report as a reusable definition; no data or SQL is stored.
+
+        ``period`` optionally replaces the saved period, e.g. a fixed month with
+        ``PeriodSelection("last_month")`` so each run uses current dates.
+        """
+        scope = self._scope(actor)
+        if not isinstance(name, str) or not 1 <= len(name.strip()) <= MAX_NAME_CHARS:
+            raise SDKError("invalid_input", f"Name the saved report with 1 to {MAX_NAME_CHARS} characters.")
+        state = self.sessions.get(session_id, (actor.subject, actor.tenant_id))
+        saved = state["reports"].get(report_id) if isinstance(report_id, str) else None
+        if (saved is None or saved["scope_key"] != _digest(scope)
+                or saved["catalog_key"] != _digest(self.catalog)):
+            raise SDKError("access_denied", "Report is unavailable under the current access rules.")
+        if "request_spec" not in saved:
+            raise SDKError("invalid_input", "Run this report again before saving it.")
+        spec = self._override(ReportSpec.from_dict(_untyped(saved["request_spec"])), period, None)
+        prepare_request(self.catalog, spec, scope, self._clock())  # Validate only; nothing executes.
+        record = {"schema_version": 1, "id": uuid4().hex, "owner": [actor.subject, actor.tenant_id],
+                  "name": name.strip(), "spec": _typed(spec), "catalog_version": self.catalog.version,
+                  "created_at": datetime.now(timezone.utc).isoformat(), "language": self.language}
+        self.saved_reports.save(record)
+        return self._saved_summary(record)
+
+    def list_saved_reports(self, actor: ActorContext) -> list[dict[str, Any]]:
+        self._scope(actor)
+        return [self._saved_summary(item) for item in self.saved_reports.list((actor.subject, actor.tenant_id))]
+
+    def delete_saved_report(self, saved_id: str, actor: ActorContext) -> None:
+        self._scope(actor)
+        self.saved_reports.delete(saved_id, (actor.subject, actor.tenant_id))
+
+    def run_saved_report(self, saved_id: str, actor: ActorContext, *,
+                         period: PeriodSelection | None = None,
+                         filters: tuple[UserFilter, ...] | None = None,
+                         cancel: Event | None = None) -> Reply:
+        """Run a saved definition with fresh data and no model call.
+
+        Current policies, catalog validation, execution opt-in and limits apply
+        exactly as for a conversation report. Relative periods resolve against
+        today's business date. Optional overrides replace the period (not for
+        comparisons) or the filters. The reply is not stored in any session.
+        """
+        reply_id = saved_id if isinstance(saved_id, str) and 1 <= len(saved_id) <= 128 else ""
+        deadline = time.monotonic() + self.limits.request_timeout_seconds
+        cancelled = Event()
+        timer = Timer(self.limits.request_timeout_seconds, cancelled.set)
+        timer.daemon = True
+        timer.start()
+
+        def active() -> None:
+            if time.monotonic() >= deadline:
+                raise SDKError("request_timeout", "Report request exceeded its time limit.", retryable=True)
+            if cancelled.is_set() or (cancel is not None and cancel.is_set()):
+                raise SDKError("cancelled", "Report request was cancelled.", retryable=True)
+
+        try:
+            if not reply_id:
+                raise SDKError("invalid_input", "Provide a saved report ID.")
+            scope = self._scope(actor)
+            scope_key = _digest(scope)
+            record = self.saved_reports.get(saved_id, (actor.subject, actor.tenant_id))
+            spec = self._override(ReportSpec.from_dict(_untyped(record["spec"])), period, filters)
+            today = self._clock()
+            if type(today) is not date:
+                raise SDKError("clock_failed", "Business-date clock must return a date.")
+            prepared, lookup = prepare_request(self.catalog, spec, scope, today)
+            if self.execution != "validated":
+                raise SDKError("execution_disabled", "The developer has not enabled report execution.")
+            prepared, artifact, question = self._read_report(
+                reply_id, 0, prepared, lookup, scope, scope_key, actor, cancelled, active)
+            if question:
+                return Reply(reply_id, 0, "needs_clarification", question, clarification=question)
+            artifact = self._public_artifact(artifact, prepared, spec)
+            artifact = replace(artifact, provenance={**artifact.provenance, "saved_report_id": saved_id})
+            caption = _period_caption(spec.period, prepared.period, self.language, self.catalog.preferred_calendar)
+            text = artifact.title + ("؛ بازه: " if self.language == "fa" else "; period: ") + caption
+            return Reply(reply_id, 0, "report_ready", text, report=artifact)
+        except SDKError as error:
+            return self._error(reply_id, 0, error)
+        except Exception:
+            return self._error(reply_id, 0, SDKError(
+                "request_failed", "Saved report could not run; try again.", retryable=True))
+        finally:
+            timer.cancel()
 
     def _read_report(self, session_id, revision, prepared, lookup, scope, scope_key,
                      actor, cancelled, active):

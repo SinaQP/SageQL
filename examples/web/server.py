@@ -271,6 +271,20 @@ def create_sqlserver_engine() -> tuple[SageQL, ActorContext, str]:
     return engine, actor, token
 
 
+def _period(value):
+    """Browser period choice -> PeriodSelection; the engine validates the meaning."""
+    from dataclasses import fields
+    from sageql.sdk import PeriodSelection
+    if value is None:
+        return None
+    names = {item.name for item in fields(PeriodSelection)}
+    if (not isinstance(value, dict) or not isinstance(value.get("kind"), str) or not set(value) <= names
+            or any(item is not None and not isinstance(item, (str, int)) or isinstance(item, bool)
+                   for item in value.values())):
+        raise SDKError("invalid_request", "Send the period as a JSON object with registered fields.")
+    return PeriodSelection(**value)
+
+
 def _json_object(pairs):
     result = {}
     for key, value in pairs:
@@ -391,6 +405,9 @@ def handler_for(engine: SageQL, actor: ActorContext, *, mode: str, token: str = 
             if not self._authenticated():
                 return
             try:
+                if parsed.path == "/saved-reports":
+                    self._write(200, {"saved_reports": engine.list_saved_reports(actor)})
+                    return
                 match = re.fullmatch(r"/report-sessions/([a-f0-9]{32})", parsed.path)
                 if match:
                     self._write(200, engine.get_session(match.group(1), actor))
@@ -434,6 +451,26 @@ def handler_for(engine: SageQL, actor: ActorContext, *, mode: str, token: str = 
                     if data:
                         raise SDKError("invalid_request", "Session creation does not accept identity or configuration.")
                     self._write(201, engine.create_session(actor).to_dict())
+                    return
+                if parsed.path == "/saved-reports":
+                    if not set(data) <= {"session_id", "report_id", "name", "period"} or not {
+                            "session_id", "report_id", "name"} <= set(data):
+                        raise SDKError("invalid_request", "Send session_id, report_id, name and optional period.")
+                    self._write(201, engine.save_report(data["session_id"], data["report_id"], actor,
+                                                        data["name"], period=_period(data.get("period"))))
+                    return
+                match = re.fullmatch(r"/saved-reports/([a-f0-9]{32})/(run|delete)", parsed.path)
+                if match:
+                    if match.group(2) == "delete":
+                        if data:
+                            raise SDKError("invalid_request", "Delete accepts no body fields.")
+                        engine.delete_saved_report(match.group(1), actor)
+                        self._write(200, {"deleted": True})
+                        return
+                    if not set(data) <= {"period"}:
+                        raise SDKError("invalid_request", "Send only an optional period.")
+                    self._write(200, engine.run_saved_report(
+                        match.group(1), actor, period=_period(data.get("period"))).to_dict())
                     return
                 match = re.fullmatch(r"/report-sessions/([a-f0-9]{32})/messages", parsed.path)
                 if match:
@@ -492,9 +529,10 @@ def main(argv: list[str] | None = None) -> int:
                 from sageql_rahtal.sdk import create_rahtal_engine
                 private_state = root / ".venv" / "rahtal-web"
                 private_state.mkdir(parents=True, exist_ok=True)
-                from sageql.sdk import SQLiteSessionStore
+                from sageql.sdk import SQLiteSavedReportStore, SQLiteSessionStore
                 engine, actor, token = create_rahtal_engine(
                     args.env_file, sessions=SQLiteSessionStore(private_state / "sessions.sqlite"),
+                    saved_reports=SQLiteSavedReportStore(private_state / "saved-reports.sqlite"),
                     diagnostics_directory=private_state / "diagnostics")
                 token_file = private_state / "host-token.txt"
                 selected = "rahtal"

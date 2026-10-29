@@ -246,8 +246,9 @@ def simulated_rahtal_startup(tmp_path, monkeypatch):
     private_state.mkdir(parents=True)
     calls = []
 
-    def create_engine(env_path, *, sessions, diagnostics_directory):
+    def create_engine(env_path, *, sessions, saved_reports, diagnostics_directory):
         assert diagnostics_directory == private_state / "diagnostics"
+        assert saved_reports is not None
         calls.append((env_path, sessions))
         return object(), ActorContext("test-operator"), "n" * 40
 
@@ -343,3 +344,28 @@ def test_real_occupied_port_rejects_second_host_and_preserves_token(simulated_ra
         assert token_file.read_text(encoding="utf-8") == "existing-workspace-token"
     finally:
         first.server_close()
+
+
+def test_saved_report_routes_save_list_run_and_delete(tmp_path):
+    with running_host(tmp_path) as request:
+        _, created, _ = request("POST", "/report-sessions", {})
+        endpoint = f"/report-sessions/{created['session_id']}/messages"
+        request("POST", endpoint, {"message": "Daily activity hours for September", "request_id": "a",
+                                   "expected_revision": 0})
+        _, report, _ = request("POST", endpoint, {"message": "2026", "request_id": "b", "expected_revision": 1})
+        code, saved, _ = request("POST", "/saved-reports", {
+            "session_id": created["session_id"], "report_id": report["report"]["id"], "name": "Daily",
+            "period": {"kind": "range", "start": "2026-09-01", "end": "2026-09-08"}})
+        assert code == 201 and saved["name"] == "Daily" and saved["period"]["end"] == "2026-09-08"
+        code, listed, _ = request("GET", "/saved-reports")
+        assert code == 200 and [item["id"] for item in listed["saved_reports"]] == [saved["id"]]
+        code, run, _ = request("POST", f"/saved-reports/{saved['id']}/run", {})
+        assert code == 200 and run["status"] == "report_ready" and len(run["report"]["rows"]) == 7
+        code, error, _ = request("POST", f"/saved-reports/{saved['id']}/run", {"period": {"kind": 5}})
+        assert code == 400 and error["error"]["code"] == "invalid_request"
+        code, error, _ = request("POST", "/saved-reports", {"session_id": created["session_id"]})
+        assert code == 400
+        code, _, _ = request("POST", f"/saved-reports/{saved['id']}/delete", {})
+        assert code == 200
+        _, listed, _ = request("GET", "/saved-reports")
+        assert listed["saved_reports"] == []

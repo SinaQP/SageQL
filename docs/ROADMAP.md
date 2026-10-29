@@ -67,6 +67,9 @@ Full rationale: [IMPROVEMENT_RECOMMENDATIONS.md](IMPROVEMENT_RECOMMENDATIONS.md)
 
 ## Recently done
 
+- Saved reports: save a finished report once, re-run it with zero model calls,
+  with dynamic dates and optional overrides ([contract](SDK_SAVED_REPORTS.md)).
+
 - Per-stage models, reasoning effort and per-stage token usage (`OpenAIReportAgent`).
 - Matched live comparison runner with per-model pricing (`evaluations/model_comparison.py`).
 - Rahtal and the web host default to mini intent, compiled intent and low reasoning effort.

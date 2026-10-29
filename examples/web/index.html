@@ -27,6 +27,7 @@
   </style>
   <style>
     [hidden]{display:none!important}
+    .save-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 16px}.save-bar input,.save-bar select{border:1px solid #cbd9c9;border-radius:8px;padding:7px 9px;font:inherit;font-size:12px;background:#fbfcf9}.save-bar input{flex:1;min-width:160px}.save-bar button,.saved-item button{border:1px solid #cbd9c9;background:#fff;color:#204c3e;border-radius:8px;padding:7px 11px;font-size:12px}.saved-item{display:flex;gap:6px;align-items:center;border:1px solid #e3ebe1;background:#fff;border-radius:8px;padding:6px 9px;margin-bottom:6px;font-size:12px}.saved-item span{flex:1}.test-set .saved-item button{display:inline-block;width:auto;margin:0;white-space:nowrap}
     .test-set{margin:0 24px 17px;border:1px solid #d9e4d7;border-radius:10px;background:#fbfcf9}.test-set summary{cursor:pointer;padding:10px 12px;font-size:12px;color:#416455;font-weight:600}#rahtal-test-groups{max-height:260px;overflow:auto}.test-set .group{padding:2px 12px 10px}.test-set h3{font-size:11px;color:#6c8077;margin:8px 0 6px}.test-set button{display:block;width:100%;text-align:right;border:1px solid #e3ebe1;background:#fff;border-radius:8px;padding:7px 9px;margin-bottom:6px;color:#17312b;font-size:12px;line-height:1.6}.test-set button small{display:block;color:#7a8b80;font-size:10.5px;margin-top:2px}
     .workspace-tabs{display:flex;gap:24px;padding:0 26px;border-bottom:1px solid #e9ede5}
     .workspace-tabs button{border:0;border-bottom:3px solid transparent;padding:15px 0;background:none;color:#6c8077;font-size:13px}
@@ -55,13 +56,14 @@
       <div id="messages" class="messages" aria-live="polite"></div>
       <div class="suggestions"><button type="button">مجموع ساعات و تعداد فعالیت‌ها در ماه قبل</button><button id="topic-example" type="button" hidden>سهم هر کارمند روی هر موضوع در یک ماه گذشته</button><button id="trend-example" type="button" hidden>روند مجموع ساعات در شش ماه گذشته، ماه به ماه شمسی</button><button id="management-example" type="button" hidden data-question="مجموع ساعات فعالیت و تعداد فعالیت‌های ثبت‌شده در شهریور ۱۴۰۵ را با مرداد ۱۴۰۵ به تفکیک سمت شغلی فعلی کارکنان مقایسه کن. در جدول نشان بده و بر اساس مجموع ساعات از بیشترین به کمترین مرتب کن.">مقایسه ماهانه حجم کار</button></div>
       <div id="status" class="status" role="status"></div>
+      <details id="saved-reports" class="test-set"><summary>گزارش‌های ذخیره‌شده (اجرا بدون هزینهٔ مدل)</summary><div id="saved-list" class="group"></div></details>
       <details id="rahtal-tests" class="test-set" hidden><summary>نمونه پرسش‌های آزمون رهتال</summary><div id="rahtal-test-groups"></div></details>
       <form id="chat-form" class="compose"><label for="message" class="hint">پرسش شما</label><textarea id="message" maxlength="8000" placeholder="چه چیزی می‌خواهید بدانید؟" required></textarea><div class="send-row"><span class="hint">Enter برای ارسال · Shift + Enter برای خط جدید</span><button id="retry" class="retry" type="button">تلاش دوباره</button><button id="send" class="primary" type="submit">ارسال ←</button></div></form>
     </section>
     <section class="panel report-panel" aria-label="نتیجه گزارش">
       <div class="panel-head"><div><h2>گزارش</h2><p class="subtitle">آخرین گزارش موفق شما اینجا نمایش داده می‌شود.</p></div><span id="revision" class="badge">هنوز گزارشی ندارید</span></div>
       <div id="workspace-tabs" class="workspace-tabs" role="tablist" aria-label="نمای گزارش" hidden><button id="result-tab" type="button" role="tab" aria-controls="result-view" aria-selected="true">نتیجه گزارش</button><button id="logs-tab" type="button" role="tab" aria-controls="diagnostics" aria-selected="false" tabindex="-1">مراحل و جزئیات اجرا</button></div>
-      <div id="result-view" class="report-body" role="tabpanel" aria-labelledby="result-tab"><div id="empty" class="empty"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><rect x="5" y="5" width="54" height="54" rx="13" fill="#edf4e9"/><path d="M18 43V31M31 43V20M44 43V26" stroke="#6e9277" stroke-width="6" stroke-linecap="round"/></svg><h2>تصویری روشن از داده‌های شما</h2><p>با یک پرسش شروع کنید. گزارش شما به صورت جدول و در صورت درخواست، نمودار نمایش داده می‌شود.</p></div><div id="report" hidden><h2 id="report-title"></h2><p id="provenance" class="meta"></p><div id="warning" class="warning" hidden></div><div id="chart" class="chart" hidden></div><div id="table" class="table-wrap"></div></div></div>
+      <div id="result-view" class="report-body" role="tabpanel" aria-labelledby="result-tab"><div id="empty" class="empty"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><rect x="5" y="5" width="54" height="54" rx="13" fill="#edf4e9"/><path d="M18 43V31M31 43V20M44 43V26" stroke="#6e9277" stroke-width="6" stroke-linecap="round"/></svg><h2>تصویری روشن از داده‌های شما</h2><p>با یک پرسش شروع کنید. گزارش شما به صورت جدول و در صورت درخواست، نمودار نمایش داده می‌شود.</p></div><div id="report" hidden><h2 id="report-title"></h2><p id="provenance" class="meta"></p><form id="save-bar" class="save-bar" hidden><input id="save-name" maxlength="120" placeholder="نام گزارش برای ذخیره" required><select id="save-period" aria-label="بازهٔ زمانی گزارش ذخیره‌شده"></select><button type="submit">ذخیره گزارش</button></form><div id="warning" class="warning" hidden></div><div id="chart" class="chart" hidden></div><div id="table" class="table-wrap"></div></div></div>
       <section id="diagnostics" role="tabpanel" aria-labelledby="logs-tab" hidden>
         <div id="diagnostics-empty" class="empty"><h2>مراحل تهیه گزارش را ببینید</h2><p>پرسش خود را ارسال کنید. پس از هر پاسخ، مراحل، SQL، زمان‌ها و جزئیات ثبت‌شده اینجا نمایش داده می‌شوند.</p></div>
         <div id="diagnostics-content" hidden><div class="trace-toolbar"><label for="trace-select">نوبت اجرا</label><select id="trace-select"></select><button id="download-trace" type="button">دریافت جزئیات اجرا</button></div><h2 id="diagnostics-summary"></h2><p id="diagnostics-note" dir="auto"></p><div id="diagnostics-events"></div></div>
@@ -107,7 +109,13 @@
         ['همین را برای شهریور ۱۴۰۵ نشان بده', '۴: همان گزارش برای شهریور؛ بقیه تنظیمات حفظ شود'],
       ]],
     ];
-    let session = null, busy = false, pending = null;
+    let session = null, busy = false, pending = null, shownReport = null;
+    const SAVE_PERIODS = {
+      jalali: [['ماه قبل (پویا)', {kind: 'last_jalali_month'}], ['ماه جاری (پویا)', {kind: 'this_jalali_month'}],
+               ['۷ روز گذشته (پویا)', {kind: 'jalali_rolling', count: 7, unit: 'day'}], ['۳۰ روز گذشته (پویا)', {kind: 'jalali_rolling', count: 30, unit: 'day'}]],
+      gregorian: [['ماه قبل (پویا)', {kind: 'last_month'}], ['ماه جاری (پویا)', {kind: 'this_month'}],
+                  ['۷ روز گذشته (پویا)', {kind: 'rolling', count: 7, unit: 'day'}], ['۳۰ روز گذشته (پویا)', {kind: 'rolling', count: 30, unit: 'day'}]],
+    };
     const persianDigits = value => String(value).replace(/[0-9]/g, digit => '۰۱۲۳۴۵۶۷۸۹'[Number(digit)]);
     function persianDate(value) {
       if (!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(String(value))) return persianDigits(value);
@@ -161,6 +169,28 @@
       const result = await response.json();
       if (!response.ok) { const error = new Error(result.error?.message || 'درخواست انجام نشد.'); error.code = result.error?.code; throw error; }
       return result;
+    }
+    async function loadSaved() {
+      try {
+        const {saved_reports: items} = await api('/saved-reports');
+        el('saved-list').replaceChildren();
+        if (!items.length) { const empty = document.createElement('small'); empty.textContent = 'هنوز گزارشی ذخیره نکرده‌اید.'; el('saved-list').append(empty); }
+        for (const item of items) {
+          const row = document.createElement('div'); row.className = 'saved-item';
+          const name = document.createElement('span'); name.textContent = item.name;
+          const run = document.createElement('button'); run.type = 'button'; run.textContent = 'اجرا';
+          run.addEventListener('click', async () => {
+            setBusy(true); status('در حال اجرای گزارش ذخیره‌شده…');
+            try { const reply = await api(`/saved-reports/${item.id}/run`, {}); if (reply.report) { renderReport(reply.report); status(''); } else status(reply.assistant?.text || 'گزارش اجرا نشد.', true); }
+            catch (error) { status(error.message, true); } finally { setBusy(false); }
+          });
+          const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = 'حذف';
+          remove.addEventListener('click', async () => {
+            try { await api(`/saved-reports/${item.id}/delete`, {}); await loadSaved(); } catch (error) { status(error.message, true); }
+          });
+          row.append(name, run, remove); el('saved-list').append(row);
+        }
+      } catch (error) { status(error.message, true); }
     }
     async function newSession() {
       setBusy(true); status('در حال شروع گفت‌وگو…');
@@ -234,7 +264,12 @@
       target.append(svg); if (report.rows.length > rows.length) { const note = document.createElement('p'); note.className = 'subtitle'; note.textContent = 'نمودار ۶۰ ردیف نخست را نشان می‌دهد. جدول شامل همه ردیف‌های نتیجه است.'; target.append(note); } target.hidden = false;
     }
     function renderReport(report) {
-      el('empty').hidden = true; el('report').hidden = false; el('report-title').textContent = report.title; el('revision').textContent = `نسخه ${persianDigits(report.revision)}`;
+      el('empty').hidden = true; el('report').hidden = false; el('report-title').textContent = report.title; shownReport = report;
+      const savedRun = Boolean(report.provenance?.saved_report_id), fixedPeriods = Boolean(report.provenance?.comparison_start);
+      el('save-bar').hidden = savedRun || !session;
+      el('save-period').replaceChildren(new Option('همان بازهٔ این گزارش', ''));
+      if (!fixedPeriods) for (const [label, value] of SAVE_PERIODS[report.provenance?.display_calendar === 'jalali' ? 'jalali' : 'gregorian']) el('save-period').append(new Option(label, JSON.stringify(value)));
+      el('save-name').value = savedRun ? '' : report.title.slice(0, 120); el('revision').textContent = `نسخه ${persianDigits(report.revision)}`;
       const provenance = report.provenance || {}, period = provenance.period || {};
       const start = provenance.period_start ?? period.start, end = provenance.period_end_exclusive ?? period.end;
       el('provenance').replaceChildren();
@@ -317,8 +352,17 @@
       }
       el('rahtal-test-groups').append(group);
     }
+    el('save-bar').addEventListener('submit', async event => {
+      event.preventDefault();
+      if (!shownReport || !session) return;
+      const period = el('save-period').value;
+      try {
+        await api('/saved-reports', {session_id: session.id, report_id: shownReport.id, name: el('save-name').value, ...(period ? {period: JSON.parse(period)} : {})});
+        status('گزارش ذخیره شد. از بخش «گزارش‌های ذخیره‌شده» بدون هزینهٔ مدل اجرا کنید.'); await loadSaved();
+      } catch (error) { status(error.message, true); }
+    });
     document.querySelectorAll('.suggestions button, .test-set button').forEach(button => button.addEventListener('click', () => { el('message').value = button.dataset.question || button.textContent; el('message').focus(); }));
-    el('login-form').addEventListener('submit', async event => { event.preventDefault(); try { await api('/auth', {token: el('token').value}); el('token').value = ''; el('login').close(); await newSession(); } catch (error) { el('login-error').textContent = error.message; } });
+    el('login-form').addEventListener('submit', async event => { event.preventDefault(); try { await api('/auth', {token: el('token').value}); el('token').value = ''; el('login').close(); await newSession(); await loadSaved(); } catch (error) { el('login-error').textContent = error.message; } });
     (async () => {
       try {
         const config = await api('/config');
@@ -332,8 +376,8 @@
           el('trend-example').hidden = false;
           el('rahtal-tests').hidden = false;
         }
-        if (config.requires_auth) { await newSession(); if (!session) el('login').showModal(); }
-        else await newSession();
+        if (config.requires_auth) { await newSession(); if (!session) el('login').showModal(); else await loadSaved(); }
+        else { await newSession(); await loadSaved(); }
       } catch (error) { status(error.message, true); }
     })();
   </script>

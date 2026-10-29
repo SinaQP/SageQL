@@ -18,6 +18,8 @@ synthetic data. Native SQL Server tests need an explicit pytest flag and a
 separately approved synthetic target ([procedure](docs/SQLSERVER_INTEGRATION_TESTING.md)).
 Production credentials and the Rahtal `.env` are never test inputs.
 
+Saved reports re-run with zero model calls and moving dates ([saved reports](docs/SDK_SAVED_REPORTS.md)).
+
 Key contracts: [embedding guide](docs/SDK.md), [agents and model settings](docs/SDK_AGENTS.md),
 [SQL Server execution](docs/SDK_SQL_SERVER.md), [reliability](docs/SDK_RELIABILITY.md),
 [read consistency](docs/SDK_READ_CONSISTENCY.md), [value vocabulary](docs/SDK_VALUE_VOCABULARY.md),
