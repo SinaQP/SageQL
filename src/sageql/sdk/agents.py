@@ -12,7 +12,7 @@ from datetime import date
 import json
 import math
 import time
-from typing import Any, Callable, Protocol
+from typing import Any, Callable, Mapping, Protocol
 
 from sageql.conversation import LLMConfig, Message
 from sageql.localization import language_instructions
@@ -32,7 +32,7 @@ from sageql.sdk.provider import (
     _ORDERING_INSTRUCTIONS, _OrderingSelectionError, _CALENDAR_INSTRUCTIONS,
     _PERIOD_LIMIT_INSTRUCTIONS,
     _BUSINESS_INSTRUCTIONS,
-    _decode_object, _transport_reason,
+    _decode_object, _transport_reason, _check_reasoning_effort,
 )
 from sageql.sdk.evidence import (
     OPERATION_LABELS, UnsupportedRequirement, anchor_intent, evidence_feedback,
@@ -662,8 +662,39 @@ class AgentReportInterpreter:
                        retryable=True)
 
 
+AGENT_STAGES = ("intent", "planner", "reviewer")
+
+
+def _stage_settings(value: Any, name: str, check: Callable[[Any], Any]) -> dict[str, Any]:
+    if value is None:
+        return {}
+    if not isinstance(value, Mapping) or not set(value) <= set(AGENT_STAGES):
+        raise ValueError(f"{name} keys must be from: " + ", ".join(AGENT_STAGES))
+    return {stage: check(setting) for stage, setting in value.items()}
+
+
+def _check_model(value: Any) -> str:
+    if not isinstance(value, str) or not value.strip() or len(value) > 200:
+        raise ValueError("stage model names must be nonempty strings of at most 200 characters")
+    return value.strip()
+
+
 class _OpenAIReportAgentBackend(OpenAIReportInterpreter):
     """Reuse bounded transport and strict decoding, without keyword routing."""
+
+    def __init__(self, config: LLMConfig, client: Any = None, *, stage_models: Any = None,
+                 reasoning_effort: Any = None, **options: Any) -> None:
+        stage_efforts = (_stage_settings(reasoning_effort, "reasoning_effort", _check_reasoning_effort)
+                         if isinstance(reasoning_effort, Mapping) else None)
+        super().__init__(config, client, **options,
+                         reasoning_effort=None if stage_efforts is not None else reasoning_effort)
+        self._stage_models = _stage_settings(stage_models, "stage_models", _check_model)
+        self._stage_efforts = stage_efforts or {}
+
+    def _stage_options(self, stage: str) -> dict[str, Any]:
+        effort = self._stage_efforts.get(stage, self._reasoning_effort)
+        return {"model": self._stage_models.get(stage, self._model),
+                **({"reasoning_effort": effort} if effort else {})}
 
     def understand(
         self, messages: tuple[Message, ...], current_spec: ReportSpec | None,
@@ -709,8 +740,8 @@ class _OpenAIReportAgentBackend(OpenAIReportInterpreter):
         content = _content({**_payload(messages, current_spec, catalog, today),
                             "consistency_feedback": list(feedback)}, catalog)
         try:
-            response = self._client.chat.completions.create(
-                model=self._model,
+            response = self._complete(
+                "intent",
                 messages=[{"role": "system", "content": _INTENT_INSTRUCTIONS + language_instructions(self.language)},
                           {"role": "user", "content": content}],
                 response_format={"type": "json_schema", "json_schema": {
@@ -804,8 +835,8 @@ class _OpenAIReportAgentBackend(OpenAIReportInterpreter):
             "schema": _record({"approved": {"type": "boolean"}, "feedback": {"type": "string"}}),
         }}
         try:
-            response = self._client.chat.completions.create(
-                model=self._model,
+            response = self._complete(
+                "reviewer",
                 messages=[{"role": "system", "content": _REVIEWER_INSTRUCTIONS + language_instructions(self.language)},
                           {"role": "user", "content": content}],
                 response_format=response_format, max_completion_tokens=self._max_output_tokens,
@@ -835,9 +866,13 @@ class _OpenAIReportAgentBackend(OpenAIReportInterpreter):
 class OpenAIReportAgent(AgentReportInterpreter):
     """Planning and review agents using the host's configured chat endpoint.
 
-    Calls share a total timeout and have transport retries disabled. The planner
-    and reviewer use separate requests on the same configured model; no additional
-    remote service is introduced. Inject a client or a ReportAgentBackend for tests.
+    Calls share a total timeout and have transport retries disabled. Every stage
+    uses the configured endpoint; no additional remote service is introduced.
+    ``stage_models`` optionally replaces the configured model for ``intent``,
+    ``planner`` or ``reviewer``. ``reasoning_effort`` is one effort for all stages
+    or a per-stage mapping; unset stages send no effort. When an observer is set,
+    each response with usage emits ``model_usage`` token counts with ``agent_stage``.
+    Inject a client or a ReportAgentBackend for tests.
     """
 
     def __init__(
@@ -845,9 +880,14 @@ class OpenAIReportAgent(AgentReportInterpreter):
         max_output_tokens: int = 4096, max_revisions: int = 1, language: str = "fa",
         max_structured_repairs: int = 0,
         observer: Callable[..., None] | None = None,
+        stage_models: Mapping[str, str] | None = None,
+        reasoning_effort: str | Mapping[str, str] | None = None,
     ) -> None:
         backend = _OpenAIReportAgentBackend(config, client, timeout_seconds=timeout_seconds,
-                                           max_output_tokens=max_output_tokens, language=language)
+                                           max_output_tokens=max_output_tokens, language=language,
+                                           stage_models=stage_models, reasoning_effort=reasoning_effort)
         super().__init__(backend, timeout_seconds=timeout_seconds, max_revisions=max_revisions,
                          max_structured_repairs=max_structured_repairs, observer=observer)
         self.language = backend.language
+        backend._usage_observer = lambda stage, model, counts: self._observe(
+            "model_usage", "complete", agent_stage=stage, model=model, **counts)

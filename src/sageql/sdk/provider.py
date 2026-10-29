@@ -30,6 +30,31 @@ _PERIOD_KINDS = (
 )
 _GRAINS = ("none", "day", "week", "month", "quarter", "year", "jalali_month")
 _CHARTS = ("table", "line", "bar", "kpi")
+REASONING_EFFORTS = ("minimal", "low", "medium", "high")
+
+
+def _check_reasoning_effort(value: Any) -> str | None:
+    if value is not None and value not in REASONING_EFFORTS:
+        raise ValueError("reasoning_effort must be None or one of: " + ", ".join(REASONING_EFFORTS))
+    return value
+
+
+def _usage_counts(response: Any) -> dict[str, int | None] | None:
+    """Token counts only; never content, headers or provider identifiers."""
+    usage = getattr(response, "usage", None)
+    if usage is None:
+        return None
+
+    def count(owner: Any, name: str) -> int | None:
+        value = getattr(owner, name, None) if owner is not None else None
+        return value if type(value) is int and value >= 0 else None
+
+    return {
+        "input_tokens": count(usage, "prompt_tokens"),
+        "output_tokens": count(usage, "completion_tokens"),
+        "cached_input_tokens": count(getattr(usage, "prompt_tokens_details", None), "cached_tokens"),
+        "reasoning_tokens": count(getattr(usage, "completion_tokens_details", None), "reasoning_tokens"),
+    }
 
 
 class _OrderingSelectionError(SDKError):
@@ -661,14 +686,17 @@ class OpenAIReportInterpreter:
     Injected clients are useful for tests. Real clients must support with_options
     so timeout and no-retry settings cannot depend on ambient SDK defaults.
     Persian prose is requested by default; language="en" selects English.
+    reasoning_effort is sent only when set, for endpoints that support it.
     """
 
     def __init__(
         self, config: LLMConfig, client: Any = None, *, timeout_seconds: float = 30,
         max_output_tokens: int = 4096,
-        language: str = "fa",
+        language: str = "fa", reasoning_effort: str | None = None,
     ) -> None:
         self.language = validate_language(language)
+        self._reasoning_effort = _check_reasoning_effort(reasoning_effort)
+        self._usage_observer = None
         if (type(timeout_seconds) not in (int, float) or not math.isfinite(timeout_seconds)
                 or not 0 < timeout_seconds <= 600):
             raise ValueError("timeout_seconds must be finite and from 0 to 600")
@@ -738,13 +766,30 @@ class OpenAIReportInterpreter:
                                retryable=True)
         return decision
 
+    def _stage_options(self, stage: str) -> dict[str, Any]:
+        """Model selection for one remote stage on the same configured endpoint."""
+        effort = self._reasoning_effort
+        return {"model": self._model, **({"reasoning_effort": effort} if effort else {})}
+
+    def _complete(self, stage: str, **request: Any) -> Any:
+        options = self._stage_options(stage)
+        response = self._client.chat.completions.create(**options, **request)
+        if self._usage_observer is not None:
+            try:
+                counts = _usage_counts(response)
+                if counts is not None:
+                    self._usage_observer(stage, options["model"], counts)
+            except Exception:
+                pass  # Accounting diagnostics must never alter report decisions.
+        return response
+
     def _request(
         self, content: str, response_format: dict[str, Any], instructions: str,
         timeout_seconds: float, catalog: ReportingCatalog, current_spec: ReportSpec | None,
     ) -> Interpretation:
         try:
-            response = self._client.chat.completions.create(
-                model=self._model,
+            response = self._complete(
+                "planner",
                 messages=[{"role": "system", "content": instructions},
                           {"role": "user", "content": content}],
                 response_format=response_format, max_completion_tokens=self._max_output_tokens,

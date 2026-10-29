@@ -205,6 +205,37 @@ to the same configured model and endpoint; no additional remote service is
 introduced. The requests are separate, but their mistakes can be correlated
 because they use the same model.
 
+### Per-stage models, reasoning effort and usage
+
+By default every stage uses `config.model` and sends no `reasoning_effort`, which
+is the earlier behavior. A host can keep a cheap default model and change only the
+stage that measurably needs it:
+
+```python
+provider = OpenAIReportAgent(
+    config,                                   # config.model stays the default.
+    stage_models={"intent": "gpt-5-mini"},    # Optional: intent, planner, reviewer.
+    reasoning_effort={"intent": "low", "reviewer": "minimal"},  # Or one string for all.
+    observer=log_event,
+)
+```
+
+`stage_models` values are model names on the **same configured endpoint and
+credentials**; no other remote service is contacted. `reasoning_effort` accepts
+`minimal`, `low`, `medium` or `high`, either as one value for every stage or as a
+per-stage mapping. Unset stages omit the parameter, so endpoints that do not
+support it keep working. `OpenAIReportInterpreter` accepts one optional
+`reasoning_effort`. Invalid stage names, empty model names and unknown efforts
+raise `ValueError` at construction.
+
+When an observer is supplied, every response that reports usage emits
+`observer("model_usage", "complete", agent_stage=..., model=..., input_tokens=...,
+output_tokens=..., cached_input_tokens=..., reasoning_tokens=...)`. It contains token
+counts only, never prompts, responses or credentials. Hosts can price them per
+model to see which stage costs the most. Missing usage emits nothing, and observer
+failures never change a report decision. Changing a stage's model changes behavior
+and cost; compare it on the frozen evaluation corpora before production use.
+
 `ReportIntent.unsupported_requirements` defaults to an empty tuple for existing
 typed backends. The live strict schema requires this array and supports
 `time_grain="jalali_month"` directly. Each unavailable requirement must quote

@@ -1,5 +1,17 @@
 # SageQL roadmap
 
+## Per-stage model selection and usage accounting (2026-10-29)
+
+Recommendation P0-1 from [the improvement plan](IMPROVEMENT_RECOMMENDATIONS.md).
+`OpenAIReportAgent` accepts optional `stage_models` (intent/planner/reviewer) and
+`reasoning_effort` (one value or per stage) on the same configured endpoint;
+`OpenAIReportInterpreter` accepts one optional effort. Defaults are unchanged:
+`config.model` everywhere and no effort parameter. Observers now receive
+`model_usage` token counts per stage (no content). The goal is to keep the cheap
+default and replace a model only for a stage that measurably fails. Offline tests
+only; no live model comparison has run. That needs separate explicit approval,
+and the live evaluation budget still assumes one approved model.
+
 ## Phase 14 final decision — Outcome C: reliability blocked (2026-10-28)
 
 Authorized V6 actually ran 20 AvalAI gpt-5-nano calls on exact df46/c4d1 and closed
