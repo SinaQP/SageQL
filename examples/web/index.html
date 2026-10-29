@@ -27,6 +27,7 @@
   </style>
   <style>
     [hidden]{display:none!important}
+    .test-set{margin:0 24px 17px;border:1px solid #d9e4d7;border-radius:10px;background:#fbfcf9}.test-set summary{cursor:pointer;padding:10px 12px;font-size:12px;color:#416455;font-weight:600}#rahtal-test-groups{max-height:260px;overflow:auto}.test-set .group{padding:2px 12px 10px}.test-set h3{font-size:11px;color:#6c8077;margin:8px 0 6px}.test-set button{display:block;width:100%;text-align:right;border:1px solid #e3ebe1;background:#fff;border-radius:8px;padding:7px 9px;margin-bottom:6px;color:#17312b;font-size:12px;line-height:1.6}.test-set button small{display:block;color:#7a8b80;font-size:10.5px;margin-top:2px}
     .workspace-tabs{display:flex;gap:24px;padding:0 26px;border-bottom:1px solid #e9ede5}
     .workspace-tabs button{border:0;border-bottom:3px solid transparent;padding:15px 0;background:none;color:#6c8077;font-size:13px}
     .workspace-tabs button[aria-selected="true"]{color:#204c3e;border-bottom-color:#204c3e;font-weight:650}
@@ -54,6 +55,7 @@
       <div id="messages" class="messages" aria-live="polite"></div>
       <div class="suggestions"><button type="button">مجموع ساعات و تعداد فعالیت‌ها در ماه قبل</button><button id="topic-example" type="button" hidden>سهم هر کارمند روی هر موضوع در یک ماه گذشته</button><button id="trend-example" type="button" hidden>روند مجموع ساعات در شش ماه گذشته، ماه به ماه شمسی</button><button id="management-example" type="button" hidden data-question="مجموع ساعات فعالیت و تعداد فعالیت‌های ثبت‌شده در شهریور ۱۴۰۵ را با مرداد ۱۴۰۵ به تفکیک سمت شغلی فعلی کارکنان مقایسه کن. در جدول نشان بده و بر اساس مجموع ساعات از بیشترین به کمترین مرتب کن.">مقایسه ماهانه حجم کار</button></div>
       <div id="status" class="status" role="status"></div>
+      <details id="rahtal-tests" class="test-set" hidden><summary>نمونه پرسش‌های آزمون رهتال</summary><div id="rahtal-test-groups"></div></details>
       <form id="chat-form" class="compose"><label for="message" class="hint">پرسش شما</label><textarea id="message" maxlength="8000" placeholder="چه چیزی می‌خواهید بدانید؟" required></textarea><div class="send-row"><span class="hint">Enter برای ارسال · Shift + Enter برای خط جدید</span><button id="retry" class="retry" type="button">تلاش دوباره</button><button id="send" class="primary" type="submit">ارسال ←</button></div></form>
     </section>
     <section class="panel report-panel" aria-label="نتیجه گزارش">
@@ -71,6 +73,40 @@
   <script>
     'use strict';
     const el = id => document.getElementById(id);
+    // Manual Rahtal test set: each item fills the message box; "expect" says what
+    // a correct answer looks like. Multi-turn items must be sent in order.
+    const RAHTAL_TESTS = [
+      ['گزارش‌های پایه (باید گزارش درست بدهد)', [
+        ['مجموع ساعات فعالیت و تعداد فعالیت‌های ثبت‌شده در مهر ۱۴۰۵', 'یک ردیف: مجموع ساعات و تعداد فعالیت‌ها برای کل مهر ۱۴۰۵'],
+        ['مجموع ساعات فعالیت در مهر ۱۴۰۵ به تفکیک سمت شغلی', 'یک ردیف برای هر سمت شغلی فعلی'],
+        ['۱۰ کارمند با بیشترین مجموع ساعات فعالیت در مهر ۱۴۰۵ را با نام کامل نشان بده', 'ده نفر با نام، مرتب از بیشترین ساعت'],
+        ['روند مجموع ساعات فعالیت در شش ماه گذشته، ماه به ماه شمسی', 'یک ردیف یا نقطه برای هر ماه شمسی'],
+        ['میانگین ساعات به‌ازای هر کارمند مشارکت‌کننده در مهر ۱۴۰۵ به تفکیک سمت شغلی', 'مجموع ساعات تقسیم بر تعداد کارکنان فعال در هر سمت'],
+        ['۱۰ موضوع فعالیت با بیشترین مجموع ساعات در شهریور ۱۴۰۵', 'ده موضوع، مرتب از بیشترین ساعت'],
+        ['تعداد پروفایل کارکنان چند تاست؟', 'یک عدد، بدون پرسیدن تاریخ'],
+        ['نام و سمت شغلی کارکنان را نشان بده', 'فهرست نام‌ها و سمت‌ها، بدون عدد تجمیعی'],
+      ]],
+      ['مقایسه‌ها', [
+        ['حجم فعالیت سازمان در شهریور ۱۴۰۵ نسبت به مرداد ۱۴۰۵ چقدر تغییر کرده؟ مجموع ساعات و تعداد فعالیت‌ها را با درصد تغییر نشان بده.', 'هر دو ماه، تفاوت و درصد تغییر'],
+        ['کدام کارکنان در شهریور ۱۴۰۵ نسبت به مرداد ۱۴۰۵ بیشترین کاهش ساعت فعالیت را داشته‌اند؟ نام، ساعات هر ماه و درصد افت را نشان بده.', 'کارکنان مرتب بر اساس بیشترین کاهش ساعت'],
+        ['مجموع ساعات فعالیت و تعداد فعالیت‌ها در شهریور ۱۴۰۵ را با مرداد ۱۴۰۵ به تفکیک سمت شغلی مقایسه کن و از بیشترین ساعت مرتب کن.', 'برای هر سمت، مقادیر هر دو ماه'],
+      ]],
+      ['باید سؤال بپرسد', [
+        ['ساعات فعالیت روزانه در مهر', 'باید بپرسد کدام سال؛ نباید سال را حدس بزند'],
+        ['بهترین کارکنان را نشان بده', 'باید معیار (مثلاً ساعات) و بازهٔ زمانی را بپرسد'],
+        ['سلام', 'باید بپرسد چه گزارشی می‌خواهید، بدون گزارش'],
+      ]],
+      ['پشتیبانی نمی‌شود (باید توضیح بدهد، بدون گزارش)', [
+        ['سهم هر موضوع از کل ساعات فعالیت مهر ۱۴۰۵ را به درصد نشان بده', 'باید بگوید سهم از کل پشتیبانی نمی‌شود'],
+        ['کارکنانی که در مهر ۱۴۰۵ هیچ فعالیتی ثبت نکرده‌اند را نشان بده', 'باید بگوید یافتن موارد بدون فعالیت پشتیبانی نمی‌شود'],
+      ]],
+      ['گفت‌وگوی چندمرحله‌ای (به ترتیب بفرستید)', [
+        ['مجموع ساعات فعالیت در مهر ۱۴۰۵ به تفکیک کارمند', '۱: گزارش با شناسهٔ کارمند'],
+        ['با اسم نشان بده', '۲: همان گزارش، با نام کامل به جای شناسه'],
+        ['فقط ۵ نفر اول را بر اساس بیشترین ساعت نشان بده', '۳: پنج نفر، مرتب از بیشترین ساعت'],
+        ['همین را برای شهریور ۱۴۰۵ نشان بده', '۴: همان گزارش برای شهریور؛ بقیه تنظیمات حفظ شود'],
+      ]],
+    ];
     let session = null, busy = false, pending = null;
     const persianDigits = value => String(value).replace(/[0-9]/g, digit => '۰۱۲۳۴۵۶۷۸۹'[Number(digit)]);
     function persianDate(value) {
@@ -118,7 +154,7 @@
       const body = document.createElement('span'); body.dir = 'auto'; body.textContent = text;
       node.append(label, body); el('messages').append(node); el('messages').scrollTop = el('messages').scrollHeight;
     }
-    function setBusy(value) { busy = value; el('send').disabled = value; el('new-chat').disabled = value; el('retry').disabled = value; el('message').disabled = value; document.querySelectorAll('.suggestions button').forEach(button => button.disabled = value); }
+    function setBusy(value) { busy = value; el('send').disabled = value; el('new-chat').disabled = value; el('retry').disabled = value; el('message').disabled = value; document.querySelectorAll('.suggestions button, .test-set button').forEach(button => button.disabled = value); }
     function status(text, error = false) { el('status').textContent = text; el('status').className = 'status' + (error ? ' error' : ''); }
     async function api(path, body) {
       const response = await fetch(path, {method: body === undefined ? 'GET' : 'POST', credentials: 'same-origin', headers: body === undefined ? {} : {'Content-Type': 'application/json'}, body: body === undefined ? undefined : JSON.stringify(body)});
@@ -268,7 +304,17 @@
       const link = document.createElement('a'); link.href = url; link.download = `rahtal-trace-${trace.id}.json`; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     });
-    document.querySelectorAll('.suggestions button').forEach(button => button.addEventListener('click', () => { el('message').value = button.dataset.question || button.textContent; el('message').focus(); }));
+    for (const [title, items] of RAHTAL_TESTS) {
+      const group = document.createElement('div'); group.className = 'group';
+      const heading = document.createElement('h3'); heading.textContent = title; group.append(heading);
+      for (const [question, expect] of items) {
+        const button = document.createElement('button'); button.type = 'button'; button.dataset.question = question;
+        const hint = document.createElement('small'); hint.textContent = 'انتظار: ' + expect;
+        button.append(question, hint); group.append(button);
+      }
+      el('rahtal-test-groups').append(group);
+    }
+    document.querySelectorAll('.suggestions button, .test-set button').forEach(button => button.addEventListener('click', () => { el('message').value = button.dataset.question || button.textContent; el('message').focus(); }));
     el('login-form').addEventListener('submit', async event => { event.preventDefault(); try { await api('/auth', {token: el('token').value}); el('token').value = ''; el('login').close(); await newSession(); } catch (error) { el('login-error').textContent = error.message; } });
     (async () => {
       try {
@@ -281,6 +327,7 @@
           el('management-example').hidden = false;
           el('topic-example').hidden = false;
           el('trend-example').hidden = false;
+          el('rahtal-tests').hidden = false;
         }
         if (config.requires_auth) { await newSession(); if (!session) el('login').showModal(); }
         else await newSession();

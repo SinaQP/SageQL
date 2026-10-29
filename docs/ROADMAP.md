@@ -28,6 +28,8 @@ Remaining failures: intent extraction mistakes that the reviewer approves (3 wro
 reports per pass), `clarification_stalled`, occasional `order_by` intent errors.
 Noise between runs is about ±2 reports. See [the comparison](MODEL_COMPARISON_NANO_MINI.md).
 
+**Real data:** a scored manual pass on Rahtal is ready ([guide](RAHTAL_MANUAL_TEST.md)); results pending.
+
 **Unverified:** native SQL Server behavior (blocked on an approved synthetic
 target), production authorization, behavior on fresh unseen wording.
 
