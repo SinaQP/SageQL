@@ -38,12 +38,20 @@ incompletions remain), `2` cannot start. Outputs go to ignored `dist/`.
 Needs explicit user approval (provider, models, cases, spending cap), an enabled
 approval packet and `SAGEQL_EVAL_API_KEY` in the child process only.
 
+Pick the cheapest level that answers the question (setup D, the host default):
+
+| Level | Cases | Turns | Typical cost | Hard cap | Use |
+|---|---|---:|---:|---:|---|
+| `smoke` | A01, A05, A07, A08 | 5 | ~$0.01 | $0.05 | After each change |
+| `standard` | legacy A01–A12 | 21 | ~$0.04 | $0.15 | Before merging a fix |
+| `full` | legacy + independent | 40 | ~$0.09 | $0.15 per cohort | Before a release or setup change |
+
 ```powershell
-python -m evaluations.model_comparison --setup B --cohort legacy --output dist/comparison/B-legacy --prepare-approval dist/comparison/approval-B-legacy.json --authorization-id "<who approved, when, cap>" --observed-at 2026-10-29T11:00:00+03:30
-python -m evaluations.model_comparison --setup B --cohort legacy --output dist/comparison/B-legacy --approval dist/comparison/approval-B-legacy.json
+python -m evaluations.model_comparison --level smoke --output dist/eval/smoke-1 --authorization-id "<who approved, when, cap>"
 ```
 
-Packets bind exact source/evaluator/corpus hashes, endpoint, models, prices and
+`--setup A..E` compares other setups. Each run writes its approval packet and
+journal under a new output directory. Packets bind exact source/evaluator/corpus hashes, endpoint, models, prices and
 limits; any source change needs new packets. Wrong synthetic reports are scored
 without stopping; isolation failures and denied reads stop the run; dropped
 connections fail only their turn and are never retried; the first HTTP 429 (rate

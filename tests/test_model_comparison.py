@@ -153,3 +153,20 @@ def test_rate_limit_halts_the_batch_even_when_transport_failures_continue(tmp_pa
     assert budget.state['stop_reason'] == 'rate_limited' and budget.exhausted
     with pytest.raises(BudgetStopped):
         client.chat.completions.create(**request)
+
+
+@pytest.mark.parametrize('level', sorted(comparison.LEVELS))
+def test_levels_select_existing_cases_with_a_hard_cap(tmp_path, level):
+    turns = 0
+    for cohort, case_ids in comparison.LEVELS[level].items():
+        cases = load_cases(cohort, case_ids)
+        turns += sum(len(case['turns']) for case in cases)
+        approval = comparison.prepare(cases, tmp_path / cohort, 'D', 'UNIT_TEST_ONLY', STAMP,
+                                      max_cost_usd=comparison.LEVEL_CAPS[level])
+        assert approval['max_cost_usd'] == comparison.LEVEL_CAPS[level]
+    assert turns == {'smoke': 5, 'standard': 21, 'full': 40}[level]
+
+
+def test_cli_refuses_an_existing_output_directory(tmp_path):
+    with pytest.raises(SystemExit):
+        comparison.main(['--output', str(tmp_path), '--authorization-id', 'UNIT_TEST_ONLY'])

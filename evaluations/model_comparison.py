@@ -34,6 +34,16 @@ SETUPS = {
 }
 
 
+# Cheap levels so routine checks do not run every case. Costs are typical
+# estimates for setup D; max_cost is the hard per-cohort stop.
+LEVELS = {
+    'smoke': {'legacy': ['A01', 'A05', 'A07', 'A08']},   # 5 turns, ~$0.01
+    'standard': {'legacy': None},                         # 21 turns, ~$0.04
+    'full': {'legacy': None, 'independent': None},        # 40 turns, ~$0.09
+}
+LEVEL_CAPS = {'smoke': '0.05', 'standard': '0.15', 'full': '0.15'}
+
+
 def comparison_check(turn):
     """Stop only for safety boundaries; semantic errors are measured, not gated."""
     if not turn['checks'].get('payload_isolation', True) or turn['goal'] == 'denial' and turn['database_calls']:
@@ -47,7 +57,7 @@ def settings(setup):
     return value
 
 
-def prepare(cases, directory, setup, authorization_id, observed_at):
+def prepare(cases, directory, setup, authorization_id, observed_at, max_cost_usd='0.45'):
     """An enabled packet; the authorization reference names the human approval."""
     root, version = corpus_for(cases)
     options = settings(setup)
@@ -64,7 +74,7 @@ def prepare(cases, directory, setup, authorization_id, observed_at):
     value.update(authorized=True, authorization_id=authorization_id, accepts_billing_uncertainty=True,
                  capture_responses=True, call_timeout_seconds=120, turn_timeout_seconds=240,
                  max_requests=110, max_input_tokens=3000000, max_output_tokens=600000,
-                 max_total_tokens=3600000, max_seconds=3000, max_cost_usd='0.45',
+                 max_total_tokens=3600000, max_seconds=3000, max_cost_usd=max_cost_usd,
                  per_call_output_tokens=8192)
     return value
 
@@ -91,31 +101,32 @@ def usage_by_stage(directory):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--setup', choices=sorted(SETUPS), required=True)
-    parser.add_argument('--cohort', choices=('legacy', 'independent'), required=True)
-    parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--prepare-approval', type=Path)
-    parser.add_argument('--authorization-id')
-    parser.add_argument('--observed-at')
-    parser.add_argument('--approval', type=Path)
+    parser.add_argument('--level', choices=sorted(LEVELS), default='smoke')
+    parser.add_argument('--setup', choices=sorted(SETUPS), default='D')
+    parser.add_argument('--output', type=Path, required=True, help='New directory for this run')
+    parser.add_argument('--authorization-id', required=True, help='Who approved this spend, when, cap')
+    parser.add_argument('--observed-at', default='2026-10-29T11:00:00+03:30',
+                        help='When the AvalAI prices in PRICES were checked')
     options = parser.parse_args(argv)
-    cases = load_cases(options.cohort)
-    if options.prepare_approval:
-        if not options.authorization_id or not options.observed_at:
-            raise SystemExit('Authorization reference and pricing observation time are required')
-        value = prepare(cases, options.output, options.setup, options.authorization_id, options.observed_at)
-        options.prepare_approval.parent.mkdir(parents=True, exist_ok=True)
-        with options.prepare_approval.open('x', encoding='utf-8') as stream:
-            json.dump(value, stream, indent=2, ensure_ascii=False); stream.write('\n')
-        print('Comparison approval written; no key or model client accessed.')
-        return 0
-    approval = json.loads(options.approval.read_text(encoding='utf-8'))
-    try:
-        result = run(cases, options.output, options.setup, approval)
-    finally:
-        if (options.output / 'journal.json').exists():
-            print(json.dumps(usage_by_stage(options.output), indent=2))
-    print(json.dumps(result['summary'], indent=2))
+    if options.output.exists():
+        raise SystemExit('Use a new output directory; runs never resume or overwrite.')
+    for cohort, case_ids in LEVELS[options.level].items():
+        cases = load_cases(cohort, case_ids)
+        directory = options.output / cohort
+        approval = prepare(cases, directory, options.setup, options.authorization_id, options.observed_at,
+                           max_cost_usd=LEVEL_CAPS[options.level])
+        directory.mkdir(parents=True)
+        (directory / 'approval.json').write_text(json.dumps(approval, indent=2, ensure_ascii=False) + '\n',
+                                                 encoding='utf-8')
+        try:
+            result = run(cases, directory, options.setup, approval)
+        finally:
+            if (directory / 'journal.json').exists():
+                print(cohort, json.dumps(usage_by_stage(directory), indent=2))
+        summary = result['summary']
+        print(cohort, 'correct reports:', summary['supported_completion']['numerator'], '/',
+              summary['supported_completion']['denominator'],
+              '| estimated cost:', summary.get('estimated_cost'))
     return 0
 
 
