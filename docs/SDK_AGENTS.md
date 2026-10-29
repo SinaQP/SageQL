@@ -196,6 +196,21 @@ is dropped unless a change/decrease calculation shows it was meant, and an
 `order_by` with `ordering_specified=false` is dropped with its direction.
 Malformed flag types still fail closed.
 
+### Optional reviewer and report interpretation
+
+`review=False` accepts a candidate that passes every local intent, request-evidence
+and preview check without the reviewer call; planner clarification/unsupported
+proposals are then accepted as returned after the local intent checks. The default
+keeps the reviewer. Measured live, the same-model reviewer approved every wrong
+report it saw, so hosts can rely on the local gates plus a user-visible
+interpretation instead.
+
+Every report carries `provenance["interpretation"]`: deterministic phrases, built
+from registered labels, for the controls the title does not show (row filters,
+aggregate conditions, sort and row limit). The title already states measures,
+grouping and periods. Phrases use the public spec, so identities resolved from a
+name lookup never appear. The reference page shows them as «برداشت از درخواست».
+
 `ReportIntent.unsupported_requirements` defaults to an empty tuple for existing
 typed backends. The live strict schema requires this array and supports
 `time_grain="jalali_month"` directly. Each unavailable requirement must quote

@@ -3,6 +3,32 @@
 First live use of per-stage models (recommendation P0-1). The question: which
 step does `gpt-5-nano` fail on, and what does replacing only that step cost?
 
+## Round 4: reviewer on vs off
+
+Current source (adds the ordering-without-measure fix and report interpretation).
+Both setups use mini intent, compiled intent and low effort; D drops the reviewer
+(`review=False`).
+
+| Setup | Correct reports | Complete trajectories | Wrong accepted | Model calls | Cost | Median turn |
+|---|---:|---:|---:|---:|---:|---:|
+| C: with nano reviewer | 22/27 | 13/18 | 3 | 62 | $0.073 | ~10.8 s |
+| **D: no reviewer** | **22/27** | **13/18** | **2** | **34** | $0.088* | **~6.8 s** |
+
+\* D's cost includes the full reservation kept for one dropped mini call; its
+settled calls cost less than C's.
+
+- **The reviewer adds nothing measurable**: same correct reports, no fewer wrong
+  ones, almost twice the calls and ~4 s more per turn. Hosts now use D, and each
+  report shows its interpretation (filters, conditions, sort, limit) so the user
+  can catch the remaining intent mistakes.
+- Remaining wrong reports are intent extraction errors: a lost filter (N02.4),
+  a wrong period (N04.2, every round), a wrong limit (N01.3) and a missing change
+  calculation (A07.1).
+- C rose from 20 to 22 since round 3: N06 now asks for the measure (ordering fix),
+  plus noise.
+
+Round 4 spend: $0.161. **Running total about $0.61** of the approved $2.
+
 ## Round 3: after the placeholder fix and compiled intent
 
 Same cohorts and runner, two SDK changes: unspecified-control placeholders are

@@ -8,9 +8,9 @@ Models never write SQL, choose joins or see result rows.
 **Status (2026-10-29).** The deterministic side (authorization, compilation,
 read-only execution, sessions, snapshot reads) is solid and heavily tested
 offline. Request understanding is the current bottleneck. The best measured cheap
-setup is `gpt-5-mini` for intent, a locally compiled report spec and a `gpt-5-nano`
-reviewer at low reasoning effort: 20/27 correct synthetic reports versus 8/27 for
-nano alone, in about 11 s per turn ([comparison](docs/MODEL_COMPARISON_NANO_MINI.md)). Next steps are in the
+setup is `gpt-5-mini` for intent, a locally compiled report spec and no reviewer
+call, at low reasoning effort: 22/27 correct synthetic reports versus 8/27 for nano
+alone, in about 7 s and one model call per typical turn ([comparison](docs/MODEL_COMPARISON_NANO_MINI.md)). Next steps are in the
 [roadmap](docs/ROADMAP.md) and the [improvement plan](docs/IMPROVEMENT_RECOMMENDATIONS.md).
 
 Tests are [SQLite-first](docs/SQLITE_FIRST_TESTING.md) and run offline with

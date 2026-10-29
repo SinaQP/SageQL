@@ -18,15 +18,17 @@ receipts, snapshot read consistency. About 2,440 offline tests pass.
 
 **Bottleneck:** understanding requests. On the frozen synthetic cohorts:
 
-| Setup (low reasoning effort), round 3 | Correct reports | Calls | Cost / 40 turns | Median turn |
+| Setup (low reasoning effort) | Correct reports | Calls | Cost / 40 turns | Median turn |
 |---|---:|---:|---:|---:|
-| nano everywhere | 8/27 | 76 | ~$0.04 | 8–21 s |
-| mini intent, nano planner/reviewer | 15/27 | 87 | ~$0.11 | 16–21 s |
-| **mini intent, compiled spec, nano reviewer (current host default)** | **20/27** | **57** | ~$0.09 | **10–11 s** |
+| nano everywhere (round 3) | 8/27 | 76 | ~$0.04 | 8–21 s |
+| mini intent, nano planner/reviewer (round 3) | 15/27 | 87 | ~$0.11 | 16–21 s |
+| mini intent, compiled spec, nano reviewer (round 4) | 22/27 | 62 | ~$0.07 | ~11 s |
+| **mini intent, compiled spec, no reviewer (round 4, host default)** | **22/27** | **34** | ~$0.07 | **~7 s** |
 
-Remaining failures: intent extraction mistakes that the reviewer approves (3 wrong
-reports per pass), `clarification_stalled`, occasional `order_by` intent errors.
-Noise between runs is about ±2 reports. See [the comparison](MODEL_COMPARISON_NANO_MINI.md).
+Remaining failures: intent extraction mistakes (2–3 wrong reports per pass: a lost
+filter, a wrong period, a wrong limit), shown to the user through the report's
+interpretation line. `clarification_stalled` only follows failed turns. Noise
+between runs is about ±2 reports. See [the comparison](MODEL_COMPARISON_NANO_MINI.md).
 
 **Real data:** a scored manual pass on Rahtal is ready ([guide](RAHTAL_MANUAL_TEST.md)); results pending.
 
@@ -38,14 +40,15 @@ target), production authorization, behavior on fresh unseen wording.
 Each step: offline tests first, then a small approved live check on the frozen
 cohorts with the same budget discipline (nano/mini only unless the user approves more).
 
-1. **Replace the same-model reviewer.** It approved every wrong report measured so
-   far. Return a deterministic interpretation sentence with each report so the
-   user can confirm or edit; consider parallel intent samples for
-   disagreement-driven clarification. Dropping the reviewer call also saves
-   ~13 calls and ~4.5 s per turn.
-2. **Fix `clarification_stalled` and `order_by` intent errors** seen in every setup.
-3. **Make `compile_intent` the SDK default** once scripted tests are updated to
-   the two-call sequence.
+1. **Collect the Rahtal manual test results** ([guide](RAHTAL_MANUAL_TEST.md)) and
+   turn every real failure into an offline regression.
+2. **Reduce intent extraction errors** (lost filters, wrong periods/limits): try
+   parallel intent samples and ask when they disagree; add evidence-quote fields
+   before decisions in the intent schema.
+3. **Let users correct the interpretation** with quick edit actions (period,
+   measure, grouping) instead of retyping.
+4. **Make `compile_intent=True, review=False` the SDK default** once scripted tests
+   are updated to the shorter call sequence.
 4. **Persist a report draft with provenance** (user said / inherited / default /
    pending) instead of re-deriving context from the transcript each turn.
 5. **Prompt and schema cleanup.** Short structured prompts with worked examples,
@@ -63,6 +66,9 @@ Full rationale: [IMPROVEMENT_RECOMMENDATIONS.md](IMPROVEMENT_RECOMMENDATIONS.md)
 - Rahtal and the web host default to mini intent, compiled intent and low reasoning effort.
 - Unspecified-control placeholders from model output are cleared instead of rejected.
 - `spec_from_intent` / `compile_intent`: complete intents skip the planner call.
+- Reports carry a deterministic interpretation (filters, conditions, sort, limit);
+  the reviewer is optional and hosts run without it.
+- Ranking without a chosen measure asks instead of sorting by a default metric.
 - Repository cleanup: historical phase reports and evidence removed.
 
 ## Out of scope unless separately designed
