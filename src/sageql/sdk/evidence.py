@@ -915,7 +915,13 @@ def anchor_intent(intent, evidence: RequestEvidence):
                                    if c.filter_id not in identifiers) + tuple(selected)
     if evidence.ordering is not None:
         order = evidence.ordering
-        changes.update(order_by=order.target, ordering_specified=True, descending=order.descending)
+        selected = {ref.concept_id for ref in (*intent.metrics, *intent.dimensions)}
+        if "measure" in changes.get("missing", intent.missing) and order.target not in selected:
+            # The measure is still to be asked. A default-metric target would
+            # pre-empt the user's choice; keep only the requested direction.
+            changes["descending"] = order.descending
+        else:
+            changes.update(order_by=order.target, ordering_specified=True, descending=order.descending)
         if order.limit is not None:
             changes['limit'] = order.limit
     if evidence.period is not None:
