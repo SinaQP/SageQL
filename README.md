@@ -76,7 +76,7 @@ Hijri grouping and timestamp conversion remain outside its scope.
 To use the **existing Rahtal SQL Server database and real model**, run:
 
 ```powershell
-.\.venv\Scripts\python.exe sageql_rahtal/web.py --env-file E:\Coding\rahtal-be\.env --port 8766
+.\.venv\Scripts\python.exe sageql_rahtal/web.py --port 8766
 ```
 
 Open `http://127.0.0.1:8766`. The server saves a local workspace token in `.venv/rahtal-web/host-token.txt`; use it in the sign-in dialog. This mode reads the registered existing employee/profile, activity and activity-topic tables and never falls back to synthetic data. It defaults to total recorded work and Persian business dates, including bounded monthly trends. See the [Rahtal frontend instructions](sageql_rahtal/README.md#local-frontend-on-the-real-database) and [manager reporting contract](docs/SDK_MANAGER_REPORTS.md). VPN access to the configured SQL Server is required when it is on the internal network.
