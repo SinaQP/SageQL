@@ -4,6 +4,7 @@ from decimal import Decimal, InvalidOperation
 import json
 import os
 from pathlib import Path
+import threading
 import time
 from urllib.parse import urlsplit
 
@@ -228,6 +229,8 @@ class Budget:
         # When False, an uncertain call keeps its full reservation in every
         # limit; the failed turn is scored and later turns may still run.
         self.stop_on_transport_failure = stop_on_transport_failure
+        # Parallel intent samples reserve/settle concurrently; journal writes serialize.
+        self.lock = threading.RLock()
         self.input_price = _money(approval['pricing']['input_usd_per_million'])
         self.output_price = _money(approval['pricing']['output_usd_per_million'])
         # Approved models only: the configured model plus reviewed stage models.
@@ -280,6 +283,10 @@ class Budget:
         raise BudgetStopped(reason)
 
     def reserve(self, options):
+        with self.lock:
+            return self._reserve(options)
+
+    def _reserve(self, options):
         if self.exhausted:
             self.stop(self.state['stop_reason'] or 'time_budget')
         model = options.get('model')
@@ -314,6 +321,10 @@ class Budget:
         return len(self.state['calls']) - 1
 
     def settle(self, ticket, usage, *, failed=False, invalid=False):
+        with self.lock:
+            self._settle(ticket, usage, failed=failed, invalid=invalid)
+
+    def _settle(self, ticket, usage, *, failed=False, invalid=False):
         call = self.state['calls'][ticket]
         if usage is not None:
             if (not self.exploratory and usage['input'] > call['input']) or usage['output'] > call['output']:
@@ -331,6 +342,10 @@ class Budget:
             self.exhausted  # Reconcile actual aggregate usage before another dispatch.
 
     def capture_response(self, ticket, response, usage):
+        with self.lock:
+            self._capture_response(ticket, response, usage)
+
+    def _capture_response(self, ticket, response, usage):
         """Opt-in local synthetic visible output only; never headers or exception bodies."""
         if not self.exploratory or not self.approval['capture_responses']:
             return

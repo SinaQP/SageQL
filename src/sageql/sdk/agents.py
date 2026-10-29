@@ -7,6 +7,7 @@ name resolution, deterministic compilation and explicitly enabled execution.
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, replace
 from datetime import date
 import json
@@ -209,6 +210,20 @@ class AgentReview:
     feedback: str = ""
 
 
+def _intent_key(intent: ReportIntent) -> str:
+    """Comparable report-defining content of a normalized intent; prose excluded."""
+    value = intent.to_dict()
+    value.pop("unsupported_reason")
+    value["unsupported_requirements"] = sorted(item["operation"] for item in value["unsupported_requirements"])
+    for key in ("metrics", "dimensions"):
+        value[key] = sorted((item["dataset_id"], item["concept_id"]) for item in value[key])
+    value["missing"] = sorted(value["missing"])
+    for key in ("filters", "aggregate_filters"):
+        if value[key] is not None:
+            value[key] = sorted(json.dumps(item, sort_keys=True, ensure_ascii=False) for item in value[key])
+    return json.dumps(value, sort_keys=True, ensure_ascii=False)
+
+
 def _observed_period(selection, today):
     """Record checked dates only; rejected strings might contain private text."""
     if selection is None:
@@ -334,15 +349,18 @@ class AgentReportInterpreter:
         self, backend: ReportAgentBackend, *, timeout_seconds: float = 30,
         max_revisions: int = 1, max_structured_repairs: int = 0,
         observer: Callable[..., None] | None = None, compile_intent: bool = False,
-        review: bool = True,
+        review: bool = True, intent_samples: int = 1,
     ) -> None:
         if (type(timeout_seconds) not in (int, float) or not math.isfinite(timeout_seconds)
                 or not 0 < timeout_seconds <= 600):
             raise ValueError("timeout_seconds must be finite and from 0 to 600")
         if type(compile_intent) is not bool or type(review) is not bool:
             raise ValueError("compile_intent and review must be booleans")
+        if type(intent_samples) is not int or not 1 <= intent_samples <= 3:
+            raise ValueError("intent_samples must be an integer from 1 to 3")
         self._compile_intent = compile_intent
         self._review = review
+        self._intent_samples = intent_samples
         if type(max_revisions) is not int or not 0 <= max_revisions <= 3:
             raise ValueError("max_revisions must be an integer from 0 to 3")
         if type(max_structured_repairs) is not int or not 0 <= max_structured_repairs <= 1:
@@ -485,6 +503,34 @@ class AgentReportInterpreter:
             check_intent(value, catalog, today=today)
             return period_context(value, catalog, current_spec)
 
+        def sampled_intent(understand):
+            # Independent parallel extractions; the one agreeing with the most
+            # others (after the same normalization) wins, earliest on ties. A
+            # failed sample is tolerated while another succeeds; none retries.
+            def one():
+                value = understand(messages, current_spec, catalog, today, timeout_seconds=remaining())
+                check_intent(value, catalog, today=today)
+                return value, normalize_intent(value)
+
+            with ThreadPoolExecutor(max_workers=self._intent_samples) as pool:
+                futures = [pool.submit(one) for _ in range(self._intent_samples)]
+            outcomes = []
+            for future in futures:
+                try:
+                    outcomes.append(future.result())
+                except Exception as error:  # Classified below; never retried.
+                    outcomes.append(error)
+            valid = [item for item in outcomes if isinstance(item, tuple)]
+            if not valid:
+                raise next((item for item in outcomes if isinstance(item, SDKError)),
+                           SDKError("provider_failed", "Report intent could not complete.", retryable=True))
+            keys = [_intent_key(normalized) for _, normalized in valid]
+            scores = [keys.count(key) for key in keys]
+            chosen = scores.index(max(scores))
+            self._observe("intent_samples", "complete", requested=self._intent_samples,
+                          valid=len(valid), agreement=scores[chosen])
+            return valid[chosen][0]
+
         def unavailable_requirements(value):
             users = [item.content for item in messages if item.role == "user"]
             texts = users if value.turn_kind == "answer" else users[-1:]
@@ -507,10 +553,13 @@ class AgentReportInterpreter:
             try:
                 self._observe("agent_intent", "started")
                 reconsider = getattr(self._backend, 'reconsider', None)
-                intent = invoke("agent_intent", lambda: understand(
-                    messages, current_spec, catalog, today, timeout_seconds=remaining()),
-                    repair=(lambda error: reconsider(messages, current_spec, catalog, today,
-                        feedback=repair_feedback(error), timeout_seconds=remaining())) if callable(reconsider) else None)
+                if self._intent_samples > 1:
+                    intent = sampled_intent(understand)
+                else:
+                    intent = invoke("agent_intent", lambda: understand(
+                        messages, current_spec, catalog, today, timeout_seconds=remaining()),
+                        repair=(lambda error: reconsider(messages, current_spec, catalog, today,
+                            feedback=repair_feedback(error), timeout_seconds=remaining())) if callable(reconsider) else None)
                 remaining()
                 check_intent(intent, catalog, today=today)
                 self._observe("agent_intent_decoded", "complete", period=json_value(intent.period),
@@ -923,14 +972,14 @@ class OpenAIReportAgent(AgentReportInterpreter):
         observer: Callable[..., None] | None = None,
         stage_models: Mapping[str, str] | None = None,
         reasoning_effort: str | Mapping[str, str] | None = None,
-        compile_intent: bool = False, review: bool = True,
+        compile_intent: bool = False, review: bool = True, intent_samples: int = 1,
     ) -> None:
         backend = _OpenAIReportAgentBackend(config, client, timeout_seconds=timeout_seconds,
                                            max_output_tokens=max_output_tokens, language=language,
                                            stage_models=stage_models, reasoning_effort=reasoning_effort)
         super().__init__(backend, timeout_seconds=timeout_seconds, max_revisions=max_revisions,
                          max_structured_repairs=max_structured_repairs, observer=observer,
-                         compile_intent=compile_intent, review=review)
+                         compile_intent=compile_intent, review=review, intent_samples=intent_samples)
         self.language = backend.language
         backend._usage_observer = lambda stage, model, counts: self._observe(
             "model_usage", "complete", agent_stage=stage, model=model, **counts)

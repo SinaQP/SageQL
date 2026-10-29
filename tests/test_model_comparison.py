@@ -43,10 +43,11 @@ def test_prepared_packets_validate_with_reviewed_rates(tmp_path, setup):
     validate_approval(approval, approval['configuration'], tmp_path, accounting_mode='exploratory')
     assert approval['configuration']['model'] == 'gpt-5-nano'
     assert approval['configuration']['reasoning_effort'] == 'low'
-    assert ('models' in approval['pricing']) == (setup in ('B', 'C', 'D'))
-    assert approval['configuration'].get('compile_intent', False) == (setup in ('C', 'D'))
-    assert approval['configuration'].get('review', True) == (setup != 'D')
-    if setup in ('B', 'C', 'D'):
+    assert ('models' in approval['pricing']) == (setup in ('B', 'C', 'D', 'E'))
+    assert approval['configuration'].get('compile_intent', False) == (setup in ('C', 'D', 'E'))
+    assert approval['configuration'].get('review', True) == (setup not in ('D', 'E'))
+    assert approval['configuration'].get('intent_samples', 1) == (3 if setup == 'E' else 1)
+    if setup in ('B', 'C', 'D', 'E'):
         assert approval['configuration']['stage_models'] == {'intent': 'gpt-5-mini'}
         assert approval['pricing']['models']['gpt-5-mini']['output_usd_per_million'] == '2.00'
 

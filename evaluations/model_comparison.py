@@ -29,6 +29,8 @@ SETUPS = {
     'C': {'reasoning_effort': 'low', 'stage_models': {'intent': 'gpt-5-mini'}, 'compile_intent': True},
     'D': {'reasoning_effort': 'low', 'stage_models': {'intent': 'gpt-5-mini'}, 'compile_intent': True,
           'review': False},
+    'E': {'reasoning_effort': 'low', 'stage_models': {'intent': 'gpt-5-mini'}, 'compile_intent': True,
+          'review': False, 'intent_samples': 3},
 }
 
 
