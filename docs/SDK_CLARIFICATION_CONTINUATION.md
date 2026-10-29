@@ -1,8 +1,6 @@
 # Scoped clarification continuation
 
-Phase 07 design, 2026-10-26; initially written before production repair and
-updated with verified reset/unsupported-operation rules. See
-[verification and limitations](PHASE07_ENGINEERING.md).
+Designed 2026-10-26 and updated with verified reset/unsupported-operation rules.
 
 ## Outcome and scope
 
@@ -67,7 +65,7 @@ their frozen current period. New date/comparison instructions still apply.
 Plural quote/example wording follows the existing literal-role rules. An
 affirmative named-filter assignment can use terminal `instead` as a correction
 modifier; quoted values keep that word and their exact Unicode/spacing as data.
-Unissued opaque references remain invalid. See [Phase 09 evidence](PHASE09_ENGINEERING.md).
+Unissued opaque references remain invalid.
 
 Known vocabulary operands take precedence over fallback unknown-value scans.
 Fallback operands cannot span registered requirements or mask date/group prose.

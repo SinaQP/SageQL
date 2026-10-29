@@ -1,7 +1,7 @@
 """Real SQL Server only after a separately approved synthetic target manifest.
 
 Default/offline CI skips before reading any credentials or loading private files.
-Never run against Rahtal/production. See docs/PHASE11_SQLSERVER_TESTING.md.
+Never run against Rahtal/production. See docs/SQLSERVER_INTEGRATION_TESTING.md.
 """
 from contextlib import contextmanager
 from datetime import date, datetime

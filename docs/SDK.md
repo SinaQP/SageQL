@@ -11,8 +11,7 @@ publication; unavailable capability returns unsupported without fallback. See
 current authorization, pooling, resource bounds and actual verification limits.
 
 For Python/runtime evidence, installation methods, optional extras and repeatable
-offline package checks, see the [release guide](SDK_RELEASE.md) and
-[Phase 10 compatibility report](PHASE10_ENGINEERING.md). Actual measured runtimes
+offline package checks, see the [release guide](SDK_RELEASE.md). Actual measured runtimes
 and dependency samples are distinct from the open-ended Python >=3.10 declaration.
 
 Optional categorical semantics can be registered on an existing filter with
@@ -23,7 +22,7 @@ local-only; standard transports use private references for grounded predicates.
 See [the contract](SDK_VALUE_VOCABULARY.md) and run
 `python examples/value_vocabulary.py` for two independent synthetic integrations.
 
-Reporting correctness and bounded recovery are documented in the [Phase 3 reliability report](REPORTING_RELIABILITY_PHASE3.md). Unsupported requirements produce transparent outcomes; request evidence also constrains custom providers before execution.
+Reporting correctness and bounded recovery are documented in the [Phase 3 reliability report](SDK_RELIABILITY.md). Unsupported requirements produce transparent outcomes; request evidence also constrains custom providers before execution.
 
 
 The implemented `sageql.sdk` slice creates and refines reports over one registered SQL Server table or trusted view per dataset. The developer supplies configuration and authentication in their backend; the frontend submits messages, session IDs, request IDs, and revisions. Existing stage APIs and the Rahtal pilot remain available.

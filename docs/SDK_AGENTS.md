@@ -1,91 +1,33 @@
 # Bounded agent planning for the embedded SDK
 
-## Final Phase 14 evidence invariants
+## Local evidence guards
 
-The private request-evidence projection distinguishes unspecified groups from a
-known empty complete projection. A fresh explicit table total with one registered
-metric owner and no positive/ambiguous grouping or ranking request retains that
-projection through known owner/year questions. Explicit new grouping replaces it;
-current grouped reports and host defaults outside this scope retain their roles.
-Predicate values/registered labels remain data. Effective Intent and every final
-provider specification must satisfy the projection before reads.
+Bounded en/fa request evidence is extracted locally from the user's own words and
+constrains both the normalized intent and every provider's final specification
+before any database read; reviewer approval cannot waive it. It covers:
 
-Named-month role/date relations bind before interval parsing in either word order.
-A role-assignment connector cannot become a date-range connector. Conflicts,
-unbound operands and missing years require clarification; all supplied years must
-be accounted for. Existing Gregorian/Jalali operations, real month ranges, negation
-and literal boundaries remain. This bounded recognizer is not a general parser.
+- **Concepts and exclusions:** positive, excluded, literal and unresolved
+  occurrences of registered metrics/groupings; explicit exclusions and replacements;
+  exact labels and specific aliases select their registered metric.
+- **Filters and ordering:** explicit predicates over permitted filter labels with
+  typed literal values; registered ordering targets, directions and counted limits;
+  refinement cues that preserve, replace or remove current controls.
+- **Periods:** named months, Jalali/Gregorian selections, relative periods,
+  role/date relations and missing years. A missing year asks; it is never inferred.
+- **Clarification continuation:** a pending slot is resolved from current permitted
+  concepts while retaining the original requirements
+  ([contract](SDK_CLARIFICATION_CONTINUATION.md)). Answers repeating an already
+  asked slot fail with `clarification_stalled`.
+- **Value vocabulary:** optional host-owned categorical aliases
+  ([contract](SDK_VALUE_VOCABULARY.md)); standard transports send opaque references
+  for registered values, never the value/alias inventory.
+- **Unavailable operations:** a typed unsupported-requirement ledger returns a
+  transparent `unsupported` outcome ([reliability contract](SDK_RELIABILITY.md)).
 
-[Phase 14's final decision](PHASE14_ENGINEERING.md) is **Outcome C** after actual V6
-failure. R02 completed live on df46; N04 failed and R04 accepted extra grouping.
-Final a226 guards have offline verification only. No new stage, public API, SQL,
-policy, model or recovery budget changed. Reviewer agreement cannot replace
-independent semantic validation or complete-conversation live assessment.
-
-[Phase 09](PHASE09_ENGINEERING.md) repairs deterministic clarification priority,
-criterion answers, replacements, quoted roles and conversational filter corrections.
-Internal pending evidence retains independent requirements and constrains every
-provider's final spec. No extra model stage or persistent schema is introduced.
-The offline harness separately corrects author metadata `refinement` to the public
-`refine` enum; actual provider decoding remains strict. Live behavior is unmeasured.
-
-[Clarification continuation](SDK_CLARIFICATION_CONTINUATION.md) resolves a known
-pending slot from current permitted concepts while retaining the original user
-requirements. Tested English/Persian wrappers, exact quoted values, negative
-choices, ambiguity and explicit resets use local evidence. A rejected owner is
-not an output-group exclusion. Every provider's final specification must satisfy
-the reconstructed constraints before reads. [Phase 07 measurements](PHASE07_ENGINEERING.md)
-are offline; live-model generalization remains unverified.
-
-[Phase 06 evaluation readiness](../evaluations/PHASE06.md) measures standard
-transport protocol behavior separately from scripted semantic enforcement. The
-transport rejects fabricated/altered reserved references and references in reviewer
-feedback, including when no vocabulary is visible. Issued references still need
-correct current ownership and semantic validation. Canonical scalar responses
-remain subject to ordinary checks. No topology or prompt rewrite is implied.
-
-Optional [host-owned value vocabulary](SDK_VALUE_VOCABULARY.md) supplies local
-categorical semantics. Grounded predicates constrain every provider's final spec;
-omissions/wrong values are repaired within existing bounds or blocked before reads.
-Standard transports use opaque references for registered canonical predicate values
-in intent, planning, review and current context; no value/alias inventory is sent.
-The user's own question remains user text. See [Phase 05](PHASE05_ENGINEERING.md).
-
-Phase 04 adds [provider-neutral filter and ordering grounding](PHASE04_ENGINEERING.md).
-Explicit predicates over permitted filter labels carry typed literal values;
-registered ordering targets, directions and counted limits constrain both intent
-and final specifications. Bounded refinement cues preserve/replace/remove existing
-controls. Literal values retain their exact source spelling and never act as
-analytical instructions. Missing owners/values, conflicting conditions and
-ambiguous sort targets clarify before reads. No value discovery query or mandatory
-enumeration is added. In particular, a value-only restriction cannot acquire its
-filter identity from a model proposal. The unchanged D03 host needs clarification.
-Two-method backends, the legacy interpreter and custom providers remain subject to
-the same engine gate; review approval cannot waive these requirements.
-
-Phase 03 additionally grounds explicit registered grouping and bounded replacement
-instructions, and preserves an explicitly retained current typed filter in every
-provider's final gate. This does not prove arbitrary new filter-value or ordering
-interpretations; the [Phase 03 report](PHASE03_ENGINEERING.md) records reproducible
-remaining limits and separate scripted/live evaluation status.
-
-The [Phase 02 semantic-evidence contract](PHASE02_ENGINEERING.md) distinguishes
-positive, excluded, literal and unresolved occurrences using bounded shared en/fa
-scope rules. Explicit exclusions constrain both normalized intent and every
-provider's final ready specification. Unclear replacements/conflicts clarify;
-ordinary source filters and output groupings have separate removal semantics.
-Exact permitted labels/specific aliases select their registered metric without
-requiring unrelated averaging words. Ambiguous labels remain clarification.
-Excluded/literal unavailable-ledger entries do not enter effective planning
-context; actual unavailable requests remain terminal. These checks are bounded
-language evidence, not a general natural-language correctness proof.
-
-The [Phase 3 reliability contract](REPORTING_RELIABILITY_PHASE3.md) adds bounded
-request evidence, a typed unavailable-requirement ledger, one optional structured
-repair allowance and one reconsideration of repeatedly conflicting intent.
-Explicit evidence constrains extraction and also gates every provider's final
-specification before database reads. These checks do not prove arbitrary natural
-language understanding.
+Missing owners/values, conflicts and ambiguous targets clarify before reads. These
+are bounded recognizers, not a general natural-language parser, and they do not
+prove the model understood the request. Business defaults and vocabulary belong to
+host registrations ([integration guide](APPLICATION_INDEPENDENCE.md)).
 
 Business defaults and domain vocabulary belong to host registrations. Shared
 intent/planning/review prompts describe supported operations and consume permitted
@@ -545,7 +487,7 @@ user evidence already establishes that missing detail. No provider retry is adde
 Affirmative year replies retain the known pending month and registered “for each”
 grouping. The engine asks for report details when a year-only message has no report
 context, including after a failed request; existing refinements and numeric business
-labels remain supported. See [the Phase 14 evidence](PHASE14_ENGINEERING.md).
+labels remain supported.
 Pending filter-owner answers may repeat the same pending literal with an explicit
 affirmative choice. Negative/question/ambiguous choices do not bind an owner.
 When local evidence confirms resolution of a pending slot, its answer role takes
@@ -577,8 +519,6 @@ Unquoted terminal Persian copulas are grammar only around a whole, uniquely
 registered value alias; quoted/free-form text and full registered phrases retain
 their exact value. The prompts describe kind-specific period fields, unique IDs
 and default output limits; strict decoding still rejects malformed model output.
-The observed failure and limited live comparison are recorded in
-[Phase 13](PHASE13_ENGINEERING.md).
 
 The agent tests use fake transports/backends and synthetic local fixtures.
 

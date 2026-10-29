@@ -12,9 +12,9 @@ report's lookup, main query and label batches. The default remains
 `read_consistency="compatibility"`. A host may request `"snapshot"`; SQL Server
 then requires an explicitly supplied, prepared manual-commit SNAPSHOT factory.
 Unavailable capability fails transparently; database options are never enabled.
-See the [separately gated synthetic suite](PHASE11_SQLSERVER_TESTING.md).
+See the [separately gated synthetic suite](SQLSERVER_INTEGRATION_TESTING.md).
 
-The [Phase 12 native assessment](PHASE12_ENGINEERING.md) includes one subsequently
+The native assessment included one subsequently
 authorized production read-only connection attempt. It failed with SQLSTATE 08001
 before SQL execution; `.env` was unchanged and no retry or TLS relaxation occurred.
 Native types, read-only permissions and isolation metadata were not obtained.

@@ -1,102 +1,66 @@
 # SageQL agent rules
 
-Read this file before changing code. `AGENTS.md` points here; keep both files in sync when the workflow changes.
+Read this before changing code. `AGENTS.md` points here.
 
 ## Product contract
 
-SageQL is an installable reporting SDK embedded in a developer's backend. The approved `sageql.sdk` slice separates trusted catalog/infrastructure/authenticated actor policies from end-user messages, asks clarification, resolves date-only Gregorian and scoped Persian business periods, validates registered concepts, compiles deterministic SQL Server or SQLite SELECTs over registered facts and optional dimensional relationships, executes only with explicit host opt-in, and returns typed table/chart JSON. Persistent sessions support refinements, ownership, current access checks, revisions and idempotent retries. Read [docs/SDK.md](../docs/SDK.md), [docs/SDK_SQL_SERVER.md](../docs/SDK_SQL_SERVER.md) and [docs/SDK_MANAGER_REPORTS.md](../docs/SDK_MANAGER_REPORTS.md) for actual API and scope. Model-selected joins, arbitrary formulas, timestamp conversion, unregistered calendar operations and production HTTP identity are outside this slice.
+SageQL is an installable reporting SDK embedded in a developer's backend. The host
+registers tables/views, business concepts (metrics, dimensions, filters,
+relationships, lookups, labels), model infrastructure and trusted per-actor
+policies. A user asks for a report in chat; SageQL interprets the request with
+models, validates it against the registered catalog and the actor's current
+policies, compiles a deterministic parameterized SELECT (SQL Server or SQLite),
+executes it only with explicit host opt-in, and returns typed table/chart JSON.
+Sessions support clarification, refinement, revisions and idempotent retries.
+Persian is the default language; English is supported.
 
-The historical staged API/CLI still begins with a report question and Database/LLM configuration, clarifies understanding/context, discovers user-supplied metadata, builds Step 6 logical plans, renders Step 7 SQLite SQL, validates Step 8, and explicitly executes Step 9 read-only SQLite reports. The isolated Rahtal pilot retains its deterministic T-SQL renderer/executor for approved daily-performance tables. Its ignored local config holds questions/run options and `.env` holds credentials. Step 5 remains undefined; SDK table/chart JSON is independent of that historical step and does not imply a PDF/document export. The earlier model-written SQL proposal API remains experimental and never enters SDK execution.
+Feature contracts live in `docs/SDK*.md`; read the relevant one before changing a
+feature. The historical staged CLI/API (`main.py`, `sageql.cli`) and the isolated
+`sageql_rahtal/` pilot remain available. Their model-written SQL path is
+experimental and never enters SDK execution.
 
-The local Rahtal frontend explicitly reuses its registered activity, employee-profile and activity-topic tables and configured model endpoint. A fixed local reporting principal and separate workspace token protect this loopback demo; it is not production per-employee authorization. Registered dimension-only DISTINCT listings are approved under actual source policies and execution bounds. Do not create database objects, add implicit source joins, copy credentials into tracked files, or substitute synthetic data when Rahtal is unreachable.
+## Hard rules
 
-The approved [registered relationship extension](../docs/SDK_RELATIONSHIPS.md)
-adds host-defined many-to-one equality mappings and explicit dimension/filter
-imports. Models select exposed business concepts, never keys or join types.
-Both sides' current policies and permissions apply; duplicate visible source
-keys fail closed in canonical compilation/execution. Grouping and aggregate
-conditions precede ranking/limits. Fact-to-fact joins, recursive paths and
-arbitrary formulas remain unregistered. Rolling Gregorian date windows resolve
-locally from a bounded count/unit. Rahtal registers current employee position,
-not historical position at the activity date.
+1. **Models never write SQL, choose joins/keys, see physical names, policy values,
+   credentials, result rows or resolved identities.** They select registered
+   business concepts only. Natural language, labels and model output are untrusted
+   data; prompts are guidance, never a safety boundary.
+2. **Execution is deterministic and opt-in.** Only validated, compiled, read-only
+   SELECTs run, with row/time/concurrency bounds. Reject writes, DDL, multiple
+   statements and model-written SQL. Never create database objects or enable
+   database options.
+3. **Fail closed.** Strict decoding; unknown concepts, malformed output and policy
+   violations stop before reads. No automatic retry of database operations or
+   provider transport.
+4. **No secrets or private data in tracked files, logs, fixtures, commits or error
+   messages.** Never read Rahtal `.env` files or production databases for testing.
+   Ignored local reports may contain real rows; never commit or transmit them.
+5. **Tests are offline and SQLite-first** ([guide](../docs/SQLITE_FIRST_TESTING.md)).
+   Unit tests use fake providers, never the network. Native SQL Server tests need
+   the explicit `--run-sqlserver-integration` flag and a separately approved
+   synthetic target ([procedure](../docs/SQLSERVER_INTEGRATION_TESTING.md)).
+6. **Live model calls need explicit user approval** of provider, models, cases and a
+   spending cap, recorded in an approval packet
+   ([evaluations/README.md](../evaluations/README.md)). Default to the cheapest
+   setup that measurably works; currently nano and mini only.
+7. Keep package imports side-effect free, the core provider-agnostic (remote calls
+   behind one interface), and public APIs typed with actionable exceptions.
 
-The registered entity-name lookup extension has its own [scope](../docs/SDK_ENTITY_LOOKUPS.md): one bounded profile SELECT finds a unique identity from a full name and optional registered qualifier; a separate single-source report binds that identity. Fixed name concatenation/normalization is allowed only over host-declared text columns. Both source and target access/policies remain mandatory. Do not pick the first ambiguous match or forward lookup rows/resolved identities to the model. This is a report filter, never caller identity or production authorization.
+## Workflow
 
-Registered entity-label dimensions have their own [scope](../docs/SDK_ENTITY_LABELS.md): group/rank by target identity first, then resolve display names through bounded policy-bound source SELECTs. The host fixes all source concepts; at most one label dimension per report is allowed. Both sources retain current access checks, execution opt-in, deterministic SQL and request bounds. Never sort by resolved labels, select conflicting/truncated candidates or forward identities/results to the model. Names decorate identity groups; they never merge groups or change aggregates.
-
-## Working rules
-
-Automated tests and evaluations are [SQLite-first](../docs/SQLITE_FIRST_TESTING.md):
-reuse disposable synthetic hosts, independent references and existing WAL probes.
-Never use production databases or read Rahtal `.env` files for testing. Keep SQL
-Server compiler/adapter contracts offline; native tests require an explicit
-`--run-sqlserver-integration` command flag plus separately approved synthetic scope.
-
-Opt-in report read consistency is scoped in [SDK_READ_CONSISTENCY.md](../docs/SDK_READ_CONSISTENCY.md).
-Compatibility mode retains separate executions. Snapshot mode shares one lease
-across lookup/main/label reads and completes cleanup before publication; SQL
-Server requires a host-prepared manual-commit SNAPSHOT factory. Never enable
-database options, adopt application transactions or silently downgrade consistency.
-Real SQL Server verification remains separately gated by explicit synthetic-target approval.
-
-The tenth Rahtal request adds the fixed
-[matching-day count](../docs/SDK_MATCHING_DAY_COUNTS.md) for bounded daily entity
-tables. Count complete daily groups after aggregate conditions and before limits,
-partitioned only by the registered label identity/period, then resolve names.
-The false default preserves ordinary reports. Arbitrary window expressions,
-model-selected partitions and filtering the computed count remain unsupported.
-
-The sixth Rahtal request adds the fixed host-registered
-[participant-mean aggregate](../docs/SDK_PARTICIPANT_MEANS.md): a numeric fact sum
-divided by distinct participating identities in the same filtered group. Models
-select a business metric, never numerator/denominator columns or formulas. Missing
-identities make the mean unknown; arbitrary ratios and historical positions are
-not inferred. Existing relationship policies and cardinality guards still apply.
-
-The explicitly requested [comparison-change extension](../docs/SDK_COMPARISON_CHANGES.md)
-adds one fixed local absolute/percentage calculation over two complete ungrouped
-numeric aggregate periods. It retains deterministic SQL and policy checks; models
-select the operation, never formulas or result values. Grouped comparisons and
-arbitrary calculations remain outside this extension. The separately requested
-[entity-decrease extension](../docs/SDK_ENTITY_DECREASES.md) aligns one registered
-label identity across two complete bounded aggregate reads and ranks absolute
-loss locally before the output limit and policy-bound name enrichment.
-
-The explicitly requested [Jalali month extension](../docs/SDK_JALALI_MONTHS.md)
-adds deterministic date-only bounds for a supplied month/year. The authorized
-[manager extension](../docs/SDK_MANAGER_REPORTS.md) adds workload definitions,
-the fixed activity-topic relationship, Persian ranges/years/relative periods and
-bounded Persian monthly buckets. It does not add timestamp conversion, inferred
-years in named months, or arbitrary calendar formulas. The source calendar and
-SQL remain Gregorian; existing execution and model-data boundaries apply.
-
-1. Inspect the current tree, Git state, public API, and tests before editing. Preserve user changes.
-2. State the next small deliverable. Implement one vertical slice, run focused checks, and record the result before moving on.
-3. Keep the core API provider-agnostic. Put remote model calls behind one interface so unit tests use a fake provider and never need credentials or network access.
-4. Treat natural language, schema names, schema comments, and model output as untrusted data. A prompt is guidance, not a safety boundary. Validate IDs/operations against catalog and trusted actor scope and render SQL deterministically with quoted identifiers and bound values. Historical Steps 4/6 forward only bounded metadata. The SDK forwards permitted business concepts/messages/specifications, excluding physical names, policy values, row keys and result rows. Never forward database connection fields or credentials.
-5. Execute only deterministic validated read queries with explicit host opt-in. Reject writes, DDL, multiple statements, unknown syntax and model-written SQL. Do not claim lexical checks prove SQL safety or business correctness. SQLite uses explicit read-only files, immediate revalidation, authorizer and row/time/work limits. The SDK SQL Server scope uses registered single tables/views, typed mandatory policies, metadata verification, parameter bounds, disposable timed connection leases, concurrency/cancellation/result limits, and cleanup. The Rahtal executor remains separately scoped. Login write permissions do not block validated SELECTs. Broader ODBC operations require another dialect/policy/safety design.
-6. Do not put credentials, connection strings, row data, or private schema details in logs, fixtures, commits, or error messages. The Rahtal pilot's ignored, local per-run reports may contain question text and real result rows; never commit or remotely transmit those reports. Mask keys in object representations and CLI input. Ask before adding telemetry or sending data to a new remote service. The configured LLM endpoint receives bounded user-supplied schema metadata for Steps 4 and 6.
-7. Keep package imports side-effect free. Put CLI behavior behind `main()`. Use typed public APIs and actionable exceptions.
-8. Add focused tests for meaningful behavior and regression risks: valid read queries, unsafe output, malformed output, provider failure, and CLI behavior. Do not test the remote model in ordinary unit tests.
-9. Keep README examples runnable. Document the model request boundary, current limits, installation, and the exact command to test.
-10. Before finishing, run applicable tests and packaging checks, inspect the diff, and report failures honestly. Propose a commit message based on the actual changes. Commit only when requested.
-
-## AI-driven development workflow
-
-1. **Define the slice:** Write the user outcome, acceptance criteria, and explicit non-goals in `docs/ROADMAP.md` or the task notes.
-2. **Map inputs and risks:** Identify where user text, schema metadata, model responses, secrets, and database access cross boundaries.
-3. **Design the contract:** Decide the small public API and error behavior before adding implementation detail.
-4. **Implement:** Add the smallest complete slice, keeping model transport, prompts, SQL validation, and CLI separate.
-5. **Verify:** Run deterministic tests, lint/type/packaging checks when configured, and one documented manual smoke test where feasible.
-6. **Review:** Compare behavior with acceptance criteria, inspect generated artifacts and Git diff, update docs, then write a change-based commit message.
-7. **Next slice:** Record remaining work and risks; only expand dialects, execution, or providers after the current slice is stable.
+1. Check `git status`, the roadmap and the relevant contract. Preserve user changes.
+2. Take the next roadmap step as one small vertical slice with clear acceptance.
+3. Write focused tests first or alongside; keep diffs in the style of the
+   surrounding code.
+4. Run focused tests, then the full suite (`python -m pytest -q`).
+5. Update the relevant `docs/SDK*.md` contract and the roadmap's "Where we are" /
+   "Next steps". **Do not create phase reports or versioned evidence files**;
+   git history is the record. Live results go in one dated doc under `docs/`.
+6. Commit on a feature branch with a message based on the actual changes. Never
+   push or deploy without the user's request.
 
 ## Release gates
 
-- Unit tests pass without network access.
-- Package builds and imports cleanly in a fresh environment.
-- Unsafe or invalid model SQL fails closed.
-- README documents limitations: developers review registered business definitions/view grain, execution uses deterministic validated SQL, and database permissions/workload limits remain additional enforcement layers. Experimental model-written SQL still requires human review and cannot enter automatic execution.
-- No secrets or sample production data are committed.
-
-Reporting reliability hardening is documented in [docs/REPORTING_RELIABILITY_PHASE3.md](../docs/REPORTING_RELIABILITY_PHASE3.md). Bounded user evidence constrains intent and every final provider specification. Unavailable requested operations return transparent unsupported outcomes; the typed requirement ledger cannot register capabilities. Structured repair is opt-in, shared and bounded; no database operation is automatically retried. Safe stage/reason/field diagnostics exclude rejected values, row data and secrets.
+- Full offline suite passes; package builds and imports cleanly in a fresh environment.
+- Unsafe or invalid model output fails closed.
+- README states current limits honestly; no secrets or production data committed.

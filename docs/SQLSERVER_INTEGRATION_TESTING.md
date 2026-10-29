@@ -4,7 +4,7 @@ Phase 12 rechecked this procedure and its disabled approval gate. A later explic
 production read-only authorization led to one short, certificate-validated
 connection attempt, which failed with 08001 before SQL. No retry, source read,
 fixture operation or isolation change occurred. That separate assessment does not
-enable this suite on production. See [the current status and coverage gaps](PHASE12_ENGINEERING.md).
+enable this suite on production.
 The twelve prepared cases are reusable infrastructure, not complete native evidence.
 
 Phase 11 has no approved real SQL Server target. This suite is prepared and its

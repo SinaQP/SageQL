@@ -5,7 +5,7 @@ reads of one ready report. It does not change reporting operations, permissions,
 model protocols, database configuration, or the default execution behavior.
 No real SQL Server target/operations have been authorized for this phase.
 
-The [Phase 12 native assessment](PHASE12_ENGINEERING.md) remains Level A: a later
+Native verification remains blocked: a later
 explicitly authorized production read-only connection failed with SQLSTATE 08001
 before any SQL. The credentials file was unchanged; no retry or isolation change
 occurred. The synthetic suite retains its disabled approval gate. Native snapshot

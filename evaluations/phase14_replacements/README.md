@@ -29,5 +29,4 @@ error code. V2 explicitly corrects that metadata to `clarification_stalled` and
 adds the period-structure replacement R04. No V1 question or report answer changes.
 V2 passed 9/9 supported reports and 4/4 conversations with scripted model outputs
 on the final SDK. These figures measure the offline contract, not real-model
-response quality. See the [Phase 14 report](../../docs/PHASE14_ENGINEERING.md) and
-[V3 evidence](../phase14/verification.v3.json) for actual live failures and scope.
+response quality.

@@ -136,7 +136,7 @@ separate isolated-synthetic-target authorization, use an explicit command flag
 python -m pytest -m sqlserver_integration --run-sqlserver-integration -q
 ```
 
-See [the prepared synthetic procedure](PHASE11_SQLSERVER_TESTING.md) for bounded
+See [the prepared synthetic procedure](SQLSERVER_INTEGRATION_TESTING.md) for bounded
 operations/fixtures/cleanup and [SQL Server coverage](SDK_SQL_SERVER.md) for the
 older host-seeded read-only case. A flag alone does not supply authorization.
 Never point these tests at Rahtal production or read its credentials for testing.
@@ -176,7 +176,5 @@ gates were rerun separately. The underlying OS cause was not established, and no
 database retry or change to evaluation expectations was introduced. The evidence
 distinguishes those interrupted runs from final completed checks.
 
-Current measured results, source binding, commands and preservation checks are
-recorded in [the SQLite-first verification record](../evaluations/testing/sqlite-first.v1.json).
 Earlier frozen cases, references, expected outcomes and measurement files are
 preserved; current runs use fresh ignored output directories.

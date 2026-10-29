@@ -6,9 +6,9 @@ Native tests now require the explicit `--run-sqlserver-integration` command flag
 as well as their existing separate synthetic authorization. Compiler and mocked
 adapter tests stay in the ordinary offline suite; production adapters are unchanged.
 
-## Phase 12 native release readiness
+## Native release readiness
 
-[Phase 12](PHASE12_ENGINEERING.md) remains **Level A: Native verification blocked**.
+Native SQL Server verification remains **blocked**.
 A later explicit authorization permitted a limited production read-only attempt.
 It failed with SQLSTATE 08001 before any SQL; the `.env` file was unchanged and
 no retry or certificate-validation bypass occurred. The existing fixture-suite
@@ -23,9 +23,9 @@ approval gate remains disabled; no source rows or native type results were obtai
 | Server transaction/session cleanup | Unverified |
 | Production pool reset | Unverified; prepared suite disables pooling |
 | Production workload | Unverified |
-| Live model on synthetic SQLite | Limited P01/P02 verification in [Phase 13](PHASE13_ENGINEERING.md); broader reliability unverified |
+| Live model on synthetic SQLite | Measured on frozen synthetic cohorts ([comparison](MODEL_COMPARISON_NANO_MINI.md)); unseen wording unverified |
 
-Reuse the [existing synthetic procedure](PHASE11_SQLSERVER_TESTING.md) only after
+Reuse the [existing synthetic procedure](SQLSERVER_INTEGRATION_TESTING.md) only after
 scoped environment approval. Twelve skipped cases are not twelve native passes,
 and an eventual green twelve-case run alone does not close all Phase 12 coverage
 gaps. Phase 13's synthetic live pilot does not establish native guarantees.
@@ -37,16 +37,14 @@ their source/version scope; documentation changes do not certify new native beha
 Phase 11 adds [explicit report read consistency](SDK_READ_CONSISTENCY.md) and
 always-on offline SQLite scope probes. Its changed SDK is separately verified
 on Windows 3.10/3.12 and Ubuntu WSL2 3.12; the Phase 10 matrix below remains the
-historical source-versioned compatibility record. See [Phase 11 results](PHASE11_ENGINEERING.md)
-and the separately gated SQL Server procedure; no real server test is enabled
+historical source-versioned compatibility record. See the separately gated SQL Server procedure; no real server test is enabled
 by ordinary release checks.
 
 SageQL 0.1.0 declares CPython-compatible Python `>=3.10`. Phase 10 actually ran
 CPython 3.10.22, 3.11.0, 3.12.0, 3.13.14, 3.14.10 and 3.15.2 on Windows, plus
 3.12.3 on Ubuntu under WSL2. This finite matrix cannot certify future Python
 versions, every patch release, other implementations, native Linux deployments
-or every possible dependency combination. See [the evidence](PHASE10_ENGINEERING.md)
-and [versioned matrix](../evaluations/compatibility/phase10.v2.json).
+or every possible dependency combination.
 
 ## Install into a clean environment
 

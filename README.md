@@ -1,58 +1,27 @@
 # SageQL
 
-Automated development and evaluation tests are **SQLite-first** and run offline
-with disposable synthetic data. See [testing and reusable fixtures](docs/SQLITE_FIRST_TESTING.md).
-Native SQL Server tests require an explicit pytest flag and separate synthetic
-target authorization. Production credentials and the Rahtal `.env` are not test inputs.
+SageQL is an embedded reporting SDK: authorized users ask for reports in chat
+(Persian by default, English supported), and SageQL turns each request into a
+validated, deterministic, parameterized SELECT over host-registered tables.
+Models never write SQL, choose joins or see result rows.
 
-[Phase 11](docs/PHASE11_ENGINEERING.md) adds explicit host-controlled snapshot
-scopes across lookup, report and label reads. New report provenance distinguishes
-snapshot from compatibility mode. See the [consistency contract](docs/SDK_READ_CONSISTENCY.md)
-and [gated SQL Server procedure](docs/PHASE11_SQLSERVER_TESTING.md). Actual SQLite
-concurrency is verified; real SQL Server execution remains unverified.
+**Status (2026-10-29).** The deterministic side (authorization, compilation,
+read-only execution, sessions, snapshot reads) is solid and heavily tested
+offline. Request understanding is the current bottleneck. The best measured cheap
+setup is `gpt-5-mini` for intent with `gpt-5-nano` for planning/review at low
+reasoning effort: 17/27 correct synthetic reports versus 6/27 for nano alone
+([comparison](docs/MODEL_COMPARISON_NANO_MINI.md)). Next steps are in the
+[roadmap](docs/ROADMAP.md) and the [improvement plan](docs/IMPROVEMENT_RECOMMENDATIONS.md).
 
-[Phase 10](docs/PHASE10_ENGINEERING.md) verifies actual CPython 3.10–3.15 on
-Windows, Ubuntu/WSL2 3.12, core lower bounds and clean wheel/sdist/editable installs.
-The [release guide](docs/SDK_RELEASE.md) distinguishes measured offline resolution
-from blocked public-index SDK resolution and locally validated CI from hosted runs.
-Real SQL Server and live-model execution remain unverified.
+Tests are [SQLite-first](docs/SQLITE_FIRST_TESTING.md) and run offline with
+synthetic data. Native SQL Server tests need an explicit pytest flag and a
+separately approved synthetic target ([procedure](docs/SQLSERVER_INTEGRATION_TESTING.md)).
+Production credentials and the Rahtal `.env` are never test inputs.
 
-[Phase 09](docs/PHASE09_ENGINEERING.md) repairs deterministic semantic continuation
-and versions an invalid offline script. With valid scripted responses, the original
-Phase 08 questions/answers complete 14/14 trajectories and 16/16 reports; the old
-script's rejected enum outputs remain documented. No live-model improvement is claimed.
-
-[Phase 08 preflight](docs/PHASE08_ENGINEERING.md) prepares a focused synthetic
-real-model pilot and disabled exact approval packets. External execution awaits
-separate authorization and provider accounting review; no live accuracy is claimed.
-
-[Phase 07](docs/PHASE07_ENGINEERING.md) repairs clarification continuation and
-request preservation across English/Persian answers, persistent sessions and
-custom providers. Run `python -m evaluations.phase07` for the new frozen offline
-cohort. The unchanged Phase 06 corpus completes 45/45 trajectories and 36/36
-reports; live-model generalization remains unverified.
-
-Hosts can optionally register local-only categorical aliases with
-`FilterValueDefinition` on existing filters. Free-form typed filters remain
-available. See [the contract](docs/SDK_VALUE_VOCABULARY.md),
-[Phase 05 results](docs/PHASE05_ENGINEERING.md) and the runnable two-domain example:
-`python examples/value_vocabulary.py`. Live-model generalization remains unverified.
-
-The [Phase 03 engineering report](docs/PHASE03_ENGINEERING.md) and
-[trajectory evaluation guide](evaluations/PHASE03.md) document frozen assessments,
-independent scoring and remaining request-completeness findings. Offline checks
-do not establish live-model generalization.
-
-The [Phase 01 engineering audit](docs/PHASE01_ENGINEERING.md) records the verified
-architecture, reproducible baseline and prioritized next work. Run the
-[offline evaluation corpus](evaluations/README.md) with `python -m evaluations`;
-correct reports, safe refusals and known defects are scored separately.
-
-The [Phase 02 semantic correctness report](docs/PHASE02_ENGINEERING.md) records
-the repaired exclusions/registered vocabulary and passing strict evaluation.
-
-Reporting correctness and bounded recovery are documented in the [Phase 3 reliability report](docs/REPORTING_RELIABILITY_PHASE3.md). Unsupported requirements produce transparent outcomes; request evidence also constrains custom providers before execution.
-
+Key contracts: [embedding guide](docs/SDK.md), [agents and model settings](docs/SDK_AGENTS.md),
+[SQL Server execution](docs/SDK_SQL_SERVER.md), [reliability](docs/SDK_RELIABILITY.md),
+[read consistency](docs/SDK_READ_CONSISTENCY.md), [value vocabulary](docs/SDK_VALUE_VOCABULARY.md),
+[release](docs/SDK_RELEASE.md). Offline evaluations: [evaluations/README.md](evaluations/README.md).
 
 SageQL is a Python SDK that a developer embeds in their backend to let authorized users create and refine reports through chat. The host registers SQL Server tables or trusted reporting views, approved metrics/dimensions/filters, model infrastructure, and per-user access policies. SageQL interprets a report specification, validates it, generates parameterized SQL itself, and returns a typed table/chart payload for your frontend.
 
@@ -352,9 +321,7 @@ python -m pytest
 python -m build
 ```
 
-Phase 06 provides [live-agent evaluation readiness](evaluations/PHASE06.md) with
-fresh synthetic questions, mocked reference-protocol probes, durable interruption
-accounting and separately approved live dispatch. Ordinary tests and offline runs
-make no external model calls. [The engineering report](docs/PHASE06_ENGINEERING.md)
-distinguishes verified offline behavior, remaining incompletions and unverified
-live-model reliability.
+Live model comparisons are separately approved runs of the shared evaluation
+runner; see `python -m evaluations.model_comparison --help` and
+[the latest results](docs/MODEL_COMPARISON_NANO_MINI.md). Ordinary tests and
+offline runs make no external model calls.

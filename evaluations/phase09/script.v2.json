@@ -1,7 +1,0 @@
-{
-  "version": 2,
-  "issue": "Phase08 case metadata says refinement; strict public intent enum requires refine. Normalize only offline author metadata before generating a mock response; never normalize real provider output.",
-  "original_inputs_unchanged": true,
-  "model_contract_unchanged": true,
-  "comparable_runs": "Both captured starting SDK and final SDK use this same corrected script. Original observed baseline retained separately."
-}

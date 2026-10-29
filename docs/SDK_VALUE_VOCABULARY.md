@@ -4,12 +4,9 @@ Phase 06 tightens invalid transport handling: fabricated or altered strings in
 the reserved `__sageql_value` namespace (including case/hyphen variants tested)
 are rejected rather than treated as free-form values. References are also forbidden
 in reviewer feedback. Ordinary free-form business literals remain supported;
-canonical scalar responses still require all existing semantic checks. See the
-[protocol guide](../evaluations/PHASE06.md) for exact limits and observations.
+canonical scalar responses still require all existing semantic checks.
 
-Phase 05 design, 2026-10-25. This document is written before implementation and
-defines the scoped contract; final implementation/verification is recorded in
-`PHASE05_ENGINEERING.md`.
+Designed 2026-10-25; this document defines the scoped contract.
 
 ## Decision and alternatives
 
