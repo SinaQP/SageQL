@@ -26,6 +26,7 @@ PRICES = {  # AvalAI published USD per million tokens, observed 2026-10-29.
 SETUPS = {
     'A': {'reasoning_effort': 'low'},
     'B': {'reasoning_effort': 'low', 'stage_models': {'intent': 'gpt-5-mini'}},
+    'C': {'reasoning_effort': 'low', 'stage_models': {'intent': 'gpt-5-mini'}, 'compile_intent': True},
 }
 
 
