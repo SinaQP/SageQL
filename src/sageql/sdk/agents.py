@@ -334,13 +334,15 @@ class AgentReportInterpreter:
         self, backend: ReportAgentBackend, *, timeout_seconds: float = 30,
         max_revisions: int = 1, max_structured_repairs: int = 0,
         observer: Callable[..., None] | None = None, compile_intent: bool = False,
+        review: bool = True,
     ) -> None:
         if (type(timeout_seconds) not in (int, float) or not math.isfinite(timeout_seconds)
                 or not 0 < timeout_seconds <= 600):
             raise ValueError("timeout_seconds must be finite and from 0 to 600")
-        if type(compile_intent) is not bool:
-            raise ValueError("compile_intent must be a boolean")
+        if type(compile_intent) is not bool or type(review) is not bool:
+            raise ValueError("compile_intent and review must be booleans")
         self._compile_intent = compile_intent
+        self._review = review
         if type(max_revisions) is not int or not 0 <= max_revisions <= 3:
             raise ValueError("max_revisions must be an integer from 0 to 3")
         if type(max_structured_repairs) is not int or not 0 <= max_structured_repairs <= 1:
@@ -666,13 +668,19 @@ class AgentReportInterpreter:
                             continue
                         raise SDKError("intent_mismatch", "The report contradicts explicit request evidence.",
                                        stage="semantic_validation", reason="request_evidence")
-                self._observe("agent_review", "started", attempt=attempt + 1)
-                review = invoke("agent_review", lambda: self._backend.review(
-                    messages, current_spec, catalog, today, decision,
-                    timeout_seconds=remaining(), **context))
-                remaining()
-                _check_review(review)
-                self._observe("agent_review", "complete", attempt=attempt + 1, approved=review.approved)
+                if self._review:
+                    self._observe("agent_review", "started", attempt=attempt + 1)
+                    review = invoke("agent_review", lambda: self._backend.review(
+                        messages, current_spec, catalog, today, decision,
+                        timeout_seconds=remaining(), **context))
+                    remaining()
+                    _check_review(review)
+                    self._observe("agent_review", "complete", attempt=attempt + 1, approved=review.approved)
+                else:
+                    # Every local intent/evidence/preview check has passed; the
+                    # report carries a deterministic interpretation for the user.
+                    review = AgentReview(True)
+                    self._observe("agent_review", "skipped", attempt=attempt + 1)
                 if review.approved:
                     if intent is not None and decision.status == "needs_clarification":
                         decision = replace(decision, clarification_key=clarification_key(intent),
@@ -915,14 +923,14 @@ class OpenAIReportAgent(AgentReportInterpreter):
         observer: Callable[..., None] | None = None,
         stage_models: Mapping[str, str] | None = None,
         reasoning_effort: str | Mapping[str, str] | None = None,
-        compile_intent: bool = False,
+        compile_intent: bool = False, review: bool = True,
     ) -> None:
         backend = _OpenAIReportAgentBackend(config, client, timeout_seconds=timeout_seconds,
                                            max_output_tokens=max_output_tokens, language=language,
                                            stage_models=stage_models, reasoning_effort=reasoning_effort)
         super().__init__(backend, timeout_seconds=timeout_seconds, max_revisions=max_revisions,
                          max_structured_repairs=max_structured_repairs, observer=observer,
-                         compile_intent=compile_intent)
+                         compile_intent=compile_intent, review=review)
         self.language = backend.language
         backend._usage_observer = lambda stage, model, counts: self._observe(
             "model_usage", "complete", agent_stage=stage, model=model, **counts)

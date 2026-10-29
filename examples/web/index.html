@@ -238,6 +238,9 @@
       const provenance = report.provenance || {}, period = provenance.period || {};
       const start = provenance.period_start ?? period.start, end = provenance.period_end_exclusive ?? period.end;
       el('provenance').replaceChildren();
+      if (Array.isArray(provenance.interpretation) && provenance.interpretation.length) {
+        el('provenance').append('برداشت از درخواست: ' + persianDigits(provenance.interpretation.join(' · ')), document.createElement('br'));
+      }
       function appendBounds(label, fromDate, untilDate) {
         const from = document.createElement('bdi'), until = document.createElement('bdi');
         from.dir = until.dir = 'ltr'; from.textContent = persianDigits(fromDate); until.textContent = persianDigits(untilDate);

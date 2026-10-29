@@ -27,6 +27,53 @@ from sageql.sdk.labels import resolve_labels
 from sageql.sdk.calendars import JALALI_MONTH_NAMES, gregorian_to_jalali
 
 
+_OPERATOR_WORDS = {
+    "fa": {"eq": "برابر", "neq": "به‌جز", "gt": "بیشتر از", "gte": "حداقل", "lt": "کمتر از",
+           "lte": "حداکثر", "in": "یکی از", "is_null": "خالی", "is_not_null": "غیرخالی"},
+    "en": {"eq": "is", "neq": "is not", "gt": ">", "gte": "≥", "lt": "<", "lte": "≤",
+           "in": "is one of", "is_null": "is empty", "is_not_null": "is not empty"},
+}
+
+
+def _interpretation(spec: ReportSpec, dataset, catalog, language: str) -> list[str]:
+    """Deterministic phrases for the controls the title omits: filters, conditions, sort, limit.
+
+    Registered business labels only, so the user can check how the request was
+    understood. Values are the report's own filter values, never policy values.
+    """
+    fa = language == "fa"
+    words = _OPERATOR_WORDS["fa" if fa else "en"]
+    labels: dict[str, str] = {item.id: item.label for item in (*dataset.metrics, *dataset.dimensions)}
+    filter_labels = {item.id: item.label for item in dataset.filters}
+    for relationship in catalog.relationships:
+        if relationship.dataset_id == dataset.id:
+            filter_labels.update({item.id: item.label for item in relationship.filters})
+    for lookup in catalog.lookups:
+        if lookup.dataset_id == dataset.id:
+            filter_labels[lookup.id] = lookup.label
+            filter_labels.update({item.id: item.label for item in lookup.qualifiers})
+    labels.update({"time_bucket": "تاریخ" if fa else "date", "period_label": "دوره" if fa else "period",
+                   "absolute_decrease": "میزان کاهش" if fa else "decrease",
+                   "matching_day_count": "تعداد روزهای مطابق شرایط" if fa else "matching days"})
+    separator = "، " if fa else ", "
+
+    def condition(label: str, operator: str, values: tuple[Any, ...]) -> str:
+        shown = separator.join(str(_untyped(value)) for value in values)
+        return " ".join(part for part in (label, words.get(operator, operator), shown) if part)
+
+    phrases = [condition(filter_labels.get(item.filter_id, "فیلتر" if fa else "filter"), item.operator, item.values)
+               for item in spec.filters]
+    phrases += [condition(labels.get(item.metric_id, item.metric_id), item.operator, item.values)
+                for item in spec.aggregate_filters]
+    if spec.order_by is not None:
+        direction = ("نزولی" if spec.descending else "صعودی") if fa else ("descending" if spec.descending else "ascending")
+        target = labels.get(spec.order_by, spec.order_by)
+        phrases.append(f"مرتب بر اساس {target} ({direction})" if fa else f"sorted by {target} ({direction})")
+    if spec.order_by is not None or spec.limit != 100:
+        phrases.append(f"حداکثر {spec.limit} ردیف" if fa else f"at most {spec.limit} rows")
+    return phrases
+
+
 def _period_caption(selection: PeriodSelection, bounds: ResolvedPeriod, language: str,
                     calendar: str = "gregorian") -> str:
     """Describe resolved periods locally without changing comparison row keys."""
@@ -415,8 +462,10 @@ class SageQL:
                 if prepared.spec.filters != spec.filters:
                     # Name/qualifier inputs belong in the public report context.
                     # The resolved identity stays out of provider specifications.
-                    artifact = replace(artifact, provenance={**artifact.provenance,
-                                                            "filters": json_value(spec.filters)})
+                    artifact = replace(artifact, provenance={
+                        **artifact.provenance, "filters": json_value(spec.filters),
+                        "interpretation": _interpretation(replace(prepared.spec, filters=spec.filters),
+                                                          prepared.dataset, self.catalog, self.language)})
                 # Verify the public JSON contract before accepting session mutation.
                 artifact_json = artifact.to_dict()
                 state["reports"][artifact.id] = {
@@ -589,6 +638,7 @@ class SageQL:
                                "source_dataset_version": bound.source.version}
                               for bound in prepared.related_sources],
             "completeness": "truncated" if result.truncated else ("empty" if not result.rows else "complete"),
+            "interpretation": _interpretation(spec, dataset, self.catalog, self.language),
         }
         if any(selection is not None and "jalali" in selection.kind
                for selection in (spec.period, spec.comparison)):

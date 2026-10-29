@@ -87,6 +87,26 @@ def test_refinement_that_leaves_current_ordering_unspecified_declines():
     assert spec_from_intent(explicit, visible(), current).order_by == "hours"
 
 
-def test_invalid_compile_intent_option_is_rejected():
+def test_invalid_compile_intent_or_review_option_is_rejected():
     with pytest.raises(ValueError):
         provider(compile_intent="yes")
+    with pytest.raises(ValueError):
+        provider(review=0)
+
+
+def test_without_review_a_compiled_report_needs_one_model_call():
+    decision, client, compiled = run(complete(), review=False)
+    assert decision.status == "ready" and decision.spec == GROUPED
+    assert [call["response_format"]["json_schema"]["name"] for call in client.calls] == ["sageql_report_intent"]
+
+
+def test_without_review_planner_output_still_passes_local_intent_checks():
+    agent, client = provider(complete(), planned(GROUPED), review=False)
+    assert agent.interpret(REQUEST, None, visible(), TODAY).spec == GROUPED
+    assert len(client.calls) == 2
+    # A planner proposal that contradicts the intent is still rejected locally.
+    agent, client = provider(complete(), planned(replace(GROUPED, dimension_ids=())), review=False,
+                             max_revisions=0)
+    with pytest.raises(Exception) as error:
+        agent.interpret(REQUEST, None, visible(), TODAY)
+    assert getattr(error.value, "code", None) == "intent_mismatch"
