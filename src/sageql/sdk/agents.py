@@ -21,7 +21,7 @@ from sageql.sdk.lookups import prepare_request
 from sageql.sdk.intent import (
     CAPABILITY_INSTRUCTIONS, MISSING_DETAILS, ConceptRef, ReportIntent,
     canonical_intent, check_intent, clarification_key, intent_feedback, normalize_unspecified_controls,
-    period_context, unavailable_intent,
+    period_context, spec_from_intent, unavailable_intent,
 )
 from sageql.sdk.models import (
     AccessScope, AggregateFilter, DatasetAccess, Interpretation, PeriodSelection, ReportingCatalog, ReportSpec, SDKError,
@@ -333,11 +333,14 @@ class AgentReportInterpreter:
     def __init__(
         self, backend: ReportAgentBackend, *, timeout_seconds: float = 30,
         max_revisions: int = 1, max_structured_repairs: int = 0,
-        observer: Callable[..., None] | None = None,
+        observer: Callable[..., None] | None = None, compile_intent: bool = False,
     ) -> None:
         if (type(timeout_seconds) not in (int, float) or not math.isfinite(timeout_seconds)
                 or not 0 < timeout_seconds <= 600):
             raise ValueError("timeout_seconds must be finite and from 0 to 600")
+        if type(compile_intent) is not bool:
+            raise ValueError("compile_intent must be a boolean")
+        self._compile_intent = compile_intent
         if type(max_revisions) is not int or not 0 <= max_revisions <= 3:
             raise ValueError("max_revisions must be an integer from 0 to 3")
         if type(max_structured_repairs) is not int or not 0 <= max_structured_repairs <= 1:
@@ -552,20 +555,49 @@ class AgentReportInterpreter:
                 remaining()
                 raise SDKError("provider_failed", "Report intent could not complete.", retryable=True) from None
 
+        def compiled_decision():
+            # A complete intent compiles locally; any doubt or failed local
+            # check falls back to the planner without consuming a revision.
+            spec = spec_from_intent(intent, catalog, current_spec)
+            if spec is None:
+                self._observe("intent_compiled", "skipped", code="incomplete_intent")
+                return None
+            decision = Interpretation("ready", spec)
+            try:
+                _check_decision(decision, catalog)
+                prepare_request(preview_catalog, spec, preview_scope, today)
+            except SDKError:
+                self._observe("intent_compiled", "skipped", code="specification_validation")
+                return None
+            if (intent_feedback(intent, decision, today=today, catalog=catalog)
+                    or evidence_feedback(evidence, spec, today, catalog)
+                    or explicit_measure_missing(replace(intent, order_by=spec.order_by, limit=spec.limit),
+                                                messages, current_spec, catalog)):
+                self._observe("intent_compiled", "skipped", code="local_check")
+                return None
+            self._observe("intent_compiled", "complete", metrics=list(spec.metric_ids),
+                          dimensions=list(spec.dimension_ids))
+            return decision
+
         previous_mismatch = None
         reconsidered = False
         for attempt in range(self._max_revisions + 1):
             try:
                 context = {"intent": intent} if intent is not None else {}
-                self._observe("agent_plan", "started", attempt=attempt + 1)
-                def checked_plan(notes):
-                    value = self._backend.plan(messages, current_spec, catalog, today,
-                        feedback=notes, timeout_seconds=remaining(), **context)
-                    _check_decision(value, catalog)
-                    return value
-                decision = invoke("agent_plan", lambda: checked_plan(feedback),
-                    repair=lambda error: checked_plan((*feedback, *repair_feedback(error))))
-                remaining()
+                compiled = (compiled_decision() if attempt == 0 and self._compile_intent and intent is not None
+                            else None)
+                if compiled is not None:
+                    decision = compiled
+                else:
+                    self._observe("agent_plan", "started", attempt=attempt + 1)
+                    def checked_plan(notes):
+                        value = self._backend.plan(messages, current_spec, catalog, today,
+                            feedback=notes, timeout_seconds=remaining(), **context)
+                        _check_decision(value, catalog)
+                        return value
+                    decision = invoke("agent_plan", lambda: checked_plan(feedback),
+                        repair=lambda error: checked_plan((*feedback, *repair_feedback(error))))
+                    remaining()
                 _check_decision(decision, catalog)
                 if decision.status == 'ready':
                     canonical = canonical_fixed_periods(evidence, decision.spec, today,
@@ -883,12 +915,14 @@ class OpenAIReportAgent(AgentReportInterpreter):
         observer: Callable[..., None] | None = None,
         stage_models: Mapping[str, str] | None = None,
         reasoning_effort: str | Mapping[str, str] | None = None,
+        compile_intent: bool = False,
     ) -> None:
         backend = _OpenAIReportAgentBackend(config, client, timeout_seconds=timeout_seconds,
                                            max_output_tokens=max_output_tokens, language=language,
                                            stage_models=stage_models, reasoning_effort=reasoning_effort)
         super().__init__(backend, timeout_seconds=timeout_seconds, max_revisions=max_revisions,
-                         max_structured_repairs=max_structured_repairs, observer=observer)
+                         max_structured_repairs=max_structured_repairs, observer=observer,
+                         compile_intent=compile_intent)
         self.language = backend.language
         backend._usage_observer = lambda stage, model, counts: self._observe(
             "model_usage", "complete", agent_stage=stage, model=model, **counts)

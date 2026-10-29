@@ -498,6 +498,62 @@ def intent_feedback(intent: ReportIntent, decision: Interpretation, *, today: da
     return None
 
 
+def spec_from_intent(intent: ReportIntent, catalog: ReportingCatalog,
+                     current_spec: ReportSpec | None = None) -> ReportSpec | None:
+    """Compile a complete checked intent into a ReportSpec, or None for the planner.
+
+    Only unambiguous cases compile: one dataset, nothing missing or unavailable,
+    a period for dated aggregates, and no unspecified control that a refinement
+    would have to carry over from the current report. Unspecified presentation
+    keeps the current report's value on refinements and registered defaults
+    otherwise. The caller must still apply every local intent, evidence and
+    preview check; this function grants no capability.
+    """
+    if intent.missing or intent.unsupported_reason.strip() or intent.unsupported_requirements:
+        return None
+    datasets = {ref.dataset_id for ref in (*intent.metrics, *intent.dimensions)}
+    if len(datasets) != 1:
+        return None
+    dataset_id = next(iter(datasets))
+    dataset = next(item for item in catalog.datasets if item.id == dataset_id)
+    current = None
+    if intent.turn_kind in ("refine", "answer") and current_spec is not None:
+        if current_spec.dataset_id != dataset_id:
+            return None
+        current = current_spec
+    unspecified_carry_over = current is not None and (
+        intent.filters is None or intent.aggregate_filters is None
+        or (not intent.comparison_specified and current.comparison is not None)
+        or (not intent.ordering_specified and current.order_by is not None))
+    if unspecified_carry_over:
+        return None
+    period = intent.period
+    if period is None:
+        if dataset.time is not None and intent.metrics:
+            return None
+        period = PeriodSelection("all")
+
+    def inherit(value: Any, name: str, default: Any) -> Any:
+        if value is not None:
+            return value
+        return getattr(current, name) if current is not None else default
+
+    return ReportSpec(
+        dataset_id, tuple(ref.concept_id for ref in intent.metrics),
+        tuple(ref.concept_id for ref in intent.dimensions),
+        filters=intent.filters or (), period=period,
+        time_grain=inherit(intent.time_grain, "time_grain", "none"),
+        chart=inherit(intent.chart, "chart", "table"),
+        order_by=intent.order_by if intent.ordering_specified else None,
+        descending=bool(intent.descending),
+        limit=inherit(intent.limit, "limit", 100),
+        comparison=intent.comparison if intent.comparison_specified else None,
+        aggregate_filters=intent.aggregate_filters or (),
+        comparison_calculation=inherit(intent.comparison_calculation, "comparison_calculation", "none"),
+        include_matching_day_count=inherit(intent.include_matching_day_count, "include_matching_day_count", False),
+    )
+
+
 def clarification_key(intent: ReportIntent) -> str:
     content = json.dumps({
         "metrics": sorted((item.dataset_id, item.concept_id) for item in intent.metrics),
