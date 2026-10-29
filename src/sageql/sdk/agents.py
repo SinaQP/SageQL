@@ -20,7 +20,8 @@ from sageql.schema import Column
 from sageql.sdk.lookups import prepare_request
 from sageql.sdk.intent import (
     CAPABILITY_INSTRUCTIONS, MISSING_DETAILS, ConceptRef, ReportIntent,
-    canonical_intent, check_intent, clarification_key, intent_feedback, period_context, unavailable_intent,
+    canonical_intent, check_intent, clarification_key, intent_feedback, normalize_unspecified_controls,
+    period_context, unavailable_intent,
 )
 from sageql.sdk.models import (
     AccessScope, AggregateFilter, DatasetAccess, Interpretation, PeriodSelection, ReportingCatalog, ReportSpec, SDKError,
@@ -792,7 +793,7 @@ class _OpenAIReportAgentBackend(OpenAIReportInterpreter):
                         raise ValueError
                     conditions.append(kind(**{**value, "values": tuple(value["values"])}))
                 result[key] = tuple(conditions)
-            intent = ReportIntent(**result)
+            intent = normalize_unspecified_controls(ReportIntent(**result))
             check_intent(intent, catalog, today=today)
             return intent
         except SDKError:

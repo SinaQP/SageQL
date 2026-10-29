@@ -232,6 +232,26 @@ def _condition_keys(conditions: tuple[UserFilter, ...] | tuple[AggregateFilter, 
     return result
 
 
+def normalize_unspecified_controls(intent: ReportIntent) -> ReportIntent:
+    """Drop placeholder values that a model attached to controls it marked unspecified.
+
+    Small models often fill ``comparison`` with an empty placeholder (``kind=all``
+    or a month without year) while setting ``comparison_specified=false``. The
+    flag is authoritative: the value is cleared, unless a change/decrease
+    calculation shows the comparison was meant, which sets the flag instead.
+    Malformed flag types are left for ``check_intent`` to reject.
+    """
+    changes: dict[str, Any] = {}
+    if intent.comparison_specified is False and intent.comparison is not None:
+        if intent.comparison_calculation in ("change", "decrease"):
+            changes["comparison_specified"] = True
+        else:
+            changes["comparison"] = None
+    if intent.ordering_specified is False and intent.order_by is not None:
+        changes.update(order_by=None, descending=None)
+    return replace(intent, **changes) if changes else intent
+
+
 def check_intent(intent: ReportIntent, catalog: ReportingCatalog, *, today: date | None = None) -> None:
     reason, field = "intent_constraints", "intent"
     try:
