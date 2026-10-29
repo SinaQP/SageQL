@@ -178,6 +178,24 @@ model to see which stage costs the most. Missing usage emits nothing, and observ
 failures never change a report decision. Changing a stage's model changes behavior
 and cost; compare it on the frozen evaluation corpora before production use.
 
+### Compiled intent and placeholder normalization
+
+With `compile_intent=True`, a complete checked intent is compiled locally into the
+`ReportSpec` (`sageql.sdk.intent.spec_from_intent`) and the planner call is skipped
+on the first attempt. It compiles only when unambiguous: one dataset, nothing
+missing or unavailable, a period for dated aggregates, and no unspecified control
+a refinement would need to carry over. Unspecified presentation keeps the current
+report's value on refinements and registered defaults otherwise. The compiled spec
+must pass the same intent, request-evidence and preview checks as a planner
+proposal; otherwise the planner runs in the same attempt without using a revision.
+The reviewer still runs. The default is off; the reference hosts enable it.
+
+Live intent decoding clears placeholder values on controls marked unspecified
+(`normalize_unspecified_controls`): a comparison with `comparison_specified=false`
+is dropped unless a change/decrease calculation shows it was meant, and an
+`order_by` with `ordering_specified=false` is dropped with its direction.
+Malformed flag types still fail closed.
+
 `ReportIntent.unsupported_requirements` defaults to an empty tuple for existing
 typed backends. The live strict schema requires this array and supports
 `time_grain="jalali_month"` directly. Each unavailable requirement must quote

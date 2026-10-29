@@ -263,7 +263,8 @@ def create_sqlserver_engine() -> tuple[SageQL, ActorContext, str]:
                         # Measured default: mini intent, configured model elsewhere.
                         stage_models={"intent": os.environ.get("SAGEQL_INTENT_MODEL") or "gpt-5-mini"},
                         reasoning_effort=(None if os.environ.get("SAGEQL_REASONING_EFFORT") == "default"
-                                          else os.environ.get("SAGEQL_REASONING_EFFORT") or "low")),
+                                          else os.environ.get("SAGEQL_REASONING_EFFORT") or "low"),
+                        compile_intent=True),
                     policy=activity_policy, execution="validated",
                     limits=ExecutionLimits(max_rows=100, query_timeout_seconds=10,
                                            request_timeout_seconds=40))

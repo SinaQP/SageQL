@@ -3,6 +3,36 @@
 First live use of per-stage models (recommendation P0-1). The question: which
 step does `gpt-5-nano` fail on, and what does replacing only that step cost?
 
+## Round 3: after the placeholder fix and compiled intent
+
+Same cohorts and runner, two SDK changes: unspecified-control placeholders are
+cleared (commit `b5cd954`), and setup C compiles complete intents locally so the
+planner call is skipped (`compile_intent=True`, commit `62fbb26`).
+
+| Setup | Correct reports | Complete trajectories | Wrong accepted | Model calls | Cost | Median turn |
+|---|---:|---:|---:|---:|---:|---:|
+| A: nano everywhere | 8/27 | 7/18 | 5 | 76 | $0.042 | 8–21 s |
+| B: mini intent | 15/27 | 9/18 | 3 | 87 | $0.107 | 16–21 s |
+| **C: mini intent + compiled intent** | **20/27** | **12/18** | 3 | **57** | $0.094 | **10–11 s** |
+
+- **C is best on every axis except wrong reports**, which equal B: more correct
+  reports, a third fewer calls, cheaper and about twice as fast. Hosts now use C.
+- C's three wrong reports are all intent extraction mistakes (a limit, a filter, a
+  period); the period error also occurs in B. The reviewer approved all of them,
+  again confirming it rarely catches real errors (roadmap step 3).
+- The placeholder fix helped nano only a little (6 → 8). With its format errors
+  removed, nano reached the planner more often but produced five wrong accepted
+  reports (mostly wrong time grain or grouping). Nano is not reliable for intent.
+- B moved from 17 to 15 between rounds with no relevant change: run-to-run noise
+  is about ±2 reports at this sample size.
+- Remaining failures: `clarification_stalled` (all setups), occasional
+  `order_by` intent constraint errors, dropped provider connections (2–4 per round).
+
+Round 3 spend: $0.243 estimated. **Running total about $0.45** of the approved $2.
+Raw journals and `analysis.json` are in ignored `dist/comparison/r3/`.
+
+## Round 2 (first measurement)
+
 ## Setup
 
 | | Setup A | Setup B |
