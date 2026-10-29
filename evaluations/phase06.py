@@ -43,16 +43,23 @@ def load_cases(cohort='all', case_ids=None):
     return cases
 
 
-def configuration(cases, mode, endpoint, model, *, corpus_root=None, corpus_version='v4', max_structured_repairs=0):
+def configuration(cases, mode, endpoint, model, *, corpus_root=None, corpus_version='v4', max_structured_repairs=0,
+                  stage_models=None, reasoning_effort=None):
     if type(max_structured_repairs) is not int or max_structured_repairs not in (0, 1):
         raise ValueError('Structured repairs must be explicitly bounded to zero or one')
+    if (stage_models or reasoning_effort) and mode != 'live':
+        raise ValueError('Per-stage model settings apply only to live comparisons')
+    # Absent settings keep earlier configuration hashes and approvals unchanged.
+    stage = {**({'stage_models': dict(stage_models)} if stage_models else {}),
+             **({'reasoning_effort': reasoning_effort if isinstance(reasoning_effort, str)
+                 else dict(reasoning_effort)} if reasoning_effort else {})}
     import sageql
     corpus = ROOT if corpus_root is None else Path(corpus_root)
     source = Path(sageql.__file__).parent
     digest = sha256()
     for file in sorted(source.rglob('*.py')):
         digest.update(file.relative_to(source).as_posix().encode()); digest.update(file.read_bytes())
-    return {**({'max_structured_repairs': max_structured_repairs} if max_structured_repairs else {}),
+    return {**({'max_structured_repairs': max_structured_repairs} if max_structured_repairs else {}), **stage,
             'mode': mode, 'adapter': 'sdk_chat_completions', 'endpoint': endpoint if mode == 'live' else None,
             'model': model if mode == 'live' else 'scripted',
             'case_ids': [c['id'] for c in cases],
@@ -171,13 +178,15 @@ def artifact(cases, journal, budget, config):
 
 def run(cases, directory, *, mode='offline', endpoint=None, model=None, approval=None,
         resume=False, max_cases=None, live_client_factory=None, turn_hook=None,
-        corpus_root=None, corpus_version='v4', accounting_mode='strict', max_structured_repairs=0):
+        corpus_root=None, corpus_version='v4', accounting_mode='strict', max_structured_repairs=0,
+        stage_models=None, reasoning_effort=None):
     if mode not in ('offline', 'protocol', 'live'):
         raise ValueError('Unknown evaluation mode')
     if mode == 'live' and any(not c['live_eligible'] for c in cases):
         raise ValueError('Only reviewed natural assessment cases may run live')
     config = configuration(cases, mode, endpoint, model, corpus_root=corpus_root, corpus_version=corpus_version,
-                           max_structured_repairs=max_structured_repairs)
+                           max_structured_repairs=max_structured_repairs, stage_models=stage_models,
+                           reasoning_effort=reasoning_effort)
     if mode == 'live':
         validate_approval(approval, config, directory, accounting_mode=accounting_mode)
     elif (approval is not None or live_client_factory is not None or endpoint is not None or model is not None
@@ -228,6 +237,8 @@ def run(cases, directory, *, mode='offline', endpoint=None, model=None, approval
                                         stage_client_type=ObservedClient, turn_checkpoint=checkpoint,
                                         outcome_scorer=assess_outcome,
                                         agent_options={**({'max_structured_repairs': max_structured_repairs} if max_structured_repairs else {}),
+                                                       **{key: config[key] for key in ('stage_models', 'reasoning_effort')
+                                                          if key in config},
                                                        **({'max_output_tokens': approval['per_call_output_tokens'],
                                                        'timeout_seconds': max(.001, min(approval.get('call_timeout_seconds', 30),
                                                                                        budget.remaining_seconds()))} if approval else {})})

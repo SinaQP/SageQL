@@ -153,8 +153,10 @@ def validate_approval(approval, configuration, directory, *, accounting_mode='st
         raise ValueError('A positive monetary ceiling is required')
     pricing = approval['pricing']
     date_key = 'observed_date' if exploratory else 'effective_date'
+    extra_models = set(configuration.get('stage_models', {}).values()) - {configuration['model']}
     if (not isinstance(pricing, dict) or set(pricing) != {'reviewed', 'source_url', date_key,
             'verified_at', 'units', 'input_usd_per_million', 'output_usd_per_million'}
+            | ({'models'} if extra_models else set())
             or pricing['reviewed'] is not True or pricing['units'] != 'USD_per_million_tokens'
             or not isinstance(pricing['source_url'], str) or not pricing['source_url'].startswith('https://')):
         raise ValueError('Reviewed pricing provenance and units are required')
@@ -170,6 +172,16 @@ def validate_approval(approval, configuration, directory, *, accounting_mode='st
     except (ValueError, TypeError):
         raise ValueError('Dated pricing verification is required') from None
     _money(pricing['input_usd_per_million']); _money(pricing['output_usd_per_million'])
+    if extra_models:
+        # Every additional stage model needs its own reviewed rate; none is inferred.
+        models = pricing['models']
+        if (not isinstance(models, dict) or set(models) != extra_models or any(
+                not isinstance(rate, dict) or set(rate) != {'source_url', 'input_usd_per_million', 'output_usd_per_million'}
+                or not isinstance(rate['source_url'], str) or not rate['source_url'].startswith('https://')
+                for rate in models.values())):
+            raise ValueError('Reviewed pricing is required for every stage model')
+        for rate in models.values():
+            _money(rate['input_usd_per_million']); _money(rate['output_usd_per_million'])
     accounting = approval['accounting']
     if exploratory:
         if (not isinstance(accounting, dict) or set(accounting) != {'input_estimate', 'overhead_tokens',
@@ -215,6 +227,10 @@ class Budget:
         self.approval, self.journal, self.clock = approval, journal, clock
         self.input_price = _money(approval['pricing']['input_usd_per_million'])
         self.output_price = _money(approval['pricing']['output_usd_per_million'])
+        # Approved models only: the configured model plus reviewed stage models.
+        self.prices = {approval['configuration']['model']: (self.input_price, self.output_price),
+                       **{model: (_money(rate['input_usd_per_million']), _money(rate['output_usd_per_million']))
+                          for model, rate in approval['pricing'].get('models', {}).items()}}
         if journal.data['budget'] is None:
             journal.data['budget'] = {'calls': [], 'stop_reason': None}
             journal.save()
@@ -263,14 +279,16 @@ class Budget:
     def reserve(self, options):
         if self.exhausted:
             self.stop(self.state['stop_reason'] or 'time_budget')
-        if options.get('model') != self.approval['configuration']['model']:
+        model = options.get('model')
+        if model not in self.prices:
             self.stop('model_changed')
+        input_price, output_price = self.prices[model]
         out = options.get('max_completion_tokens')
         if type(out) is not int or not 0 < out <= self.approval['per_call_output_tokens']:
             self.stop('output_cap')
         # Include instructions, metadata, conversation, schema and framing options.
         inp = len(json.dumps(options, ensure_ascii=False, allow_nan=False).encode('utf-8')) + self.approval['accounting']['overhead_tokens']
-        cost = (inp * self.input_price + out * self.output_price) / 1000000
+        cost = (inp * input_price + out * output_price) / 1000000
         used = self.accounting()
         if used['requests_dispatched'] >= self.approval['max_requests']:
             self.stop('request_budget')
@@ -284,7 +302,8 @@ class Budget:
             self.stop('cost_budget')
         stage = {'sageql_report_intent': 'intent', 'sageql_report_interpretation': 'planning',
                  'sageql_report_review': 'review'}.get(options.get('response_format', {}).get('json_schema', {}).get('name'), 'unknown')
-        self.state['calls'].append({'stage': stage, 'input': inp, 'output': out, 'cost': str(cost), 'status': 'reserved'})
+        self.state['calls'].append({'stage': stage, 'input': inp, 'output': out, 'cost': str(cost), 'status': 'reserved',
+                                    **({'model': model} if len(self.prices) > 1 else {})})
         if self.exploratory:
             self.state['calls'][-1].update(estimated_input=inp, requested_output_cap=out)
         self.journal.save()  # Must succeed before the external call is attempted.
@@ -296,8 +315,9 @@ class Budget:
         if usage is not None:
             if (not self.exploratory and usage['input'] > call['input']) or usage['output'] > call['output']:
                 self.state['stop_reason'] = 'provider_bound_violation'
+            input_price, output_price = self.prices[call.get('model', self.approval['configuration']['model'])]
             call.update(input=usage['input'], output=usage['output'],
-                        cost=str((usage['input'] * self.input_price + usage['output'] * self.output_price) / 1000000))
+                        cost=str((usage['input'] * input_price + usage['output'] * output_price) / 1000000))
         if invalid:
             self.state['stop_reason'] = 'invalid_usage'
         elif self.exploratory and (failed or usage is None):
