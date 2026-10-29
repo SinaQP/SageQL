@@ -95,8 +95,11 @@ class ObservedClient(StageClient):
             except (ValueError, TypeError, AttributeError, IndexError, RecursionError):
                 record['decoded'] = None
             return response
-        except Exception:
+        except Exception as error:
             record['failed'] = True
+            # HTTP 429 (rate limit or exhausted quota) will not clear within a
+            # batch; stop instead of reserving more doomed calls.
+            record['rate_limited'] = getattr(error, 'status_code', None) == 429
             raise
         except BaseException:
             record['failed'] = True
@@ -109,6 +112,8 @@ class ObservedClient(StageClient):
             self.records.append(record)
             if self.budget and not uncertain:
                 self.budget.settle(ticket, record['usage'], failed=record['failed'], invalid=invalid_usage)
+                if record.get('rate_limited'):
+                    self.budget.halt('rate_limited')
 
 
 class ProtocolClient:

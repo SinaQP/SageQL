@@ -46,7 +46,8 @@ python -m evaluations.model_comparison --setup B --cohort legacy --output dist/c
 Packets bind exact source/evaluator/corpus hashes, endpoint, models, prices and
 limits; any source change needs new packets. Wrong synthetic reports are scored
 without stopping; isolation failures and denied reads stop the run; dropped
-connections fail only their turn and are never retried. Latest results:
+connections fail only their turn and are never retried; the first HTTP 429 (rate
+limit or exhausted quota) halts the batch. Latest results:
 [docs/MODEL_COMPARISON_NANO_MINI.md](../docs/MODEL_COMPARISON_NANO_MINI.md).
 
 ## Outcomes

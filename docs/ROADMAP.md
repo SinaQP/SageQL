@@ -30,6 +30,10 @@ filter, a wrong period, a wrong limit), shown to the user through the report's
 interpretation line. `clarification_stalled` only follows failed turns. Noise
 between runs is about ±2 reports. See [the comparison](MODEL_COMPARISON_NANO_MINI.md).
 
+**Live budget:** the approved $2 is used up under conservative estimates (about
+$0.61 settled plus $1.49 reserved for rate-limited calls); new live runs need
+new approval.
+
 **Real data:** a scored manual pass on Rahtal is ready ([guide](RAHTAL_MANUAL_TEST.md)); results pending.
 
 **Unverified:** native SQL Server behavior (blocked on an approved synthetic
@@ -42,9 +46,11 @@ cohorts with the same budget discipline (nano/mini only unless the user approves
 
 1. **Collect the Rahtal manual test results** ([guide](RAHTAL_MANUAL_TEST.md)) and
    turn every real failure into an offline regression.
-2. **Reduce intent extraction errors** (lost filters, wrong periods/limits): try
-   parallel intent samples and ask when they disagree; add evidence-quote fields
-   before decisions in the intent schema.
+2. **Reduce intent extraction errors** (lost filters, wrong periods/limits).
+   `intent_samples` (parallel samples with an agreement vote) is implemented but
+   unmeasured: round 5 hit provider rate limits. Measure it once AvalAI credit is
+   confirmed and a new budget is approved; then try evidence-quote fields before
+   decisions in the intent schema.
 3. **Let users correct the interpretation** with quick edit actions (period,
    measure, grouping) instead of retyping.
 4. **Make `compile_intent=True, review=False` the SDK default** once scripted tests
@@ -69,6 +75,8 @@ Full rationale: [IMPROVEMENT_RECOMMENDATIONS.md](IMPROVEMENT_RECOMMENDATIONS.md)
 - Reports carry a deterministic interpretation (filters, conditions, sort, limit);
   the reviewer is optional and hosts run without it.
 - Ranking without a chosen measure asks instead of sorting by a default metric.
+- Optional parallel intent samples (`intent_samples`, default 1) that also
+  tolerate one failed sample; comparison runs halt on HTTP 429.
 - Repository cleanup: historical phase reports and evidence removed.
 
 ## Out of scope unless separately designed

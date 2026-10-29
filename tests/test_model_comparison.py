@@ -128,3 +128,28 @@ def test_setup_b_routes_intent_to_mini_on_the_real_runner_path(tmp_path):
     usage = comparison.usage_by_stage(tmp_path)
     assert {(item['stage'], item['model']) for item in usage} == {('intent', 'gpt-5-mini'),
                                                                  ('planning', 'gpt-5-nano')}
+
+
+def test_rate_limit_halts_the_batch_even_when_transport_failures_continue(tmp_path):
+    from evaluations.phase06_transport import ObservedClient
+
+    class RateLimited(Exception):
+        status_code = 429
+
+    class Delegate:
+        def __init__(self):
+            self.chat = SimpleNamespace(completions=self)
+
+        def create(self, **options):
+            raise RateLimited()
+
+    cases, approval = packet(tmp_path, 'A')
+    budget = Budget(approval, Journal(tmp_path, approval['configuration']), stop_on_transport_failure=False)
+    client = ObservedClient(Delegate(), budget=budget)
+    request = {'messages': [{'role': 'user', 'content': 'synthetic'}], 'max_completion_tokens': 1000,
+               'model': 'gpt-5-nano', 'response_format': {'json_schema': {'name': 'sageql_report_intent'}}}
+    with pytest.raises(RateLimited):
+        client.chat.completions.create(**request)
+    assert budget.state['stop_reason'] == 'rate_limited' and budget.exhausted
+    with pytest.raises(BudgetStopped):
+        client.chat.completions.create(**request)

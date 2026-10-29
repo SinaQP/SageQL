@@ -277,6 +277,13 @@ class Budget:
                 'stop_reason': self.state['stop_reason'],
                 'provider_billed_usd': None}
 
+    def halt(self, reason):
+        """Record a stop reason without raising; later reservations are refused."""
+        with self.lock:
+            if not self.state['stop_reason']:
+                self.state['stop_reason'] = reason
+                self.journal.save()
+
     def stop(self, reason):
         self.state['stop_reason'] = reason
         self.journal.save()

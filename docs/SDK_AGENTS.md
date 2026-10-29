@@ -211,6 +211,18 @@ aggregate conditions, sort and row limit). The title already states measures,
 grouping and periods. Phrases use the public spec, so identities resolved from a
 name lookup never appear. The reference page shows them as «برداشت از درخواست».
 
+### Parallel intent samples
+
+`intent_samples` (1–3, default 1) runs independent intent extractions in parallel,
+so it adds model cost but not latency. Each sample passes the same strict decoding
+and normalization; the sample whose report-defining content (concepts, periods,
+controls, missing details; not prose) agrees with the most others wins, the
+earliest on ties. A failed or malformed sample is tolerated while another
+succeeds, so one dropped connection does not fail the turn; nothing is retried and
+the turn fails only when every sample fails. Structured repair is not used for
+sampled extraction. The observer receives `intent_samples` with the requested,
+valid and agreement counts.
+
 `ReportIntent.unsupported_requirements` defaults to an empty tuple for existing
 typed backends. The live strict schema requires this array and supports
 `time_grain="jalali_month"` directly. Each unavailable requirement must quote

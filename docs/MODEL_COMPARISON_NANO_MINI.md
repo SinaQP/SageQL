@@ -3,6 +3,19 @@
 First live use of per-stage models (recommendation P0-1). The question: which
 step does `gpt-5-nano` fail on, and what does replacing only that step cost?
 
+## Round 5: aborted by provider rate limits
+
+Planned: setup D against setup E (D + 3 parallel intent samples). AvalAI answered
+almost every call with HTTP 429 from the start, in both setups, so **no result
+was obtained and intent sampling remains unmeasured**. A 429 on every call from
+the first request suggests exhausted account credit/quota rather than burst load.
+
+The runner kept reserving calls through the 429s because comparison runs continue
+past failed turns. Reserved-but-unsettled estimates total $1.49; rejected requests
+normally have no billed usage, but billing is unverified. Under the conservative
+estimate the approved $2 is used up, so live tests stopped. The runner now halts a
+batch on the first HTTP 429. Hosts keep setup D.
+
 ## Round 4: reviewer on vs off
 
 Current source (adds the ordering-without-measure fix and report interpretation).
