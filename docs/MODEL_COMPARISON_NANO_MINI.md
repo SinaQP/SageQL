@@ -1,0 +1,106 @@
+# Nano vs mini stage comparison (2026-10-29)
+
+First live use of per-stage models (recommendation P0-1). The question: which
+step does `gpt-5-nano` fail on, and what does replacing only that step cost?
+
+## Setup
+
+| | Setup A | Setup B |
+|---|---|---|
+| Intent | gpt-5-nano | **gpt-5-mini** |
+| Planner / Reviewer | gpt-5-nano | gpt-5-nano |
+| Reasoning effort | low (all stages) | low (all stages) |
+
+- Same frozen synthetic SQLite cases for both: Phase 14 `independent` (N01–N06,
+  19 turns, 13 report goals) and `legacy` (A01–A12, 21 turns, 14 report goals).
+- AvalAI `https://api.avalai.ir/v1`, Chat Completions. Published rates observed
+  2026-10-29: nano $0.05 / $0.40, mini $0.25 / $2.00 per million input/output tokens.
+- Runner: `python -m evaluations.model_comparison` (shared Phase 06 runner, budget,
+  journal and scorer). SDK source fixed at commit `f2d91de` for every run.
+- Approved by the user in chat on 2026-10-29: nano and mini only, about $2 total.
+- Differences from the Phase 14 assessment procedure: wrong synthetic reports are
+  scored without stopping the batch, and a dropped provider connection fails only
+  its turn (no retry; its reservation stays in the budget). Isolation failures
+  and denied reads still stop a run. One sample per turn.
+
+## Results
+
+| | A independent | B independent | A legacy | B legacy | **A total** | **B total** |
+|---|---:|---:|---:|---:|---:|---:|
+| Correct reports | 4/13 | 6/13 | 2/14 | 11/14 | **6/27 (22%)** | **17/27 (63%)** |
+| Complete trajectories | 2/6 | 1/6 | 4/12 | 9/12 | 6/18 | 10/18 |
+| Wrong accepted reports | 0 | 1 | 2 | 0 | 2 | 1 |
+| Turns lost to dropped connection | 1 | 2 | 1 | 0 | 2 | 2 |
+| Model calls | 20 | 39 | 28 | 47 | 48 | 86 |
+| Estimated cost (USD) | 0.0133 | 0.0640 | 0.0168 | 0.0458 | **0.030** | **0.110** |
+| Cost per correct report | | | | | $0.0050 | $0.0065 |
+| Median turn time | 7.6 s | 15.9 s | 10.0 s | 20.7 s | | |
+
+Setup A turns look faster only because most of them fail at the first call. Median
+latency per call was similar across setups: intent 7–9 s, planner about 6 s,
+reviewer 4–7 s. That is much faster than the Phase 14 baseline (default effort,
+about 18 s per intent call), so low reasoning effort is worth keeping.
+
+### Where nano fails
+
+Setup A's intent errors, from the turn diagnostics:
+
+| Error | A independent | A legacy |
+|---|---:|---:|
+| `intent_constraints / comparison_specified` | 6 | 6 |
+| `conditions` (invalid filter/threshold shape) | 0 | 2 |
+| `intent_mismatch / repeated_conflict` | 0 | 1 |
+| `clarification_stalled` | 2 | 1 |
+
+**12 of nano's failures are the same structural error.** It returns a comparison
+period while setting `comparison_specified=false`. `check_intent`
+(`src/sageql/sdk/intent.py:249`) requires an unspecified comparison to be null, so
+the whole intent is rejected before planning. This is a format inconsistency, not
+a misunderstanding of the request. It is the schema problem described in
+recommendation P1-6.
+
+### Where mini still fails
+
+Setup B's remaining errors: `intent_mismatch / repeated_conflict` (3, legacy),
+`agent_exhausted` (2), `clarification_stalled` (2), one `order_by` constraint error,
+and one wrong accepted report (N04 turn 2). The repeated conflicts are the
+nano planner disagreeing with the mini intent, the failure class that
+recommendation P0-2 (build the spec from intent without a planner call) removes.
+
+### Cost
+
+Mini on intent is 78% of setup B's cost ($0.086 of $0.110). Per correct report,
+B costs about 30% more than A ($0.0065 vs $0.0050), but it produces almost three
+times as many correct reports. A full 40-turn pass of setup B costs about $0.11.
+
+## Conclusions
+
+1. **Nano's planner and reviewer are not the main problem; its intent step is.**
+   Replacing only intent with mini raised correct reports from 6/27 to 17/27.
+2. **Most of nano's intent failures look cheaply fixable.** A deterministic fix
+   for the `comparison_specified` inconsistency would remove 12 rejections. Two
+   candidates: treat an unspecified comparison as null during normalization, or
+   replace the flag pair with one tri-state field. Re-test nano after that fix
+   before paying for mini permanently.
+3. **P0-2 is the right next structural step.** The remaining B failures include
+   planner/intent disagreement, which deleting the planner call removes.
+4. **Keep low reasoning effort.** It roughly halved per-call latency versus Phase 14.
+
+## Limits
+
+- One sample per turn and 27 report goals per setup: differences of one or two
+  reports are noise. The A/B gap (6 vs 17) is large enough to matter.
+- Dropped connections cost B two independent turns, and later turns in those
+  trajectories may have been affected.
+- N and A cases now have additional live exposure. Fixes tuned on them need
+  fresh held-out wording before any generalization claim.
+- Costs are published-rate estimates; billed amounts are unverified. Failed calls
+  keep their full reservation in the estimate.
+
+## Spend
+
+Round 2 (these results): $0.140 estimated. A first attempt stopped early on dropped
+connections and is preserved in `dist/comparison/attempt1/`: about $0.066 including
+reservations for failed calls. **Total about $0.21** of the approved $2.
+
+Raw journals, responses and `analysis.json` are in ignored `dist/comparison/r2/`.

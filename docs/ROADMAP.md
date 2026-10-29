@@ -1,5 +1,14 @@
 # SageQL roadmap
 
+## Nano vs mini live comparison (2026-10-29)
+
+[Measured](MODEL_COMPARISON_NANO_MINI.md) on the frozen Phase 14 cohorts with low
+reasoning effort. Nano everywhere: 6/27 correct reports. Mini on intent only:
+17/27. Estimated cost $0.030 vs $0.110 per 40-turn pass. 12 of nano's failures are
+one `comparison_specified` inconsistency in its intent output, a likely cheap
+deterministic fix. Next: fix that, re-test nano, then P0-2. About $0.21 of the
+approved $2 was spent.
+
 ## Per-stage model selection and usage accounting (2026-10-29)
 
 Recommendation P0-1 from [the improvement plan](IMPROVEMENT_RECOMMENDATIONS.md).
