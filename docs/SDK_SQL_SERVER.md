@@ -1,6 +1,25 @@
 # Embedded SDK SQL Server execution scope
 
+Optional [host-owned value vocabulary](SDK_VALUE_VOCABULARY.md) resolves registered
+aliases locally into existing typed predicates. It adds no value SELECT, resolver,
+SQL expression or relationship; canonical values use ordinary bound parameters
+under the same current source policies. Registration is not permission.
+
 This is the scope and safety design for the new `sageql.sdk` adapter. It is separate from the existing Rahtal pilot. The SDK never accepts or executes a SQL string from a model or browser.
+
+The additive [read-consistency contract](SDK_READ_CONSISTENCY.md) covers one
+report's lookup, main query and label batches. The default remains
+`read_consistency="compatibility"`. A host may request `"snapshot"`; SQL Server
+then requires an explicitly supplied, prepared manual-commit SNAPSHOT factory.
+Unavailable capability fails transparently; database options are never enabled.
+See the [separately gated synthetic suite](PHASE11_SQLSERVER_TESTING.md).
+
+The [Phase 12 native assessment](PHASE12_ENGINEERING.md) includes one subsequently
+authorized production read-only connection attempt. It failed with SQLSTATE 08001
+before SQL execution; `.env` was unchanged and no retry or TLS relaxation occurred.
+Native types, read-only permissions and isolation metadata were not obtained.
+Snapshot concurrency/cancellation/full cleanup tests still require an approved
+isolated environment; the mutation suite remains disabled on production.
 
 ## Supported contract
 
@@ -35,9 +54,11 @@ SQLite reference authorizer allows only these registered physical sources.
 Aggregate filters run after grouping and before the outer limit. Rolling date
 windows use bounded count/unit selections resolved locally.
 
-This remains a normal database SELECT under the host connection's isolation
-level. Hosts requiring a consistent snapshot during concurrent writes must
-configure suitable database/connection isolation; the SDK does not change it.
+Default execution remains a SELECT under each host connection's isolation.
+Opt-in snapshot execution shares one prepared connection and transaction across
+contributing reads, then rolls back/closes before session publication. Host
+initialization and pool reset remain required; RCSI alone is not a transaction
+snapshot. Actual SQL Server execution remains unverified in this Phase 11 work.
 
 A report may also select only registered dimensions: the compiler returns bounded `SELECT DISTINCT` combinations with the same typed filters and mandatory policies. Such listings require table presentation, no time grouping, and no comparison. A dimension-only dataset is allowed; an entirely fieldless dataset or report is rejected. This supports employee-name lists without inventing an aggregate or allowing arbitrary columns.
 
@@ -46,8 +67,9 @@ name-based activity requests. A host-declared full-name equality filter uses fix
 concatenation and normalization over one to four registered text columns. The
 engine reads up to two distinct candidate identities with current source policies,
 then binds a unique identity to the registered target equality filter. These are
-two separate single-source SELECTs with ordinary adapter bounds and cleanup;
-they are not a join or an atomic cross-source snapshot. Ambiguous/truncated matches
+separate single-source SELECTs with ordinary adapter bounds. Compatibility mode
+has separate connection lifetimes; snapshot mode covers both under its documented
+prerequisites. They are not a join or a distributed snapshot. Ambiguous/truncated matches
 never select the first row. Lookup rows/IDs do not enter model context.
 
 The adapter accepts only registered dimensional joins and rejects arbitrary expressions, user-supplied SQL, cross-database names, timestamp timezone conversion, fiscal calendars, and write operations. The [explicit Jalali month extension](SDK_JALALI_MONTHS.md) resolves one supplied month/year locally to ordinary Gregorian date bounds before compilation; it adds no calendar SQL expressions or Jalali time buckets. A developer-provided view can encapsulate reviewed business joins; its aggregate grain is the developer's responsibility. The compiler cannot verify that a view's business formula is correct. Models cannot introduce aggregate fan-out by inventing joins.
@@ -88,4 +110,4 @@ all reads; duplicate profiles never multiply target aggregates.
 
 Offline tests use fake providers and SQL Server connections, checking compilation, mandatory policies, denied IDs, metadata drift, type compatibility, ordered binds, cancellation, result limits, resource cleanup, sanitized errors, ownership, persistence, duplicate turns, refinements, and failed revisions. SQLite supplies an explicitly read-only reference for synthetic result correctness; it does not provide SQL Server's fixed-point arithmetic guarantees.
 
-The separate SQL Server integration suite runs only on an explicitly configured synthetic test table/view, with known expected totals and two actor scopes. Set `SAGEQL_SQLSERVER_TEST_CONFIRM_SYNTHETIC=1`, `SAGEQL_SQLSERVER_TEST_CONNECTION`, and `SAGEQL_SQLSERVER_TEST_TABLE`; optional `SAGEQL_SQLSERVER_TEST_SCHEMA` and `SAGEQL_SQLSERVER_TEST_KIND` default to `dbo` and `TABLE`. The host seeds the fixture documented in `tests/test_sdk_adapters.py`; the test performs SELECTs only and never provisions/seeds a database. Run `python -m pytest tests/test_sdk_adapters.py -k opt_in -q`. Rahtal can then provide a local real-data smoke test within its approved catalog. Its credentials and reports remain ignored and local. Integration results must be reported separately from offline test success.
+The separate SQL Server integration suite runs only on an explicitly configured synthetic test table/view, with known expected totals and two actor scopes. Set `SAGEQL_SQLSERVER_TEST_CONFIRM_SYNTHETIC=1`, `SAGEQL_SQLSERVER_TEST_CONNECTION`, and `SAGEQL_SQLSERVER_TEST_TABLE`; optional `SAGEQL_SQLSERVER_TEST_SCHEMA` and `SAGEQL_SQLSERVER_TEST_KIND` default to `dbo` and `TABLE`. The host seeds the fixture documented in `tests/test_sdk_adapters.py`; the test performs SELECTs only and never provisions/seeds a database. After separate synthetic-target authorization, run `python -m pytest tests/test_sdk_adapters.py -k opt_in --run-sqlserver-integration -q`. Ordinary [SQLite-first tests](SQLITE_FIRST_TESTING.md) never use Rahtal production or its credentials. Native integration results must be reported separately from offline test success.

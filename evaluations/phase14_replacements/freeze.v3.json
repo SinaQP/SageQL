@@ -1,0 +1,37 @@
+{
+  "version": 3,
+  "frozen_at": "2026-10-28T07:57:56.357769+00:00",
+  "frozen_before_first_offline_execution": true,
+  "live_authorized": false,
+  "live_exposure": "none; offline-exposed familiar fixtures",
+  "author_exposure": "Separately frozen replacement candidates; offline only, not added to any approved live selection; familiar hosts/source, no external blind author",
+  "replaces_development_cases": [
+    "N01",
+    "N02",
+    "N03",
+    "N04"
+  ],
+  "counts": {
+    "trajectories": 4,
+    "turns": 13,
+    "report_goals": 9
+  },
+  "files": {
+    "evaluations/phase14/cases.v1.json": "653c98514ab115140d94e4aa50fc40192c9d15b65a82c99ecb27d30a47dfc71b",
+    "evaluations/phase14/expectations.v1.json": "89040fd5aec9a7f5095c64eaf2eb78c128520503020631d5efed81aa623cb7ab",
+    "evaluations/phase05/hosts.v1.json": "7fcf86418f6434103517fb856d8beec820d44bb48163036e19e934a1dc724a04",
+    "evaluations/phase05_hosts.py": "aa7320cb90718bccc50d5d2c28041a23e89048ba7c2f267b58404c3720c68c09",
+    "evaluations/phase05_reference.py": "2e9c3ba24fd8f51ed5eccc1ec924f66b39d3b23e4916d02b840c35686b4b8e9d",
+    "evaluations/reference.py": "c57658afc27433b5ea25b777b509cfabe36d6d19f72ae0712c7958cb0f4809ab",
+    "evaluations/scoring.py": "ca8be94b4a12d82e482844872c3b4cf81b5343f3f65972065cf563edc37d800f",
+    "evaluations/phase03_hosts.py": "fe8d167d11748f72ebb1f2175e1ebf944cb9c7c1e693c552f4fc5d0fc87a19b9",
+    "evaluations/phase03/records.json": "ede03aa9e006781539678b2c7a4034cf24bcb2af6ba6b0eb1178b4c0881d0abe",
+    "examples/multi_domain.py": "c776c3f014c1e510a785ad8b8ab8d63600f682a29477e6da137c2b7898eff816",
+    "evaluations/phase14/freeze.v1.json": "56ad5413697a9570da1102849b4dc302de50cabcbe296917003c82df16ef1d72",
+    "evaluations/phase14/cases.v2.json": "9d8d92c44467b430385620fec2ce0981e5da527fb33f1669047439e15f34cfe6",
+    "evaluations/phase14/expectations.v2.json": "09462457e2170f7e08404ec3076480e0473dca98bd791e4d61e31a03568db68d",
+    "evaluations/phase14_replacements/cases.v3.json": "37bb76b7b568cdf5ed4bca63973ef717742cc4703327a0a4bbee88fc4fce3a7d",
+    "evaluations/phase14_replacements/expectations.v3.json": "f314bfa996485118465506eb051cec87c9d33f7bebde4f89fc22b32358c14ad8"
+  },
+  "author_correction": "V3 changes only eligibility/exposure metadata for review; V2 questions and every expected answer remain identical."
+}

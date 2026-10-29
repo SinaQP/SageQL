@@ -1,0 +1,2221 @@
+{
+  "schema_version": 1,
+  "mode": "scripted_offline",
+  "corpus_sha256": "86656ecc57c75760930ee4eafddbb55e71d688c712a21c5c86151dcb2ffad43c",
+  "package_source_sha256": "b0353dc9689c4fceab56ccf10757d10ecde952efe04dac17508d6dc3edada7ca",
+  "evaluator_sha256": "0a24f866be5386302a73cd336a79ff9e100484a26098ec5ad2a52ba9af7274bd",
+  "host_fixture_sha256": "c776c3f014c1e510a785ad8b8ab8d63600f682a29477e6da137c2b7898eff816",
+  "environment": {
+    "python": "3.12.0",
+    "sqlglot": "30.19.0",
+    "sageql": "0.1.0"
+  },
+  "live_model_status": "not_executed",
+  "summary": {
+    "cases": 61,
+    "outcomes": {
+      "correct_block": 1,
+      "correct_clarification": 6,
+      "correct_denial": 1,
+      "correct_report": 40,
+      "correct_unsupported": 11,
+      "operational_failure": 2
+    },
+    "supported_completion": {
+      "numerator": 40,
+      "denominator": 40,
+      "value": 1.0
+    },
+    "semantic_correctness": {
+      "numerator": 40,
+      "denominator": 40,
+      "value": 1.0
+    },
+    "report_completeness": {
+      "numerator": 40,
+      "denominator": 40,
+      "value": 1.0
+    },
+    "clarification_precision": {
+      "numerator": 6,
+      "denominator": 6,
+      "value": 1.0
+    },
+    "unsupported_classification_accuracy": {
+      "numerator": 57,
+      "denominator": 57,
+      "value": 1.0
+    },
+    "unauthorized_prevention": {
+      "numerator": 1,
+      "denominator": 1,
+      "value": 1.0
+    },
+    "recovery_effectiveness": {
+      "numerator": 2,
+      "denominator": 2,
+      "value": 1.0
+    },
+    "new_regressions": 0,
+    "known_failures": 0,
+    "model_calls": 147,
+    "model_calls_per_request": 2.130434782608696,
+    "requests": 69,
+    "database_calls": 47,
+    "recovery_attempts": {
+      "planning_revisions": 2,
+      "structured_repairs": 1,
+      "intent_reconsiderations": 0
+    },
+    "latency_ms": {
+      "total": 1576.06,
+      "median": 27.819
+    }
+  },
+  "results": [
+    {
+      "id": "retail_groups_en",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "relationship",
+        "policy"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 54.148
+    },
+    {
+      "id": "library_groups_en",
+      "domain": "library",
+      "tags": [
+        "en",
+        "independent_domain",
+        "count"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 31.689
+    },
+    {
+      "id": "retail_jalali_fa",
+      "domain": "retail",
+      "tags": [
+        "fa",
+        "jalali"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 27.121
+    },
+    {
+      "id": "library_jalali_fa",
+      "domain": "library",
+      "tags": [
+        "fa",
+        "jalali"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 27.822
+    },
+    {
+      "id": "retail_daily_filter",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "filter",
+        "dates"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 28.437
+    },
+    {
+      "id": "library_mean",
+      "domain": "library",
+      "tags": [
+        "en",
+        "average",
+        "filter"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 29.425
+    },
+    {
+      "id": "retail_top_group",
+      "domain": "retail",
+      "tags": [
+        "ranking",
+        "aggregate_filter"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 28.886
+    },
+    {
+      "id": "retail_listing",
+      "domain": "retail",
+      "tags": [
+        "listing",
+        "policy"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 22.587
+    },
+    {
+      "id": "retail_lookup",
+      "domain": "retail",
+      "tags": [
+        "lookup",
+        "policy"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 2,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 30.106
+    },
+    {
+      "id": "retail_labels",
+      "domain": "retail",
+      "tags": [
+        "label",
+        "ranking"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 2,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 29.218
+    },
+    {
+      "id": "library_participant_mean",
+      "domain": "library",
+      "tags": [
+        "participant_mean",
+        "aggregation"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 29.002
+    },
+    {
+      "id": "retail_comparison",
+      "domain": "retail",
+      "tags": [
+        "comparison",
+        "null"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 23.461
+    },
+    {
+      "id": "retail_change",
+      "domain": "retail",
+      "tags": [
+        "comparison",
+        "fixed_change"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 32.332
+    },
+    {
+      "id": "retail_year_question",
+      "domain": "retail",
+      "tags": [
+        "clarification",
+        "en"
+      ],
+      "goal": "clarification",
+      "status": "needs_clarification",
+      "outcome": "correct_clarification",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_clarification",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 12.635
+    },
+    {
+      "id": "retail_year_answer",
+      "domain": "retail",
+      "tags": [
+        "conversation",
+        "clarification",
+        "fa"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 6,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 41.783
+    },
+    {
+      "id": "library_refinement",
+      "domain": "library",
+      "tags": [
+        "conversation",
+        "persistence"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 6,
+      "database_calls": 2,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 64.065
+    },
+    {
+      "id": "unsupported_shares_en",
+      "domain": "retail",
+      "tags": [
+        "unsupported",
+        "en"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 10.85
+    },
+    {
+      "id": "unsupported_absence_fa",
+      "domain": "library",
+      "tags": [
+        "unsupported",
+        "fa"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 11.591
+    },
+    {
+      "id": "unauthorized_actor",
+      "domain": "retail",
+      "tags": [
+        "authorization"
+      ],
+      "goal": "denial",
+      "status": "blocked",
+      "outcome": "correct_denial",
+      "checks": {
+        "invariants": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_denial",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 0.037
+    },
+    {
+      "id": "wrong_period_recovery",
+      "domain": "retail",
+      "tags": [
+        "recovery",
+        "period"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": true,
+      "model_calls": 4,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 1,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 27.406
+    },
+    {
+      "id": "malformed_intent_recovery",
+      "domain": "library",
+      "tags": [
+        "recovery",
+        "structured"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": true,
+      "model_calls": 4,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 1,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 28.848
+    },
+    {
+      "id": "provider_failure",
+      "domain": "retail",
+      "tags": [
+        "failure",
+        "redaction"
+      ],
+      "goal": "failure",
+      "status": "failed",
+      "outcome": "operational_failure",
+      "checks": {
+        "invariants": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "operational_failure",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 1,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 11.697
+    },
+    {
+      "id": "database_failure",
+      "domain": "library",
+      "tags": [
+        "failure",
+        "no_replay"
+      ],
+      "goal": "failure",
+      "status": "failed",
+      "outcome": "operational_failure",
+      "checks": {
+        "invariants": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "operational_failure",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 19.271
+    },
+    {
+      "id": "model_sql_rejected",
+      "domain": "retail",
+      "tags": [
+        "untrusted_output"
+      ],
+      "goal": "blocked",
+      "status": "blocked",
+      "outcome": "correct_block",
+      "checks": {
+        "invariants": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_block",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 2,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 10.463
+    },
+    {
+      "id": "known_negated_share",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "negation"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 27.526
+    },
+    {
+      "id": "known_negated_daily",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "negation",
+        "correlated_error"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 4,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 1,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 27.897
+    },
+    {
+      "id": "known_exact_mean_label",
+      "domain": "library",
+      "tags": [
+        "participant_mean",
+        "aggregation"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 31.055
+    },
+    {
+      "id": "p02_share_omit",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 27.282
+    },
+    {
+      "id": "p02_share_exclude_fa",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 27.819
+    },
+    {
+      "id": "p02_share_literal_example",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 28.374
+    },
+    {
+      "id": "p02_unsupported_quoted",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 10.987
+    },
+    {
+      "id": "p02_unsupported_quoted_fa",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 10.443
+    },
+    {
+      "id": "p02_unsupported_mixed_ratio",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 10.673
+    },
+    {
+      "id": "p02_unsupported_mixed_ratio_fa",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 10.386
+    },
+    {
+      "id": "p02_unsupported_mixed_same",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 11.134
+    },
+    {
+      "id": "p02_unsupported_negative_grain",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 10.942
+    },
+    {
+      "id": "p02_unsupported_positive_fa",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 11.148
+    },
+    {
+      "id": "p02_grain_daily",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 26.425
+    },
+    {
+      "id": "p02_grain_monthly_not_daily",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 26.937
+    },
+    {
+      "id": "p02_grain_example_daily",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 30.706
+    },
+    {
+      "id": "p02_grain_quoted_daily",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 27.973
+    },
+    {
+      "id": "p02_jalali_monthly_exclusion",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 29.382
+    },
+    {
+      "id": "p02_clarify_quoted",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "clarification",
+      "status": "needs_clarification",
+      "outcome": "correct_clarification",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_clarification",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 10.57
+    },
+    {
+      "id": "p02_clarify_conflict",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "clarification",
+      "status": "needs_clarification",
+      "outcome": "correct_clarification",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_clarification",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 11.35
+    },
+    {
+      "id": "p02_clarify_no_replacement",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "clarification",
+      "status": "needs_clarification",
+      "outcome": "correct_clarification",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_clarification",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 12.946
+    },
+    {
+      "id": "p02_clarify_alternative",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "clarification",
+      "status": "needs_clarification",
+      "outcome": "correct_clarification",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_clarification",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 12.096
+    },
+    {
+      "id": "p02_clarify_unknown_operation_quote",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "clarification",
+      "status": "needs_clarification",
+      "outcome": "correct_clarification",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_clarification",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 11.772
+    },
+    {
+      "id": "p02_unsupported_hourly",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 11.462
+    },
+    {
+      "id": "p02_mean_alias",
+      "domain": "library",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 28.465
+    },
+    {
+      "id": "p02_mean_quoted_label",
+      "domain": "library",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 29.955
+    },
+    {
+      "id": "p02_mean_exclusion",
+      "domain": "library",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 28.415
+    },
+    {
+      "id": "p02_units_excluding_sales",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 23.419
+    },
+    {
+      "id": "p02_two_distinct_averages",
+      "domain": "library",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 31.911
+    },
+    {
+      "id": "p02_literal_mean_example",
+      "domain": "library",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 29.629
+    },
+    {
+      "id": "p02_remove_dimension_refinement",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 6,
+      "database_calls": 2,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 54.598
+    },
+    {
+      "id": "p02_remove_grain_refinement",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 6,
+      "database_calls": 2,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 59.475
+    },
+    {
+      "id": "p02_remove_excluded_operation",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 6,
+      "database_calls": 2,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 60.873
+    },
+    {
+      "id": "p02_negated_requirement_ledger",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 30.071
+    },
+    {
+      "id": "p02_quote_answer_literal",
+      "domain": "retail",
+      "tags": [
+        "phase02",
+        "quote",
+        "conversation"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 49.454
+    },
+    {
+      "id": "p02_quote_answer_actual",
+      "domain": "retail",
+      "tags": [
+        "phase02",
+        "quote",
+        "conversation"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 23.888
+    },
+    {
+      "id": "p02_pending_grouping_answer",
+      "domain": "retail",
+      "tags": [
+        "phase02",
+        "conversation",
+        "period"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 35.742
+    }
+  ],
+  "cohort": "all"
+}

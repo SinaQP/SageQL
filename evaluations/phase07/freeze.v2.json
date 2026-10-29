@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "frozen_before_phase07_sdk_repair": false,
+  "live_exposure": "none",
+  "files": {
+    "evaluations/phase07/cases.v1.json": "6afbd150e335e5dd75917a5250459d221c6f45e5028666a4fd517079677e7562",
+    "evaluations/phase06/cases.v4.json": "2592b5fe171b746f758cf093649b463a9c3f103f49c03d16600ee7914804cda3",
+    "evaluations/phase06/freeze.v4.json": "4e62237611dbce72f63004ae2dac453cd7bb23c8092b6ecba9f56906062bd5eb",
+    "evaluations/phase05/hosts.v1.json": "7fcf86418f6434103517fb856d8beec820d44bb48163036e19e934a1dc724a04",
+    "evaluations/phase05_hosts.py": "aa7320cb90718bccc50d5d2c28041a23e89048ba7c2f267b58404c3720c68c09",
+    "evaluations/phase05_reference.py": "2e9c3ba24fd8f51ed5eccc1ec924f66b39d3b23e4916d02b840c35686b4b8e9d",
+    "evaluations/reference.py": "c57658afc27433b5ea25b777b509cfabe36d6d19f72ae0712c7958cb0f4809ab",
+    "evaluations/phase03_hosts.py": "fe8d167d11748f72ebb1f2175e1ebf944cb9c7c1e693c552f4fc5d0fc87a19b9",
+    "evaluations/phase03/records.json": "ede03aa9e006781539678b2c7a4034cf24bcb2af6ba6b0eb1178b4c0881d0abe",
+    "examples/multi_domain.py": "c776c3f014c1e510a785ad8b8ab8d63600f682a29477e6da137c2b7898eff816",
+    "evaluations/phase07/cases.v2.json": "1b2095f0ae0bdcfb4999fa0497a4bfb73e0a0e0afd5de537b7876925869b0622"
+  },
+  "counts": {
+    "assessment": 13,
+    "development": 14
+  },
+  "frozen_before_A07_suffix_fix": true,
+  "frozen_before_replacement_execution": true,
+  "promoted_after_first_measurement": [
+    "A07"
+  ],
+  "replacements": [
+    "A14"
+  ],
+  "annotation_corrections": [
+    "A13"
+  ]
+}

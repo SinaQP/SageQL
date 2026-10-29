@@ -1,0 +1,3651 @@
+{
+  "schema_version": 6,
+  "phase": 14,
+  "date": "2026-10-28",
+  "status": "V3 stopped on wrong accepted grouping; N03 correction exercised live; final fixes offline-only",
+  "previous_verification": "verification.v5.json",
+  "starting_baseline": {
+    "SDK_sha256": "ccc6dae186ccb424138f8d3832a2bd8ff72d5dfe334ce991cf8178d4c56ad680",
+    "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec",
+    "pytest_passed": 2360,
+    "native_skips": 13
+  },
+  "current_offline_SDK_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+  "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec",
+  "authorized_scope": {
+    "path": "dist\\phase14\\completion\\approval-scope.v3.json",
+    "sha256": "93f8349714c08970e4f5b806ceb44e5e87f46bd2215aabd5090d97c23c7d2987",
+    "closed": true,
+    "order_preserved": true,
+    "unused_allowance_reused": false
+  },
+  "actual_live": {
+    "configuration": {
+      "max_structured_repairs": 1,
+      "mode": "live",
+      "adapter": "sdk_chat_completions",
+      "model": "gpt-5-nano",
+      "case_ids": [
+        "N02",
+        "N03",
+        "N04"
+      ],
+      "selection_sha256": "147277cf5383bc3052c8515c8b3eef7d83801ddd8f0e68da98fabe352516089d",
+      "corpus_sha256": "9d8d92c44467b430385620fec2ce0981e5da527fb33f1669047439e15f34cfe6",
+      "freeze_sha256": "41e3e4253051003687afadeda73768f68e0e43688f6e628b02dd01557eae84b3",
+      "source_sha256": "ccc6dae186ccb424138f8d3832a2bd8ff72d5dfe334ce991cf8178d4c56ad680",
+      "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec"
+    },
+    "batch": {
+      "authorization": "Explicit human approval of completion approval-scope.v3.json",
+      "approved_scope_sha256": "93f8349714c08970e4f5b806ceb44e5e87f46bd2215aabd5090d97c23c7d2987",
+      "credential_source": "root model-key setting only",
+      "provider": "AvalAI",
+      "model": "gpt-5-nano",
+      "accounting_mode": "exploratory",
+      "rahtal_env_read": false,
+      "production_database_access": false,
+      "selections": [
+        {
+          "name": "development",
+          "output_directory": "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-targeted-development-v3",
+          "preserved_copy": "<workspace>\\dist\\phase14\\completion\\live-v3\\development-first",
+          "elapsed_seconds": 349.547,
+          "exception_sanitized": true,
+          "budget_accounting": {
+            "accounting_mode": "exploratory",
+            "requests_dispatched": 17,
+            "input_charged_or_reserved": 74601,
+            "output_charged_or_reserved": 49876,
+            "estimated_usd_charged_or_reserved": "0.02368045",
+            "uncertain_requests": 0,
+            "stop_reason": null,
+            "provider_billed_usd": null
+          },
+          "summary": {
+            "trajectories": 3,
+            "turns": 9,
+            "trajectory_correctness": {
+              "numerator": 1,
+              "denominator": 3,
+              "value": 0.3333333333333333
+            },
+            "supported_completion": {
+              "numerator": 4,
+              "denominator": 6,
+              "value": 0.6666666666666666
+            },
+            "semantic_correctness": {
+              "numerator": 4,
+              "denominator": 5,
+              "value": 0.8
+            },
+            "requirement_completeness": {
+              "numerator": 64,
+              "denominator": 78,
+              "value": 0.8205128205128205
+            },
+            "complete_supported_turns": {
+              "numerator": 4,
+              "denominator": 6,
+              "value": 0.6666666666666666
+            },
+            "clarification_precision": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "unnecessary_clarifications": 0,
+            "correct_unsupported": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "incorrect_unsupported": 0,
+            "unauthorized_prevention": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "incorrect_accepted_specifications": 1,
+            "outcomes": {
+              "correct_clarification": 1,
+              "correct_block": 1,
+              "incorrect_rejection": 2,
+              "correct_report": 4,
+              "semantic_error": 1
+            },
+            "diagnoses": {
+              "required_clarification": 1,
+              "planning_failure": 2,
+              "extraction_failure": 1,
+              "correct_report": 4,
+              "incorrect_accepted_specification": 1
+            },
+            "failure_origins": {
+              "extraction_failure": 1
+            },
+            "model_calls_by_stage": {
+              "intent": 7,
+              "planning": 5,
+              "review": 5
+            },
+            "stage_latency_ms": {
+              "intent": 180293.202,
+              "planning": 106201.461,
+              "review": 51191.629
+            },
+            "scenario_latency_ms": 338581.068,
+            "database_calls": 5,
+            "revisions": 0,
+            "structured_repairs": 1,
+            "intent_reconsiderations": 0,
+            "deterministic_rejections": 0,
+            "evidence_corrections": 5,
+            "reviewer": {
+              "incorrect_rejected": 0,
+              "incorrect_approved": 1,
+              "correct_rejected": 0,
+              "correct_approved": 4,
+              "useful_revisions": 0,
+              "unproductive_revisions": 0
+            },
+            "usage_coverage": {
+              "numerator": 17,
+              "denominator": 17,
+              "value": 1.0
+            },
+            "tokens": {
+              "input": 74601,
+              "output": 49876
+            },
+            "estimated_cost": "0.02368045",
+            "cost_status": "Exploratory published-rate estimate/reservation; billing and input bound unverified",
+            "failing_trajectories": [
+              "N02",
+              "N04"
+            ],
+            "protocol": {
+              "issued": 11,
+              "valid": 5,
+              "malformed_json": 1
+            },
+            "database_latency_ms": 238.547,
+            "recovery_latency_ms": 44439.417,
+            "calls_per_complete_report": {
+              "numerator": 17,
+              "denominator": 4,
+              "value": 4.25
+            },
+            "missing_clarifications": 1,
+            "recovery_success": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "unauthorized_reads": 0,
+            "clarification_turnaround_ms": null,
+            "usage_details": {
+              "cached_input": {
+                "observed_calls": 17,
+                "tokens": 46464
+              },
+              "reasoning": {
+                "observed_calls": 17,
+                "tokens": 48000
+              }
+            },
+            "diagnostic_call_coverage": {
+              "numerator": 17,
+              "denominator": 17,
+              "value": 1.0
+            },
+            "completion_over_planned_supported_turns": {
+              "numerator": 4,
+              "denominator": 8,
+              "value": 0.5
+            },
+            "correct_over_planned_trajectories": {
+              "numerator": 1,
+              "denominator": 3,
+              "value": 0.3333333333333333
+            },
+            "stage_correctness": {
+              "decoded_intent": {
+                "numerator": 2,
+                "denominator": 7,
+                "value": 0.2857142857142857
+              },
+              "effective_intent": {
+                "numerator": 4,
+                "denominator": 5,
+                "value": 0.8
+              },
+              "proposal": {
+                "numerator": 2,
+                "denominator": 5,
+                "value": 0.4
+              }
+            },
+            "reviewer_incorrect_plan_rejection": {
+              "numerator": 0,
+              "denominator": 1,
+              "value": 0.0
+            },
+            "reviewer_false_rejection": {
+              "numerator": 0,
+              "denominator": 4,
+              "value": 0.0
+            },
+            "stage_detection": {
+              "decoded_intent_wrong": 5,
+              "proposals_wrong": 3,
+              "wrong_review_approved": 1,
+              "final_report_wrong": true
+            },
+            "model_sql_attempts_accepted": 0,
+            "payload_isolation_failures": 0
+          },
+          "runner_reason": "runner_failure",
+          "unexecuted_turns": 2
+        }
+      ],
+      "requests": 17,
+      "estimated_usd": "0.02368045",
+      "stop_reason": "wrong_report_or_security_boundary",
+      "elapsed_seconds": 349.594,
+      "outcome": "batch_stopped"
+    },
+    "summary_unchanged": {
+      "trajectories": 3,
+      "turns": 9,
+      "trajectory_correctness": {
+        "numerator": 1,
+        "denominator": 3,
+        "value": 0.3333333333333333
+      },
+      "supported_completion": {
+        "numerator": 4,
+        "denominator": 6,
+        "value": 0.6666666666666666
+      },
+      "semantic_correctness": {
+        "numerator": 4,
+        "denominator": 5,
+        "value": 0.8
+      },
+      "requirement_completeness": {
+        "numerator": 64,
+        "denominator": 78,
+        "value": 0.8205128205128205
+      },
+      "complete_supported_turns": {
+        "numerator": 4,
+        "denominator": 6,
+        "value": 0.6666666666666666
+      },
+      "clarification_precision": {
+        "numerator": 1,
+        "denominator": 1,
+        "value": 1.0
+      },
+      "unnecessary_clarifications": 0,
+      "correct_unsupported": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null
+      },
+      "incorrect_unsupported": 0,
+      "unauthorized_prevention": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null
+      },
+      "incorrect_accepted_specifications": 1,
+      "outcomes": {
+        "correct_clarification": 1,
+        "correct_block": 1,
+        "incorrect_rejection": 2,
+        "correct_report": 4,
+        "semantic_error": 1
+      },
+      "diagnoses": {
+        "required_clarification": 1,
+        "planning_failure": 2,
+        "extraction_failure": 1,
+        "correct_report": 4,
+        "incorrect_accepted_specification": 1
+      },
+      "failure_origins": {
+        "extraction_failure": 1
+      },
+      "model_calls_by_stage": {
+        "intent": 7,
+        "planning": 5,
+        "review": 5
+      },
+      "stage_latency_ms": {
+        "intent": 180293.202,
+        "planning": 106201.461,
+        "review": 51191.629
+      },
+      "scenario_latency_ms": 338581.068,
+      "database_calls": 5,
+      "revisions": 0,
+      "structured_repairs": 1,
+      "intent_reconsiderations": 0,
+      "deterministic_rejections": 0,
+      "evidence_corrections": 5,
+      "reviewer": {
+        "incorrect_rejected": 0,
+        "incorrect_approved": 1,
+        "correct_rejected": 0,
+        "correct_approved": 4,
+        "useful_revisions": 0,
+        "unproductive_revisions": 0
+      },
+      "usage_coverage": {
+        "numerator": 17,
+        "denominator": 17,
+        "value": 1.0
+      },
+      "tokens": {
+        "input": 74601,
+        "output": 49876
+      },
+      "estimated_cost": "0.02368045",
+      "cost_status": "Exploratory published-rate estimate/reservation; billing and input bound unverified",
+      "failing_trajectories": [
+        "N02",
+        "N04"
+      ],
+      "protocol": {
+        "issued": 11,
+        "valid": 5,
+        "malformed_json": 1
+      },
+      "database_latency_ms": 238.547,
+      "recovery_latency_ms": 44439.417,
+      "calls_per_complete_report": {
+        "numerator": 17,
+        "denominator": 4,
+        "value": 4.25
+      },
+      "missing_clarifications": 1,
+      "recovery_success": {
+        "numerator": 0,
+        "denominator": 0,
+        "value": null
+      },
+      "unauthorized_reads": 0,
+      "clarification_turnaround_ms": null,
+      "usage_details": {
+        "cached_input": {
+          "observed_calls": 17,
+          "tokens": 46464
+        },
+        "reasoning": {
+          "observed_calls": 17,
+          "tokens": 48000
+        }
+      },
+      "diagnostic_call_coverage": {
+        "numerator": 17,
+        "denominator": 17,
+        "value": 1.0
+      },
+      "completion_over_planned_supported_turns": {
+        "numerator": 4,
+        "denominator": 8,
+        "value": 0.5
+      },
+      "correct_over_planned_trajectories": {
+        "numerator": 1,
+        "denominator": 3,
+        "value": 0.3333333333333333
+      },
+      "stage_correctness": {
+        "decoded_intent": {
+          "numerator": 2,
+          "denominator": 7,
+          "value": 0.2857142857142857
+        },
+        "effective_intent": {
+          "numerator": 4,
+          "denominator": 5,
+          "value": 0.8
+        },
+        "proposal": {
+          "numerator": 2,
+          "denominator": 5,
+          "value": 0.4
+        }
+      },
+      "reviewer_incorrect_plan_rejection": {
+        "numerator": 0,
+        "denominator": 1,
+        "value": 0.0
+      },
+      "reviewer_false_rejection": {
+        "numerator": 0,
+        "denominator": 4,
+        "value": 0.0
+      },
+      "stage_detection": {
+        "decoded_intent_wrong": 5,
+        "proposals_wrong": 3,
+        "wrong_review_approved": 1,
+        "final_report_wrong": true
+      },
+      "model_sql_attempts_accepted": 0,
+      "payload_isolation_failures": 0
+    },
+    "raw_artifact_hashes": {
+      "batch.json": "857a458daff74c942f7fc09864b3af822e15cae85e64f5e9f814a4f0c9da60dc",
+      "development-first\\journal.json": "1e8c12c08fe85822e84369a57f609f16bf357c6014121444d9fb1aeb6b6ccdb2",
+      "development-first\\responses\\call-0001.json": "38695601f8634ea83f23b3a90a7a9fdb0e6e43524173fb85ba8ed755a39ea63c",
+      "development-first\\responses\\call-0002.json": "c0d5b956cc802eba75a34e9f81c9f55ab89e09c8136bc72487f9640a42025218",
+      "development-first\\responses\\call-0003.json": "8740ea96fdf6561aa8d44c853c6e7aac1602fd389215f9f632f6cb353632db94",
+      "development-first\\responses\\call-0004.json": "7db5c71d21e740cc37e4b1b92147db0c56b027877450636ae3c0ef3ed056349e",
+      "development-first\\responses\\call-0005.json": "a78bb360985cb221ee90fbe021162bfc174bd1801e2baec293708f8dcd8d96e7",
+      "development-first\\responses\\call-0006.json": "d360baa4d34d7b1930c6f41f8d1733b997822c8272deff6010a8d1b38ca5963a",
+      "development-first\\responses\\call-0007.json": "4463d2e6e3386f184c163e3319276972219b840fd28bd931dbe75f4435337913",
+      "development-first\\responses\\call-0008.json": "793668bc143d76fdcb56811015e38d0fcfc74bb4ed0e0724f416a1b310506381",
+      "development-first\\responses\\call-0009.json": "9040b1e0b0d76d742bc635a5caa50842e3f97ff5c9c44367e3277a67415cdb41",
+      "development-first\\responses\\call-0010.json": "ab3b7e19b1497c9b0643fdea87aa76575e2f0799f4c60a9fd416dfa3d6e7c607",
+      "development-first\\responses\\call-0011.json": "39eec374c59a1bf1c0d94fb2125f1f55ea65c047f7cff7b17465929c366c0e39",
+      "development-first\\responses\\call-0012.json": "63109bf96db5febefc6c6bdecfb4ddec292fff9af5479a1777ccb8af4e33237f",
+      "development-first\\responses\\call-0013.json": "af53f3b4015716c5ddc9d62ebfa8ba1b4c32dd5aa3d6def0c2c38d0978b490e9",
+      "development-first\\responses\\call-0014.json": "e614c15939ef4adb25d7255c5bf3117be1a316d77088264784b3dbd03333899d",
+      "development-first\\responses\\call-0015.json": "3101e04f81140217c61a3bdf51e5a260e90ca1d6e46e2473e3c8b35c0b45e954",
+      "development-first\\responses\\call-0016.json": "c316df6672d7bf427f3932eaf5c8b871071bad447daa0620b3a6b9f6e4a3675a",
+      "development-first\\responses\\call-0017.json": "860298114a36f342990797baf705d52585156025cefde2a8a42302145d789751",
+      "development-first\\results.json": "4de7e236d49523a9807f0b1454e2e27bc100eddceece6377bd932e3021230944"
+    },
+    "requests": 17,
+    "executed_turns": 9,
+    "planned_turns": 24,
+    "unexecuted_turns": 15,
+    "correct_report_goals": {
+      "numerator": 4,
+      "denominator": 6
+    },
+    "correct_published_reports": {
+      "numerator": 4,
+      "denominator": 5
+    },
+    "correct_attempted_conversations_including_partial": {
+      "numerator": 1,
+      "denominator": 3
+    },
+    "correct_fully_executed_conversations": {
+      "numerator": 1,
+      "denominator": 2
+    },
+    "partial_conversation": "N04",
+    "clarification_precision": {
+      "numerator": 1,
+      "denominator": 1
+    },
+    "clarification_recall": {
+      "numerator": 1,
+      "denominator": 2
+    },
+    "requirement_satisfaction": {
+      "numerator": 64,
+      "denominator": 78
+    },
+    "N04_wrong_grouping_not_exonerated_by_equal_amount": true,
+    "N03_typed_period_correction_exercised_live_turns": [
+      2,
+      3
+    ],
+    "N02_confirmed_role_anchor_not_reached_due_to_decode_failure": true,
+    "N04_comparison_followups_unexecuted": true,
+    "replacements_score": null,
+    "by_stage": {
+      "intent": {
+        "requests": 7,
+        "tokens": {
+          "input": 32145,
+          "output": 30415,
+          "total": 62560,
+          "cached_input": 19584,
+          "reasoning": 29376
+        }
+      },
+      "planning": {
+        "requests": 5,
+        "tokens": {
+          "input": 23939,
+          "output": 13834,
+          "total": 37773,
+          "cached_input": 15616,
+          "reasoning": 13120
+        }
+      },
+      "review": {
+        "requests": 5,
+        "tokens": {
+          "input": 18517,
+          "output": 5627,
+          "total": 24144,
+          "cached_input": 11264,
+          "reasoning": 5504
+        }
+      }
+    },
+    "tokens_independently_summed": {
+      "input": 74601,
+      "output": 49876,
+      "total": 124477,
+      "cached_input": 46464,
+      "reasoning": 48000
+    },
+    "estimated_usd": "0.02368045",
+    "cached_input_and_reasoning_are_subsets": true,
+    "cache_discount_assumed": false,
+    "provider_billed_usd": null,
+    "billing_guaranteed": false,
+    "usage_uncertain_requests": 0,
+    "denied_policy_turns_executed": 0
+  },
+  "causal_audit": "causal-audit.v3.json",
+  "comparison": {
+    "V2_source": "8e3c03564c4169c521531713aec01c86293ca2f0063f43a0e03d260eb13159b2",
+    "N02_report_completion": "V2 1/2; V3 1/2; different first failing boundary",
+    "N03": "V2 t1 correct/t2 typed failure/t3 unexecuted; V3 all three correct with two actual canonicalizations",
+    "aggregate_4_of_6_populations_differ": true,
+    "causal_or_blind_comparison_claimed": false
+  },
+  "historical_replay": {
+    "SDK_sha256": "ccc6dae186ccb424138f8d3832a2bd8ff72d5dfe334ce991cf8178d4c56ad680",
+    "responses": 17,
+    "divergences": [],
+    "external_requests": 0,
+    "artifact": "dist/phase14/completion/live-v3/historical-replay.v1.json",
+    "sha256": "6bbc327252ea1b56a7c9e57f1b6a8e081a38c7b36a39f5064e7a6605bc5f53b8"
+  },
+  "counterfactual": {
+    "mode": "counterfactual_offline_only",
+    "external_requests": 0,
+    "SDK_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+    "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec",
+    "N02": {
+      "known_year_question_correct": true,
+      "recorded_responses_consumed": 1,
+      "empty_repair_not_used": true,
+      "model_judgment_not_reevaluated": true,
+      "result": {
+        "id": "N02",
+        "cohort": "phase14_independent",
+        "domain": "workshop",
+        "tags": [
+          "English",
+          "ambiguous_owner",
+          "multiple_missing_details",
+          "negative_answer",
+          "reopen",
+          "new_report",
+          "policy_isolation"
+        ],
+        "host_version": "workshop-ambiguous-v1",
+        "correct": true,
+        "first_failing_turn": null,
+        "unexecuted_turns": 0,
+        "turns": [
+          {
+            "index": 1,
+            "goal": "clarification",
+            "status": "needs_clarification",
+            "outcome": "correct_clarification",
+            "diagnosis": "required_clarification",
+            "first_disagreement_stage": null,
+            "stage_requirements": [],
+            "failure_origin": null,
+            "correct": true,
+            "requirements": {},
+            "checks": {
+              "invariants": true,
+              "clarification": true,
+              "clarification_detail": true,
+              "receipt": true,
+              "persisted": true,
+              "previous_preserved": true,
+              "payload_isolation": true
+            },
+            "accepted_specification_incorrect": false,
+            "database_calls": 0,
+            "elapsed_ms": 24.828,
+            "vocabulary_resolution_ms": 5.1628,
+            "model_calls": [],
+            "reviews": [],
+            "revisions": 0,
+            "deterministic_rejections": 0,
+            "evidence_corrections": 0,
+            "structured_repairs": 0,
+            "intent_reconsiderations": 0,
+            "protocol": [],
+            "safe_errors": [],
+            "database_latency_ms": 0.0,
+            "stage_detection": {
+              "decoded_intent_wrong": 0,
+              "proposals_wrong": 0,
+              "wrong_review_approved": 0,
+              "wrong_review_rejected": 0,
+              "local_checks_failed": 0,
+              "final_report_wrong": false
+            }
+          },
+          {
+            "index": 2,
+            "goal": "blocked",
+            "status": "blocked",
+            "outcome": "correct_block",
+            "diagnosis": "planning_failure",
+            "first_disagreement_stage": null,
+            "stage_requirements": [],
+            "failure_origin": null,
+            "correct": true,
+            "requirements": {},
+            "checks": {
+              "invariants": true,
+              "receipt": true,
+              "persisted": true,
+              "previous_preserved": true,
+              "payload_isolation": true
+            },
+            "accepted_specification_incorrect": false,
+            "database_calls": 0,
+            "elapsed_ms": 25.983,
+            "vocabulary_resolution_ms": 0.3196,
+            "model_calls": [],
+            "reviews": [],
+            "revisions": 0,
+            "deterministic_rejections": 0,
+            "evidence_corrections": 0,
+            "structured_repairs": 0,
+            "intent_reconsiderations": 0,
+            "protocol": [],
+            "safe_errors": [
+              {
+                "code": "clarification_stalled"
+              }
+            ],
+            "database_latency_ms": 0.0,
+            "stage_detection": {
+              "decoded_intent_wrong": 0,
+              "proposals_wrong": 0,
+              "wrong_review_approved": 0,
+              "wrong_review_rejected": 0,
+              "local_checks_failed": 0,
+              "final_report_wrong": false
+            }
+          },
+          {
+            "index": 3,
+            "goal": "clarification",
+            "status": "needs_clarification",
+            "outcome": "correct_clarification",
+            "diagnosis": "required_clarification",
+            "first_disagreement_stage": "decoded_intent",
+            "stage_requirements": [
+              {
+                "stage": "decoded_intent",
+                "checks": {
+                  "metrics": true,
+                  "dimensions": true,
+                  "filters": false,
+                  "period": false,
+                  "comparison": true,
+                  "chart": true,
+                  "time_grain": false,
+                  "order_by": true,
+                  "descending": false,
+                  "limit": false,
+                  "aggregate_filters": true,
+                  "missing": true
+                }
+              }
+            ],
+            "failure_origin": null,
+            "correct": true,
+            "requirements": {},
+            "checks": {
+              "invariants": true,
+              "clarification": true,
+              "clarification_detail": true,
+              "receipt": true,
+              "persisted": true,
+              "previous_preserved": true,
+              "payload_isolation": true
+            },
+            "accepted_specification_incorrect": false,
+            "database_calls": 0,
+            "elapsed_ms": 34.902,
+            "vocabulary_resolution_ms": 0.4262,
+            "model_calls": [
+              {
+                "stage": "intent",
+                "elapsed_ms": 0.042,
+                "usage": null,
+                "failed": false,
+                "recovery": false
+              }
+            ],
+            "reviews": [],
+            "revisions": 0,
+            "deterministic_rejections": 0,
+            "evidence_corrections": 0,
+            "structured_repairs": 0,
+            "intent_reconsiderations": 0,
+            "protocol": [
+              {
+                "issued": 1,
+                "valid": 1,
+                "fabricated": 0,
+                "modified": 0,
+                "wrong_owner": 0,
+                "scalar_instead_of_reference": 0,
+                "display_reference": 0,
+                "malformed_json": 0,
+                "model_sql_attempt": 0
+              }
+            ],
+            "safe_errors": [],
+            "database_latency_ms": 0.0,
+            "stage_detection": {
+              "decoded_intent_wrong": 1,
+              "proposals_wrong": 0,
+              "wrong_review_approved": 0,
+              "wrong_review_rejected": 0,
+              "local_checks_failed": 0,
+              "final_report_wrong": false
+            }
+          }
+        ]
+      }
+    },
+    "N04": {
+      "recorded_responses_consumed": 2,
+      "captured_Reviewer_response_unused": true,
+      "changed_path_missing_response": true,
+      "database_calls": 0,
+      "rejected_extra_grouping": true,
+      "complete_report_claimed": false,
+      "result": {
+        "id": "N04",
+        "cohort": "phase14_independent",
+        "domain": "workshop",
+        "tags": [
+          "English",
+          "categorical_alias",
+          "negation",
+          "period_comparison",
+          "comparison_reversal"
+        ],
+        "host_version": "workshop-values-v1",
+        "correct": false,
+        "first_failing_turn": 1,
+        "unexecuted_turns": 0,
+        "turns": [
+          {
+            "index": 1,
+            "goal": "report",
+            "status": "failed",
+            "outcome": "operational_failure",
+            "diagnosis": "provider_transport_failure",
+            "first_disagreement_stage": "decoded_intent",
+            "stage_requirements": [
+              {
+                "stage": "decoded_intent",
+                "checks": {
+                  "metrics": true,
+                  "dimensions": false,
+                  "filters": true,
+                  "period": true,
+                  "comparison": true,
+                  "chart": true,
+                  "time_grain": true,
+                  "order_by": true,
+                  "descending": false,
+                  "limit": false,
+                  "aggregate_filters": false,
+                  "missing": true
+                }
+              },
+              {
+                "stage": "effective_intent",
+                "checks": {
+                  "metrics": true,
+                  "dimensions": true,
+                  "filters": true,
+                  "period": true,
+                  "comparison": true,
+                  "chart": true,
+                  "time_grain": true,
+                  "order_by": true,
+                  "descending": true,
+                  "limit": true,
+                  "aggregate_filters": false,
+                  "missing": true
+                }
+              },
+              {
+                "stage": "proposal",
+                "checks": {
+                  "dataset_id": true,
+                  "metric_ids": true,
+                  "dimension_ids": false,
+                  "filters": true,
+                  "period": true,
+                  "time_grain": true,
+                  "chart": true,
+                  "order_by": true,
+                  "descending": true,
+                  "limit": true,
+                  "comparison": true,
+                  "comparison_calculation": true,
+                  "include_matching_day_count": true,
+                  "aggregate_filters": true
+                }
+              }
+            ],
+            "failure_origin": null,
+            "correct": false,
+            "requirements": {
+              "metric_ids": false,
+              "dimension_ids": false,
+              "filters": false,
+              "aggregate_filters": false,
+              "period": false,
+              "comparison": false,
+              "comparison_calculation": false,
+              "include_matching_day_count": false,
+              "time_grain": false,
+              "chart": false,
+              "order_by": false,
+              "descending": false,
+              "limit": false
+            },
+            "checks": {
+              "invariants": true,
+              "receipt": true,
+              "persisted": true,
+              "previous_preserved": true,
+              "payload_isolation": true
+            },
+            "accepted_specification_incorrect": false,
+            "database_calls": 0,
+            "elapsed_ms": 50.447,
+            "vocabulary_resolution_ms": 0.9918,
+            "model_calls": [
+              {
+                "stage": "intent",
+                "elapsed_ms": 0.035,
+                "usage": null,
+                "failed": false,
+                "recovery": false
+              },
+              {
+                "stage": "planning",
+                "elapsed_ms": 0.034,
+                "usage": null,
+                "failed": false,
+                "recovery": false
+              },
+              {
+                "stage": "planning",
+                "elapsed_ms": 0.011,
+                "usage": null,
+                "failed": true,
+                "recovery": true
+              }
+            ],
+            "reviews": [],
+            "revisions": 1,
+            "deterministic_rejections": 1,
+            "evidence_corrections": 1,
+            "structured_repairs": 0,
+            "intent_reconsiderations": 0,
+            "protocol": [
+              {
+                "issued": 1,
+                "valid": 1,
+                "fabricated": 0,
+                "modified": 0,
+                "wrong_owner": 0,
+                "scalar_instead_of_reference": 0,
+                "display_reference": 0,
+                "malformed_json": 0,
+                "model_sql_attempt": 0
+              },
+              {
+                "issued": 1,
+                "valid": 1,
+                "fabricated": 0,
+                "modified": 0,
+                "wrong_owner": 0,
+                "scalar_instead_of_reference": 0,
+                "display_reference": 0,
+                "malformed_json": 0,
+                "model_sql_attempt": 0
+              },
+              {
+                "transport_error": 1
+              }
+            ],
+            "safe_errors": [
+              {
+                "code": "provider_failed",
+                "stage": "planning",
+                "reason": "transport"
+              }
+            ],
+            "database_latency_ms": 0.0,
+            "stage_detection": {
+              "decoded_intent_wrong": 1,
+              "proposals_wrong": 1,
+              "wrong_review_approved": 0,
+              "wrong_review_rejected": 0,
+              "local_checks_failed": 1,
+              "final_report_wrong": false
+            }
+          }
+        ]
+      }
+    }
+  },
+  "corrections": [
+    "Preserve confirmed pending-year invalid-period diagnostic for existing local fallback before optional repair",
+    "Exclude added business dimensions on explicit fresh dated whole-period plain totals without grouping/ranking cues"
+  ],
+  "intermediate_failures_preserved": {
+    "final_regressions_on_historical_source": "8 failed / 6 passed",
+    "initial_new_test_fixture_errors_corrected": true,
+    "rejected_pre_model_question_SDK": "d907eaeda07121498495efde13b50e8c76fbf11c886f7eaab47fa08c2ca49c9b",
+    "full_each_runtime": "1 failed / 2373 passed / 13 skips",
+    "existing_tests_weakened": false,
+    "artifact_prefix": "dist/phase14/completion/live-v3/offline-final-"
+  },
+  "final_offline": {
+    "windows312": {
+      "environment": {
+        "python": "3.12.0",
+        "implementation": "CPython",
+        "platform": "Windows-11-10.0.26200-SP0",
+        "sqlite": "3.42.0",
+        "executable": "<workspace>\\.venv\\Scripts\\python.exe",
+        "dependencies": {
+          "sageql": "0.1.0",
+          "sqlglot": "30.19.0",
+          "python-dotenv": "1.2.3",
+          "openai": "2.54.0",
+          "pyodbc": "5.3.0",
+          "pytest": "9.1.1",
+          "build": "1.6.1",
+          "hatchling": "1.32.4"
+        }
+      },
+      "pytest_passed": 2374,
+      "native_skips": 13,
+      "commands": {
+        "outcome": "passed; retained independent cohort incompletions are not successful reports",
+        "commands": [
+          {
+            "name": "previous-gates",
+            "command": [
+              "<workspace>\\.venv\\Scripts\\python.exe",
+              "tools/release_check.py",
+              "offline",
+              "--source",
+              "<workspace>",
+              "--output",
+              "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-cd91sgr_\\gates\\results.json"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "seconds": 169.718
+          },
+          {
+            "name": "legacy",
+            "command": [
+              "<workspace>\\.venv\\Scripts\\python.exe",
+              "-m",
+              "evaluations.phase14",
+              "--cohort",
+              "legacy",
+              "--output",
+              "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-cd91sgr_\\legacy"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "seconds": 3.594
+          },
+          {
+            "name": "independent",
+            "command": [
+              "<workspace>\\.venv\\Scripts\\python.exe",
+              "-m",
+              "evaluations.phase14",
+              "--cohort",
+              "independent",
+              "--output",
+              "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-cd91sgr_\\independent"
+            ],
+            "exit_code": 1,
+            "expected_exit_code": 1,
+            "seconds": 2.844
+          }
+        ]
+      },
+      "previous_gate_commands": [
+        {
+          "name": "pytest",
+          "command": [
+            "<workspace>\\.venv\\Scripts\\python.exe",
+            "-m",
+            "pytest",
+            "-q",
+            "-o",
+            "pythonpath="
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 104.063
+        },
+        {
+          "name": "pip-check",
+          "command": [
+            "<workspace>\\.venv\\Scripts\\python.exe",
+            "-I",
+            "-m",
+            "pip",
+            "check"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 4.266
+        },
+        {
+          "name": "read-consistency",
+          "command": [
+            "<workspace>\\.venv\\Scripts\\python.exe",
+            "-I",
+            "<workspace>\\tools\\probe_read_consistency.py",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-cd91sgr_\\gates\\read-consistency.json"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 1.531
+        },
+        {
+          "name": "regression",
+          "command": [
+            "<workspace>\\.venv\\Scripts\\python.exe",
+            "-m",
+            "evaluations",
+            "--suite",
+            "regression",
+            "--strict",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-cd91sgr_\\gates\\regression.json"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 8.188
+        },
+        {
+          "name": "holdout",
+          "command": [
+            "<workspace>\\.venv\\Scripts\\python.exe",
+            "-m",
+            "evaluations",
+            "--suite",
+            "holdout",
+            "--strict",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-cd91sgr_\\gates\\holdout.json"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 5.171
+        },
+        {
+          "name": "phase03",
+          "command": [
+            "<workspace>\\.venv\\Scripts\\python.exe",
+            "-m",
+            "evaluations",
+            "--suite",
+            "phase03",
+            "--strict",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-cd91sgr_\\gates\\phase03.json"
+          ],
+          "exit_code": 1,
+          "expected_exit_code": 1,
+          "seconds": 7.156
+        },
+        {
+          "name": "phase04",
+          "command": [
+            "<workspace>\\.venv\\Scripts\\python.exe",
+            "-m",
+            "evaluations",
+            "--suite",
+            "phase04",
+            "--strict",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-cd91sgr_\\gates\\phase04.json"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 5.265
+        },
+        {
+          "name": "phase05",
+          "command": [
+            "<workspace>\\.venv\\Scripts\\python.exe",
+            "-m",
+            "evaluations",
+            "--suite",
+            "phase05",
+            "--strict",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-cd91sgr_\\gates\\phase05.json"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 6.594
+        },
+        {
+          "name": "phase06",
+          "command": [
+            "<workspace>\\.venv\\Scripts\\python.exe",
+            "-m",
+            "evaluations.phase06",
+            "--cohort",
+            "all",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-cd91sgr_\\gates\\phase06"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 10.328
+        },
+        {
+          "name": "phase07",
+          "command": [
+            "<workspace>\\.venv\\Scripts\\python.exe",
+            "-m",
+            "evaluations.phase07",
+            "--cohort",
+            "all",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-cd91sgr_\\gates\\phase07"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 8.141
+        },
+        {
+          "name": "phase08",
+          "command": [
+            "<workspace>\\.venv\\Scripts\\python.exe",
+            "-m",
+            "evaluations.phase08",
+            "--cohort",
+            "all",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-cd91sgr_\\gates\\phase08"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 3.969
+        },
+        {
+          "name": "phase09",
+          "command": [
+            "<workspace>\\.venv\\Scripts\\python.exe",
+            "-m",
+            "evaluations.phase09",
+            "--cohort",
+            "all",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-cd91sgr_\\gates\\phase09"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 4.406
+        }
+      ],
+      "historical_phase03_failures": [
+        "D02",
+        "D03"
+      ],
+      "SQLite_consistency_schedules_passed": 14,
+      "cohorts": {
+        "legacy": {
+          "summary": {
+            "trajectories": 12,
+            "turns": 21,
+            "trajectory_correctness": {
+              "numerator": 12,
+              "denominator": 12,
+              "value": 1.0
+            },
+            "supported_completion": {
+              "numerator": 14,
+              "denominator": 14,
+              "value": 1.0
+            },
+            "semantic_correctness": {
+              "numerator": 14,
+              "denominator": 14,
+              "value": 1.0
+            },
+            "requirement_completeness": {
+              "numerator": 182,
+              "denominator": 182,
+              "value": 1.0
+            },
+            "complete_supported_turns": {
+              "numerator": 14,
+              "denominator": 14,
+              "value": 1.0
+            },
+            "clarification_precision": {
+              "numerator": 5,
+              "denominator": 5,
+              "value": 1.0
+            },
+            "unnecessary_clarifications": 0,
+            "correct_unsupported": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "incorrect_unsupported": 0,
+            "unauthorized_prevention": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "incorrect_accepted_specifications": 0,
+            "outcomes": {
+              "correct_report": 14,
+              "correct_clarification": 5,
+              "correct_unsupported": 1,
+              "correct_denial": 1
+            },
+            "diagnoses": {
+              "correct_report": 14,
+              "required_clarification": 5,
+              "unsupported_capability": 1,
+              "authorization_denial": 1
+            },
+            "failure_origins": {},
+            "model_calls_by_stage": {
+              "intent": 16,
+              "planning": 16,
+              "review": 16
+            },
+            "stage_latency_ms": {
+              "intent": 2.375,
+              "planning": 1.903,
+              "review": 0.928
+            },
+            "scenario_latency_ms": 1470.645,
+            "database_calls": 14,
+            "revisions": 0,
+            "structured_repairs": 0,
+            "intent_reconsiderations": 0,
+            "deterministic_rejections": 0,
+            "evidence_corrections": 2,
+            "reviewer": {
+              "incorrect_rejected": 0,
+              "incorrect_approved": 0,
+              "correct_rejected": 0,
+              "correct_approved": 16,
+              "useful_revisions": 0,
+              "unproductive_revisions": 0
+            },
+            "usage_coverage": {
+              "numerator": 0,
+              "denominator": 48,
+              "value": 0.0
+            },
+            "tokens": null,
+            "estimated_cost": null,
+            "cost_status": "No independently verified pricing metadata supplied",
+            "failing_trajectories": [],
+            "protocol": {
+              "issued": 27,
+              "valid": 15
+            },
+            "database_latency_ms": 132.892,
+            "recovery_latency_ms": 0,
+            "calls_per_complete_report": {
+              "numerator": 48,
+              "denominator": 14,
+              "value": 3.4285714285714284
+            },
+            "missing_clarifications": 0,
+            "recovery_success": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "unauthorized_reads": 0,
+            "clarification_turnaround_ms": null,
+            "usage_details": {
+              "cached_input": {
+                "observed_calls": 0,
+                "tokens": null
+              },
+              "reasoning": {
+                "observed_calls": 0,
+                "tokens": null
+              }
+            },
+            "diagnostic_call_coverage": {
+              "numerator": 48,
+              "denominator": 48,
+              "value": 1.0
+            },
+            "completion_over_planned_supported_turns": {
+              "numerator": 14,
+              "denominator": 14,
+              "value": 1.0
+            },
+            "correct_over_planned_trajectories": {
+              "numerator": 12,
+              "denominator": 12,
+              "value": 1.0
+            },
+            "stage_correctness": {
+              "decoded_intent": {
+                "numerator": 16,
+                "denominator": 16,
+                "value": 1.0
+              },
+              "effective_intent": {
+                "numerator": 16,
+                "denominator": 16,
+                "value": 1.0
+              },
+              "proposal": {
+                "numerator": 14,
+                "denominator": 14,
+                "value": 1.0
+              }
+            },
+            "reviewer_incorrect_plan_rejection": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "reviewer_false_rejection": {
+              "numerator": 0,
+              "denominator": 16,
+              "value": 0.0
+            },
+            "stage_detection": {},
+            "model_sql_attempts_accepted": 0,
+            "payload_isolation_failures": 0
+          },
+          "configuration": {
+            "mode": "offline",
+            "adapter": "sdk_chat_completions",
+            "model": "scripted",
+            "case_ids": [
+              "A01",
+              "A02",
+              "A03",
+              "A04",
+              "A05",
+              "A06",
+              "A07",
+              "A08",
+              "A09",
+              "A10",
+              "A11",
+              "A12"
+            ],
+            "selection_sha256": "e8687f32f0aebf8e1c7b06e29e60202e1eae39b278b7e4c522e4497e7b3c52cc",
+            "corpus_sha256": "f915e30613ccf2609386a608b0b433fd8919501db7b221529dc42452f4d45b48",
+            "freeze_sha256": "c2c84188dbcdf0db5ec2dead8ecee435dcd99af0ce4c3fd736d4394fb80c4011",
+            "source_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+            "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec"
+          },
+          "sha256": "9bc32c50c7b13217f1fb7397338cd19b548fd9b0fa6b4bbc0210c0192e24582f"
+        },
+        "independent": {
+          "summary": {
+            "trajectories": 6,
+            "turns": 19,
+            "trajectory_correctness": {
+              "numerator": 5,
+              "denominator": 6,
+              "value": 0.8333333333333334
+            },
+            "supported_completion": {
+              "numerator": 12,
+              "denominator": 13,
+              "value": 0.9230769230769231
+            },
+            "semantic_correctness": {
+              "numerator": 12,
+              "denominator": 12,
+              "value": 1.0
+            },
+            "requirement_completeness": {
+              "numerator": 156,
+              "denominator": 169,
+              "value": 0.9230769230769231
+            },
+            "complete_supported_turns": {
+              "numerator": 12,
+              "denominator": 13,
+              "value": 0.9230769230769231
+            },
+            "clarification_precision": {
+              "numerator": 3,
+              "denominator": 4,
+              "value": 0.75
+            },
+            "unnecessary_clarifications": 1,
+            "correct_unsupported": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "incorrect_unsupported": 0,
+            "unauthorized_prevention": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "incorrect_accepted_specifications": 0,
+            "outcomes": {
+              "correct_clarification": 3,
+              "correct_report": 12,
+              "correct_block": 1,
+              "correct_denial": 1,
+              "incorrect_rejection": 2
+            },
+            "diagnoses": {
+              "required_clarification": 3,
+              "correct_report": 12,
+              "planning_failure": 1,
+              "authorization_denial": 1,
+              "extraction_failure": 1,
+              "unnecessary_clarification": 1
+            },
+            "failure_origins": {},
+            "model_calls_by_stage": {
+              "intent": 15,
+              "planning": 14,
+              "review": 14
+            },
+            "stage_latency_ms": {
+              "intent": 2.509,
+              "planning": 1.776,
+              "review": 0.987
+            },
+            "scenario_latency_ms": 1326.456,
+            "database_calls": 12,
+            "revisions": 0,
+            "structured_repairs": 0,
+            "intent_reconsiderations": 0,
+            "deterministic_rejections": 0,
+            "evidence_corrections": 5,
+            "reviewer": {
+              "incorrect_rejected": 0,
+              "incorrect_approved": 0,
+              "correct_rejected": 0,
+              "correct_approved": 14,
+              "useful_revisions": 0,
+              "unproductive_revisions": 0
+            },
+            "usage_coverage": {
+              "numerator": 0,
+              "denominator": 43,
+              "value": 0.0
+            },
+            "tokens": null,
+            "estimated_cost": null,
+            "cost_status": "No independently verified pricing metadata supplied",
+            "failing_trajectories": [
+              "N06"
+            ],
+            "protocol": {
+              "issued": 21,
+              "valid": 11
+            },
+            "database_latency_ms": 109.991,
+            "recovery_latency_ms": 0,
+            "calls_per_complete_report": {
+              "numerator": 43,
+              "denominator": 12,
+              "value": 3.5833333333333335
+            },
+            "missing_clarifications": 1,
+            "recovery_success": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "unauthorized_reads": 0,
+            "clarification_turnaround_ms": null,
+            "usage_details": {
+              "cached_input": {
+                "observed_calls": 0,
+                "tokens": null
+              },
+              "reasoning": {
+                "observed_calls": 0,
+                "tokens": null
+              }
+            },
+            "diagnostic_call_coverage": {
+              "numerator": 43,
+              "denominator": 43,
+              "value": 1.0
+            },
+            "completion_over_planned_supported_turns": {
+              "numerator": 12,
+              "denominator": 13,
+              "value": 0.9230769230769231
+            },
+            "correct_over_planned_trajectories": {
+              "numerator": 5,
+              "denominator": 6,
+              "value": 0.8333333333333334
+            },
+            "stage_correctness": {
+              "decoded_intent": {
+                "numerator": 15,
+                "denominator": 15,
+                "value": 1.0
+              },
+              "effective_intent": {
+                "numerator": 12,
+                "denominator": 14,
+                "value": 0.8571428571428571
+              },
+              "proposal": {
+                "numerator": 12,
+                "denominator": 12,
+                "value": 1.0
+              }
+            },
+            "reviewer_incorrect_plan_rejection": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "reviewer_false_rejection": {
+              "numerator": 0,
+              "denominator": 14,
+              "value": 0.0
+            },
+            "stage_detection": {},
+            "model_sql_attempts_accepted": 0,
+            "payload_isolation_failures": 0
+          },
+          "configuration": {
+            "mode": "offline",
+            "adapter": "sdk_chat_completions",
+            "model": "scripted",
+            "case_ids": [
+              "N01",
+              "N02",
+              "N03",
+              "N04",
+              "N05",
+              "N06"
+            ],
+            "selection_sha256": "326638e9b03e8b6263a1f650c1c6e77ed64f5513a18be30c9a9693e2c7ecb84f",
+            "corpus_sha256": "9d8d92c44467b430385620fec2ce0981e5da527fb33f1669047439e15f34cfe6",
+            "freeze_sha256": "41e3e4253051003687afadeda73768f68e0e43688f6e628b02dd01557eae84b3",
+            "source_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+            "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec"
+          },
+          "sha256": "675ded6cf3a6cd6162ba70b68788427317b1c885544a89e496417cc8a8eebf9b"
+        }
+      }
+    },
+    "windows310": {
+      "environment": {
+        "python": "3.10.22",
+        "implementation": "CPython",
+        "platform": "Windows-10-10.0.26200-SP0",
+        "sqlite": "3.53.1",
+        "executable": "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+        "dependencies": {
+          "sageql": "0.1.0",
+          "sqlglot": "26.0.0",
+          "python-dotenv": "1.2.0",
+          "openai": null,
+          "pyodbc": null,
+          "pytest": "8.0.0",
+          "build": null,
+          "hatchling": null
+        }
+      },
+      "pytest_passed": 2374,
+      "native_skips": 13,
+      "commands": {
+        "outcome": "passed; retained independent cohort incompletions are not successful reports",
+        "commands": [
+          {
+            "name": "previous-gates",
+            "command": [
+              "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+              "tools/release_check.py",
+              "offline",
+              "--source",
+              "<workspace>",
+              "--output",
+              "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-wypqh00d\\gates\\results.json"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "seconds": 173.313
+          },
+          {
+            "name": "legacy",
+            "command": [
+              "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+              "-m",
+              "evaluations.phase14",
+              "--cohort",
+              "legacy",
+              "--output",
+              "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-wypqh00d\\legacy"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "seconds": 3.687
+          },
+          {
+            "name": "independent",
+            "command": [
+              "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+              "-m",
+              "evaluations.phase14",
+              "--cohort",
+              "independent",
+              "--output",
+              "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-wypqh00d\\independent"
+            ],
+            "exit_code": 1,
+            "expected_exit_code": 1,
+            "seconds": 2.86
+          }
+        ]
+      },
+      "previous_gate_commands": [
+        {
+          "name": "pytest",
+          "command": [
+            "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+            "-m",
+            "pytest",
+            "-q",
+            "-o",
+            "pythonpath="
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 106.75
+        },
+        {
+          "name": "pip-check",
+          "command": [
+            "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+            "-I",
+            "-m",
+            "pip",
+            "check"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 1.203
+        },
+        {
+          "name": "read-consistency",
+          "command": [
+            "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+            "-I",
+            "<workspace>\\tools\\probe_read_consistency.py",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-wypqh00d\\gates\\read-consistency.json"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 1.532
+        },
+        {
+          "name": "regression",
+          "command": [
+            "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+            "-m",
+            "evaluations",
+            "--suite",
+            "regression",
+            "--strict",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-wypqh00d\\gates\\regression.json"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 9.344
+        },
+        {
+          "name": "holdout",
+          "command": [
+            "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+            "-m",
+            "evaluations",
+            "--suite",
+            "holdout",
+            "--strict",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-wypqh00d\\gates\\holdout.json"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 5.375
+        },
+        {
+          "name": "phase03",
+          "command": [
+            "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+            "-m",
+            "evaluations",
+            "--suite",
+            "phase03",
+            "--strict",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-wypqh00d\\gates\\phase03.json"
+          ],
+          "exit_code": 1,
+          "expected_exit_code": 1,
+          "seconds": 8.172
+        },
+        {
+          "name": "phase04",
+          "command": [
+            "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+            "-m",
+            "evaluations",
+            "--suite",
+            "phase04",
+            "--strict",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-wypqh00d\\gates\\phase04.json"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 4.407
+        },
+        {
+          "name": "phase05",
+          "command": [
+            "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+            "-m",
+            "evaluations",
+            "--suite",
+            "phase05",
+            "--strict",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-wypqh00d\\gates\\phase05.json"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 7.188
+        },
+        {
+          "name": "phase06",
+          "command": [
+            "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+            "-m",
+            "evaluations.phase06",
+            "--cohort",
+            "all",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-wypqh00d\\gates\\phase06"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 11.078
+        },
+        {
+          "name": "phase07",
+          "command": [
+            "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+            "-m",
+            "evaluations.phase07",
+            "--cohort",
+            "all",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-wypqh00d\\gates\\phase07"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 8.531
+        },
+        {
+          "name": "phase08",
+          "command": [
+            "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+            "-m",
+            "evaluations.phase08",
+            "--cohort",
+            "all",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-wypqh00d\\gates\\phase08"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 4.109
+        },
+        {
+          "name": "phase09",
+          "command": [
+            "<workspace>\\dist\\phase11\\win310\\Scripts\\python.exe",
+            "-m",
+            "evaluations.phase09",
+            "--cohort",
+            "all",
+            "--output",
+            "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-corrected-wypqh00d\\gates\\phase09"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 4.609
+        }
+      ],
+      "historical_phase03_failures": [
+        "D02",
+        "D03"
+      ],
+      "SQLite_consistency_schedules_passed": 14,
+      "cohorts": {
+        "legacy": {
+          "summary": {
+            "trajectories": 12,
+            "turns": 21,
+            "trajectory_correctness": {
+              "numerator": 12,
+              "denominator": 12,
+              "value": 1.0
+            },
+            "supported_completion": {
+              "numerator": 14,
+              "denominator": 14,
+              "value": 1.0
+            },
+            "semantic_correctness": {
+              "numerator": 14,
+              "denominator": 14,
+              "value": 1.0
+            },
+            "requirement_completeness": {
+              "numerator": 182,
+              "denominator": 182,
+              "value": 1.0
+            },
+            "complete_supported_turns": {
+              "numerator": 14,
+              "denominator": 14,
+              "value": 1.0
+            },
+            "clarification_precision": {
+              "numerator": 5,
+              "denominator": 5,
+              "value": 1.0
+            },
+            "unnecessary_clarifications": 0,
+            "correct_unsupported": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "incorrect_unsupported": 0,
+            "unauthorized_prevention": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "incorrect_accepted_specifications": 0,
+            "outcomes": {
+              "correct_report": 14,
+              "correct_clarification": 5,
+              "correct_unsupported": 1,
+              "correct_denial": 1
+            },
+            "diagnoses": {
+              "correct_report": 14,
+              "required_clarification": 5,
+              "unsupported_capability": 1,
+              "authorization_denial": 1
+            },
+            "failure_origins": {},
+            "model_calls_by_stage": {
+              "intent": 16,
+              "planning": 16,
+              "review": 16
+            },
+            "stage_latency_ms": {
+              "intent": 2.533,
+              "planning": 2.048,
+              "review": 0.953
+            },
+            "scenario_latency_ms": 1474.07,
+            "database_calls": 14,
+            "revisions": 0,
+            "structured_repairs": 0,
+            "intent_reconsiderations": 0,
+            "deterministic_rejections": 0,
+            "evidence_corrections": 2,
+            "reviewer": {
+              "incorrect_rejected": 0,
+              "incorrect_approved": 0,
+              "correct_rejected": 0,
+              "correct_approved": 16,
+              "useful_revisions": 0,
+              "unproductive_revisions": 0
+            },
+            "usage_coverage": {
+              "numerator": 0,
+              "denominator": 48,
+              "value": 0.0
+            },
+            "tokens": null,
+            "estimated_cost": null,
+            "cost_status": "No independently verified pricing metadata supplied",
+            "failing_trajectories": [],
+            "protocol": {
+              "issued": 27,
+              "valid": 15
+            },
+            "database_latency_ms": 162.718,
+            "recovery_latency_ms": 0,
+            "calls_per_complete_report": {
+              "numerator": 48,
+              "denominator": 14,
+              "value": 3.4285714285714284
+            },
+            "missing_clarifications": 0,
+            "recovery_success": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "unauthorized_reads": 0,
+            "clarification_turnaround_ms": null,
+            "usage_details": {
+              "cached_input": {
+                "observed_calls": 0,
+                "tokens": null
+              },
+              "reasoning": {
+                "observed_calls": 0,
+                "tokens": null
+              }
+            },
+            "diagnostic_call_coverage": {
+              "numerator": 48,
+              "denominator": 48,
+              "value": 1.0
+            },
+            "completion_over_planned_supported_turns": {
+              "numerator": 14,
+              "denominator": 14,
+              "value": 1.0
+            },
+            "correct_over_planned_trajectories": {
+              "numerator": 12,
+              "denominator": 12,
+              "value": 1.0
+            },
+            "stage_correctness": {
+              "decoded_intent": {
+                "numerator": 16,
+                "denominator": 16,
+                "value": 1.0
+              },
+              "effective_intent": {
+                "numerator": 16,
+                "denominator": 16,
+                "value": 1.0
+              },
+              "proposal": {
+                "numerator": 14,
+                "denominator": 14,
+                "value": 1.0
+              }
+            },
+            "reviewer_incorrect_plan_rejection": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "reviewer_false_rejection": {
+              "numerator": 0,
+              "denominator": 16,
+              "value": 0.0
+            },
+            "stage_detection": {},
+            "model_sql_attempts_accepted": 0,
+            "payload_isolation_failures": 0
+          },
+          "configuration": {
+            "mode": "offline",
+            "adapter": "sdk_chat_completions",
+            "model": "scripted",
+            "case_ids": [
+              "A01",
+              "A02",
+              "A03",
+              "A04",
+              "A05",
+              "A06",
+              "A07",
+              "A08",
+              "A09",
+              "A10",
+              "A11",
+              "A12"
+            ],
+            "selection_sha256": "e8687f32f0aebf8e1c7b06e29e60202e1eae39b278b7e4c522e4497e7b3c52cc",
+            "corpus_sha256": "f915e30613ccf2609386a608b0b433fd8919501db7b221529dc42452f4d45b48",
+            "freeze_sha256": "c2c84188dbcdf0db5ec2dead8ecee435dcd99af0ce4c3fd736d4394fb80c4011",
+            "source_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+            "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec"
+          },
+          "sha256": "69f029e94e13a71033f4497be2d8d9171e3a51ae61cb95760597c1f533c5c9dc"
+        },
+        "independent": {
+          "summary": {
+            "trajectories": 6,
+            "turns": 19,
+            "trajectory_correctness": {
+              "numerator": 5,
+              "denominator": 6,
+              "value": 0.8333333333333334
+            },
+            "supported_completion": {
+              "numerator": 12,
+              "denominator": 13,
+              "value": 0.9230769230769231
+            },
+            "semantic_correctness": {
+              "numerator": 12,
+              "denominator": 12,
+              "value": 1.0
+            },
+            "requirement_completeness": {
+              "numerator": 156,
+              "denominator": 169,
+              "value": 0.9230769230769231
+            },
+            "complete_supported_turns": {
+              "numerator": 12,
+              "denominator": 13,
+              "value": 0.9230769230769231
+            },
+            "clarification_precision": {
+              "numerator": 3,
+              "denominator": 4,
+              "value": 0.75
+            },
+            "unnecessary_clarifications": 1,
+            "correct_unsupported": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "incorrect_unsupported": 0,
+            "unauthorized_prevention": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "incorrect_accepted_specifications": 0,
+            "outcomes": {
+              "correct_clarification": 3,
+              "correct_report": 12,
+              "correct_block": 1,
+              "correct_denial": 1,
+              "incorrect_rejection": 2
+            },
+            "diagnoses": {
+              "required_clarification": 3,
+              "correct_report": 12,
+              "planning_failure": 1,
+              "authorization_denial": 1,
+              "extraction_failure": 1,
+              "unnecessary_clarification": 1
+            },
+            "failure_origins": {},
+            "model_calls_by_stage": {
+              "intent": 15,
+              "planning": 14,
+              "review": 14
+            },
+            "stage_latency_ms": {
+              "intent": 2.564,
+              "planning": 1.996,
+              "review": 0.997
+            },
+            "scenario_latency_ms": 1358.677,
+            "database_calls": 12,
+            "revisions": 0,
+            "structured_repairs": 0,
+            "intent_reconsiderations": 0,
+            "deterministic_rejections": 0,
+            "evidence_corrections": 5,
+            "reviewer": {
+              "incorrect_rejected": 0,
+              "incorrect_approved": 0,
+              "correct_rejected": 0,
+              "correct_approved": 14,
+              "useful_revisions": 0,
+              "unproductive_revisions": 0
+            },
+            "usage_coverage": {
+              "numerator": 0,
+              "denominator": 43,
+              "value": 0.0
+            },
+            "tokens": null,
+            "estimated_cost": null,
+            "cost_status": "No independently verified pricing metadata supplied",
+            "failing_trajectories": [
+              "N06"
+            ],
+            "protocol": {
+              "issued": 21,
+              "valid": 11
+            },
+            "database_latency_ms": 149.806,
+            "recovery_latency_ms": 0,
+            "calls_per_complete_report": {
+              "numerator": 43,
+              "denominator": 12,
+              "value": 3.5833333333333335
+            },
+            "missing_clarifications": 1,
+            "recovery_success": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "unauthorized_reads": 0,
+            "clarification_turnaround_ms": null,
+            "usage_details": {
+              "cached_input": {
+                "observed_calls": 0,
+                "tokens": null
+              },
+              "reasoning": {
+                "observed_calls": 0,
+                "tokens": null
+              }
+            },
+            "diagnostic_call_coverage": {
+              "numerator": 43,
+              "denominator": 43,
+              "value": 1.0
+            },
+            "completion_over_planned_supported_turns": {
+              "numerator": 12,
+              "denominator": 13,
+              "value": 0.9230769230769231
+            },
+            "correct_over_planned_trajectories": {
+              "numerator": 5,
+              "denominator": 6,
+              "value": 0.8333333333333334
+            },
+            "stage_correctness": {
+              "decoded_intent": {
+                "numerator": 15,
+                "denominator": 15,
+                "value": 1.0
+              },
+              "effective_intent": {
+                "numerator": 12,
+                "denominator": 14,
+                "value": 0.8571428571428571
+              },
+              "proposal": {
+                "numerator": 12,
+                "denominator": 12,
+                "value": 1.0
+              }
+            },
+            "reviewer_incorrect_plan_rejection": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "reviewer_false_rejection": {
+              "numerator": 0,
+              "denominator": 14,
+              "value": 0.0
+            },
+            "stage_detection": {},
+            "model_sql_attempts_accepted": 0,
+            "payload_isolation_failures": 0
+          },
+          "configuration": {
+            "mode": "offline",
+            "adapter": "sdk_chat_completions",
+            "model": "scripted",
+            "case_ids": [
+              "N01",
+              "N02",
+              "N03",
+              "N04",
+              "N05",
+              "N06"
+            ],
+            "selection_sha256": "326638e9b03e8b6263a1f650c1c6e77ed64f5513a18be30c9a9693e2c7ecb84f",
+            "corpus_sha256": "9d8d92c44467b430385620fec2ce0981e5da527fb33f1669047439e15f34cfe6",
+            "freeze_sha256": "41e3e4253051003687afadeda73768f68e0e43688f6e628b02dd01557eae84b3",
+            "source_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+            "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec"
+          },
+          "sha256": "a0a57a264d4364357d429d843d61c6d31fbd81ea9663423d5eed97bc58ed5283"
+        }
+      }
+    },
+    "linux312": {
+      "environment": {
+        "python": "3.12.3",
+        "implementation": "CPython",
+        "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "sqlite": "3.45.1",
+        "executable": "<workspace>/dist/phase11/linux312/bin/python",
+        "dependencies": {
+          "sageql": "0.1.0",
+          "sqlglot": "30.15.0",
+          "python-dotenv": "1.2.2",
+          "openai": null,
+          "pyodbc": null,
+          "pytest": "8.0.0",
+          "build": null,
+          "hatchling": null
+        }
+      },
+      "pytest_passed": 2374,
+      "native_skips": 13,
+      "commands": {
+        "outcome": "passed; retained independent cohort incompletions are not successful reports",
+        "commands": [
+          {
+            "name": "previous-gates",
+            "command": [
+              "<workspace>/dist/phase11/linux312/bin/python",
+              "tools/release_check.py",
+              "offline",
+              "--source",
+              "<workspace>",
+              "--output",
+              "/tmp/sageql-phase14-corrected-80efz5hy/gates/results.json"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "seconds": 332.72
+          },
+          {
+            "name": "legacy",
+            "command": [
+              "<workspace>/dist/phase11/linux312/bin/python",
+              "-m",
+              "evaluations.phase14",
+              "--cohort",
+              "legacy",
+              "--output",
+              "/tmp/sageql-phase14-corrected-80efz5hy/legacy"
+            ],
+            "exit_code": 0,
+            "expected_exit_code": 0,
+            "seconds": 4.378
+          },
+          {
+            "name": "independent",
+            "command": [
+              "<workspace>/dist/phase11/linux312/bin/python",
+              "-m",
+              "evaluations.phase14",
+              "--cohort",
+              "independent",
+              "--output",
+              "/tmp/sageql-phase14-corrected-80efz5hy/independent"
+            ],
+            "exit_code": 1,
+            "expected_exit_code": 1,
+            "seconds": 3.818
+          }
+        ]
+      },
+      "previous_gate_commands": [
+        {
+          "name": "pytest",
+          "command": [
+            "<workspace>/dist/phase11/linux312/bin/python",
+            "-m",
+            "pytest",
+            "-q",
+            "-o",
+            "pythonpath="
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 226.97
+        },
+        {
+          "name": "pip-check",
+          "command": [
+            "<workspace>/dist/phase11/linux312/bin/python",
+            "-I",
+            "-m",
+            "pip",
+            "check"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 5.487
+        },
+        {
+          "name": "read-consistency",
+          "command": [
+            "<workspace>/dist/phase11/linux312/bin/python",
+            "-I",
+            "<workspace>/tools/probe_read_consistency.py",
+            "--output",
+            "/tmp/sageql-phase14-corrected-80efz5hy/gates/read-consistency.json"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 3.534
+        },
+        {
+          "name": "regression",
+          "command": [
+            "<workspace>/dist/phase11/linux312/bin/python",
+            "-m",
+            "evaluations",
+            "--suite",
+            "regression",
+            "--strict",
+            "--output",
+            "/tmp/sageql-phase14-corrected-80efz5hy/gates/regression.json"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 10.279
+        },
+        {
+          "name": "holdout",
+          "command": [
+            "<workspace>/dist/phase11/linux312/bin/python",
+            "-m",
+            "evaluations",
+            "--suite",
+            "holdout",
+            "--strict",
+            "--output",
+            "/tmp/sageql-phase14-corrected-80efz5hy/gates/holdout.json"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 13.152
+        },
+        {
+          "name": "phase03",
+          "command": [
+            "<workspace>/dist/phase11/linux312/bin/python",
+            "-m",
+            "evaluations",
+            "--suite",
+            "phase03",
+            "--strict",
+            "--output",
+            "/tmp/sageql-phase14-corrected-80efz5hy/gates/phase03.json"
+          ],
+          "exit_code": 1,
+          "expected_exit_code": 1,
+          "seconds": 17.078
+        },
+        {
+          "name": "phase04",
+          "command": [
+            "<workspace>/dist/phase11/linux312/bin/python",
+            "-m",
+            "evaluations",
+            "--suite",
+            "phase04",
+            "--strict",
+            "--output",
+            "/tmp/sageql-phase14-corrected-80efz5hy/gates/phase04.json"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 11.05
+        },
+        {
+          "name": "phase05",
+          "command": [
+            "<workspace>/dist/phase11/linux312/bin/python",
+            "-m",
+            "evaluations",
+            "--suite",
+            "phase05",
+            "--strict",
+            "--output",
+            "/tmp/sageql-phase14-corrected-80efz5hy/gates/phase05.json"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 15.483
+        },
+        {
+          "name": "phase06",
+          "command": [
+            "<workspace>/dist/phase11/linux312/bin/python",
+            "-m",
+            "evaluations.phase06",
+            "--cohort",
+            "all",
+            "--output",
+            "/tmp/sageql-phase14-corrected-80efz5hy/gates/phase06"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 10.17
+        },
+        {
+          "name": "phase07",
+          "command": [
+            "<workspace>/dist/phase11/linux312/bin/python",
+            "-m",
+            "evaluations.phase07",
+            "--cohort",
+            "all",
+            "--output",
+            "/tmp/sageql-phase14-corrected-80efz5hy/gates/phase07"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 8.297
+        },
+        {
+          "name": "phase08",
+          "command": [
+            "<workspace>/dist/phase11/linux312/bin/python",
+            "-m",
+            "evaluations.phase08",
+            "--cohort",
+            "all",
+            "--output",
+            "/tmp/sageql-phase14-corrected-80efz5hy/gates/phase08"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 4.754
+        },
+        {
+          "name": "phase09",
+          "command": [
+            "<workspace>/dist/phase11/linux312/bin/python",
+            "-m",
+            "evaluations.phase09",
+            "--cohort",
+            "all",
+            "--output",
+            "/tmp/sageql-phase14-corrected-80efz5hy/gates/phase09"
+          ],
+          "exit_code": 0,
+          "expected_exit_code": 0,
+          "seconds": 5.43
+        }
+      ],
+      "historical_phase03_failures": [
+        "D02",
+        "D03"
+      ],
+      "SQLite_consistency_schedules_passed": 14,
+      "cohorts": {
+        "legacy": {
+          "summary": {
+            "trajectories": 12,
+            "turns": 21,
+            "trajectory_correctness": {
+              "numerator": 12,
+              "denominator": 12,
+              "value": 1.0
+            },
+            "supported_completion": {
+              "numerator": 14,
+              "denominator": 14,
+              "value": 1.0
+            },
+            "semantic_correctness": {
+              "numerator": 14,
+              "denominator": 14,
+              "value": 1.0
+            },
+            "requirement_completeness": {
+              "numerator": 182,
+              "denominator": 182,
+              "value": 1.0
+            },
+            "complete_supported_turns": {
+              "numerator": 14,
+              "denominator": 14,
+              "value": 1.0
+            },
+            "clarification_precision": {
+              "numerator": 5,
+              "denominator": 5,
+              "value": 1.0
+            },
+            "unnecessary_clarifications": 0,
+            "correct_unsupported": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "incorrect_unsupported": 0,
+            "unauthorized_prevention": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "incorrect_accepted_specifications": 0,
+            "outcomes": {
+              "correct_report": 14,
+              "correct_clarification": 5,
+              "correct_unsupported": 1,
+              "correct_denial": 1
+            },
+            "diagnoses": {
+              "correct_report": 14,
+              "required_clarification": 5,
+              "unsupported_capability": 1,
+              "authorization_denial": 1
+            },
+            "failure_origins": {},
+            "model_calls_by_stage": {
+              "intent": 16,
+              "planning": 16,
+              "review": 16
+            },
+            "stage_latency_ms": {
+              "intent": 1.945,
+              "planning": 1.417,
+              "review": 0.708
+            },
+            "scenario_latency_ms": 1385.587,
+            "database_calls": 14,
+            "revisions": 0,
+            "structured_repairs": 0,
+            "intent_reconsiderations": 0,
+            "deterministic_rejections": 0,
+            "evidence_corrections": 2,
+            "reviewer": {
+              "incorrect_rejected": 0,
+              "incorrect_approved": 0,
+              "correct_rejected": 0,
+              "correct_approved": 16,
+              "useful_revisions": 0,
+              "unproductive_revisions": 0
+            },
+            "usage_coverage": {
+              "numerator": 0,
+              "denominator": 48,
+              "value": 0.0
+            },
+            "tokens": null,
+            "estimated_cost": null,
+            "cost_status": "No independently verified pricing metadata supplied",
+            "failing_trajectories": [],
+            "protocol": {
+              "issued": 27,
+              "valid": 15
+            },
+            "database_latency_ms": 235.071,
+            "recovery_latency_ms": 0,
+            "calls_per_complete_report": {
+              "numerator": 48,
+              "denominator": 14,
+              "value": 3.4285714285714284
+            },
+            "missing_clarifications": 0,
+            "recovery_success": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "unauthorized_reads": 0,
+            "clarification_turnaround_ms": null,
+            "usage_details": {
+              "cached_input": {
+                "observed_calls": 0,
+                "tokens": null
+              },
+              "reasoning": {
+                "observed_calls": 0,
+                "tokens": null
+              }
+            },
+            "diagnostic_call_coverage": {
+              "numerator": 48,
+              "denominator": 48,
+              "value": 1.0
+            },
+            "completion_over_planned_supported_turns": {
+              "numerator": 14,
+              "denominator": 14,
+              "value": 1.0
+            },
+            "correct_over_planned_trajectories": {
+              "numerator": 12,
+              "denominator": 12,
+              "value": 1.0
+            },
+            "stage_correctness": {
+              "decoded_intent": {
+                "numerator": 16,
+                "denominator": 16,
+                "value": 1.0
+              },
+              "effective_intent": {
+                "numerator": 16,
+                "denominator": 16,
+                "value": 1.0
+              },
+              "proposal": {
+                "numerator": 14,
+                "denominator": 14,
+                "value": 1.0
+              }
+            },
+            "reviewer_incorrect_plan_rejection": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "reviewer_false_rejection": {
+              "numerator": 0,
+              "denominator": 16,
+              "value": 0.0
+            },
+            "stage_detection": {},
+            "model_sql_attempts_accepted": 0,
+            "payload_isolation_failures": 0
+          },
+          "configuration": {
+            "mode": "offline",
+            "adapter": "sdk_chat_completions",
+            "model": "scripted",
+            "case_ids": [
+              "A01",
+              "A02",
+              "A03",
+              "A04",
+              "A05",
+              "A06",
+              "A07",
+              "A08",
+              "A09",
+              "A10",
+              "A11",
+              "A12"
+            ],
+            "selection_sha256": "e8687f32f0aebf8e1c7b06e29e60202e1eae39b278b7e4c522e4497e7b3c52cc",
+            "corpus_sha256": "f915e30613ccf2609386a608b0b433fd8919501db7b221529dc42452f4d45b48",
+            "freeze_sha256": "c2c84188dbcdf0db5ec2dead8ecee435dcd99af0ce4c3fd736d4394fb80c4011",
+            "source_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+            "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec"
+          },
+          "sha256": "177d6be76752a1166e5f8ccdb9ffdf95795be45e7f61337d28dee8338bb1a9da"
+        },
+        "independent": {
+          "summary": {
+            "trajectories": 6,
+            "turns": 19,
+            "trajectory_correctness": {
+              "numerator": 5,
+              "denominator": 6,
+              "value": 0.8333333333333334
+            },
+            "supported_completion": {
+              "numerator": 12,
+              "denominator": 13,
+              "value": 0.9230769230769231
+            },
+            "semantic_correctness": {
+              "numerator": 12,
+              "denominator": 12,
+              "value": 1.0
+            },
+            "requirement_completeness": {
+              "numerator": 156,
+              "denominator": 169,
+              "value": 0.9230769230769231
+            },
+            "complete_supported_turns": {
+              "numerator": 12,
+              "denominator": 13,
+              "value": 0.9230769230769231
+            },
+            "clarification_precision": {
+              "numerator": 3,
+              "denominator": 4,
+              "value": 0.75
+            },
+            "unnecessary_clarifications": 1,
+            "correct_unsupported": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "incorrect_unsupported": 0,
+            "unauthorized_prevention": {
+              "numerator": 1,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "incorrect_accepted_specifications": 0,
+            "outcomes": {
+              "correct_clarification": 3,
+              "correct_report": 12,
+              "correct_block": 1,
+              "correct_denial": 1,
+              "incorrect_rejection": 2
+            },
+            "diagnoses": {
+              "required_clarification": 3,
+              "correct_report": 12,
+              "planning_failure": 1,
+              "authorization_denial": 1,
+              "extraction_failure": 1,
+              "unnecessary_clarification": 1
+            },
+            "failure_origins": {},
+            "model_calls_by_stage": {
+              "intent": 15,
+              "planning": 14,
+              "review": 14
+            },
+            "stage_latency_ms": {
+              "intent": 2.132,
+              "planning": 1.368,
+              "review": 0.663
+            },
+            "scenario_latency_ms": 1324.32,
+            "database_calls": 12,
+            "revisions": 0,
+            "structured_repairs": 0,
+            "intent_reconsiderations": 0,
+            "deterministic_rejections": 0,
+            "evidence_corrections": 5,
+            "reviewer": {
+              "incorrect_rejected": 0,
+              "incorrect_approved": 0,
+              "correct_rejected": 0,
+              "correct_approved": 14,
+              "useful_revisions": 0,
+              "unproductive_revisions": 0
+            },
+            "usage_coverage": {
+              "numerator": 0,
+              "denominator": 43,
+              "value": 0.0
+            },
+            "tokens": null,
+            "estimated_cost": null,
+            "cost_status": "No independently verified pricing metadata supplied",
+            "failing_trajectories": [
+              "N06"
+            ],
+            "protocol": {
+              "issued": 21,
+              "valid": 11
+            },
+            "database_latency_ms": 219.673,
+            "recovery_latency_ms": 0,
+            "calls_per_complete_report": {
+              "numerator": 43,
+              "denominator": 12,
+              "value": 3.5833333333333335
+            },
+            "missing_clarifications": 1,
+            "recovery_success": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "unauthorized_reads": 0,
+            "clarification_turnaround_ms": null,
+            "usage_details": {
+              "cached_input": {
+                "observed_calls": 0,
+                "tokens": null
+              },
+              "reasoning": {
+                "observed_calls": 0,
+                "tokens": null
+              }
+            },
+            "diagnostic_call_coverage": {
+              "numerator": 43,
+              "denominator": 43,
+              "value": 1.0
+            },
+            "completion_over_planned_supported_turns": {
+              "numerator": 12,
+              "denominator": 13,
+              "value": 0.9230769230769231
+            },
+            "correct_over_planned_trajectories": {
+              "numerator": 5,
+              "denominator": 6,
+              "value": 0.8333333333333334
+            },
+            "stage_correctness": {
+              "decoded_intent": {
+                "numerator": 15,
+                "denominator": 15,
+                "value": 1.0
+              },
+              "effective_intent": {
+                "numerator": 12,
+                "denominator": 14,
+                "value": 0.8571428571428571
+              },
+              "proposal": {
+                "numerator": 12,
+                "denominator": 12,
+                "value": 1.0
+              }
+            },
+            "reviewer_incorrect_plan_rejection": {
+              "numerator": 0,
+              "denominator": 0,
+              "value": null
+            },
+            "reviewer_false_rejection": {
+              "numerator": 0,
+              "denominator": 14,
+              "value": 0.0
+            },
+            "stage_detection": {},
+            "model_sql_attempts_accepted": 0,
+            "payload_isolation_failures": 0
+          },
+          "configuration": {
+            "mode": "offline",
+            "adapter": "sdk_chat_completions",
+            "model": "scripted",
+            "case_ids": [
+              "N01",
+              "N02",
+              "N03",
+              "N04",
+              "N05",
+              "N06"
+            ],
+            "selection_sha256": "326638e9b03e8b6263a1f650c1c6e77ed64f5513a18be30c9a9693e2c7ecb84f",
+            "corpus_sha256": "9d8d92c44467b430385620fec2ce0981e5da527fb33f1669047439e15f34cfe6",
+            "freeze_sha256": "41e3e4253051003687afadeda73768f68e0e43688f6e628b02dd01557eae84b3",
+            "source_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+            "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec"
+          },
+          "sha256": "011f437697db8652399640334376fb039b8c3ed77516119fbc025a2141c5cd8e"
+        }
+      }
+    }
+  },
+  "new_focused_regressions": 14,
+  "next_proposal_scripted_only": {
+    "development": {
+      "mode": "offline",
+      "summary": {
+        "trajectories": 2,
+        "turns": 8,
+        "trajectory_correctness": {
+          "numerator": 2,
+          "denominator": 2,
+          "value": 1.0
+        },
+        "supported_completion": {
+          "numerator": 5,
+          "denominator": 5,
+          "value": 1.0
+        },
+        "semantic_correctness": {
+          "numerator": 5,
+          "denominator": 5,
+          "value": 1.0
+        },
+        "requirement_completeness": {
+          "numerator": 65,
+          "denominator": 65,
+          "value": 1.0
+        },
+        "complete_supported_turns": {
+          "numerator": 5,
+          "denominator": 5,
+          "value": 1.0
+        },
+        "clarification_precision": {
+          "numerator": 2,
+          "denominator": 2,
+          "value": 1.0
+        },
+        "unnecessary_clarifications": 0,
+        "correct_unsupported": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "incorrect_unsupported": 0,
+        "unauthorized_prevention": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "incorrect_accepted_specifications": 0,
+        "outcomes": {
+          "correct_clarification": 2,
+          "correct_block": 1,
+          "correct_report": 5
+        },
+        "diagnoses": {
+          "required_clarification": 2,
+          "planning_failure": 1,
+          "correct_report": 5
+        },
+        "failure_origins": {},
+        "model_calls_by_stage": {
+          "intent": 6,
+          "planning": 6,
+          "review": 6
+        },
+        "stage_latency_ms": {
+          "intent": 0.971,
+          "planning": 0.758,
+          "review": 0.366
+        },
+        "scenario_latency_ms": 614.703,
+        "database_calls": 5,
+        "revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0,
+        "deterministic_rejections": 0,
+        "evidence_corrections": 3,
+        "reviewer": {
+          "incorrect_rejected": 0,
+          "incorrect_approved": 0,
+          "correct_rejected": 0,
+          "correct_approved": 6,
+          "useful_revisions": 0,
+          "unproductive_revisions": 0
+        },
+        "usage_coverage": {
+          "numerator": 0,
+          "denominator": 18,
+          "value": 0.0
+        },
+        "tokens": null,
+        "estimated_cost": null,
+        "cost_status": "No independently verified pricing metadata supplied",
+        "failing_trajectories": [],
+        "protocol": {
+          "issued": 15,
+          "valid": 9
+        },
+        "database_latency_ms": 47.944,
+        "recovery_latency_ms": 0,
+        "calls_per_complete_report": {
+          "numerator": 18,
+          "denominator": 5,
+          "value": 3.6
+        },
+        "missing_clarifications": 0,
+        "recovery_success": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "unauthorized_reads": 0,
+        "clarification_turnaround_ms": null,
+        "usage_details": {
+          "cached_input": {
+            "observed_calls": 0,
+            "tokens": null
+          },
+          "reasoning": {
+            "observed_calls": 0,
+            "tokens": null
+          }
+        },
+        "diagnostic_call_coverage": {
+          "numerator": 18,
+          "denominator": 18,
+          "value": 1.0
+        },
+        "completion_over_planned_supported_turns": {
+          "numerator": 5,
+          "denominator": 5,
+          "value": 1.0
+        },
+        "correct_over_planned_trajectories": {
+          "numerator": 2,
+          "denominator": 2,
+          "value": 1.0
+        },
+        "stage_correctness": {
+          "decoded_intent": {
+            "numerator": 6,
+            "denominator": 6,
+            "value": 1.0
+          },
+          "effective_intent": {
+            "numerator": 4,
+            "denominator": 6,
+            "value": 0.6666666666666666
+          },
+          "proposal": {
+            "numerator": 5,
+            "denominator": 5,
+            "value": 1.0
+          }
+        },
+        "reviewer_incorrect_plan_rejection": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "reviewer_false_rejection": {
+          "numerator": 0,
+          "denominator": 6,
+          "value": 0.0
+        },
+        "stage_detection": {},
+        "model_sql_attempts_accepted": 0,
+        "payload_isolation_failures": 0
+      },
+      "configuration": {
+        "max_structured_repairs": 1,
+        "mode": "offline",
+        "adapter": "sdk_chat_completions",
+        "model": "scripted",
+        "case_ids": [
+          "N02",
+          "N04"
+        ],
+        "selection_sha256": "27ac625b782d60018c0d198d94d07c19cae3ed7374b9b02477d5770f80c79974",
+        "corpus_sha256": "9d8d92c44467b430385620fec2ce0981e5da527fb33f1669047439e15f34cfe6",
+        "freeze_sha256": "41e3e4253051003687afadeda73768f68e0e43688f6e628b02dd01557eae84b3",
+        "source_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+        "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec"
+      }
+    },
+    "replacements": {
+      "mode": "offline",
+      "summary": {
+        "trajectories": 4,
+        "turns": 13,
+        "trajectory_correctness": {
+          "numerator": 4,
+          "denominator": 4,
+          "value": 1.0
+        },
+        "supported_completion": {
+          "numerator": 9,
+          "denominator": 9,
+          "value": 1.0
+        },
+        "semantic_correctness": {
+          "numerator": 9,
+          "denominator": 9,
+          "value": 1.0
+        },
+        "requirement_completeness": {
+          "numerator": 117,
+          "denominator": 117,
+          "value": 1.0
+        },
+        "complete_supported_turns": {
+          "numerator": 9,
+          "denominator": 9,
+          "value": 1.0
+        },
+        "clarification_precision": {
+          "numerator": 3,
+          "denominator": 3,
+          "value": 1.0
+        },
+        "unnecessary_clarifications": 0,
+        "correct_unsupported": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "incorrect_unsupported": 0,
+        "unauthorized_prevention": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "incorrect_accepted_specifications": 0,
+        "outcomes": {
+          "correct_clarification": 3,
+          "correct_report": 9,
+          "correct_block": 1
+        },
+        "diagnoses": {
+          "required_clarification": 3,
+          "correct_report": 9,
+          "planning_failure": 1
+        },
+        "failure_origins": {},
+        "model_calls_by_stage": {
+          "intent": 11,
+          "planning": 11,
+          "review": 11
+        },
+        "stage_latency_ms": {
+          "intent": 1.848,
+          "planning": 1.55,
+          "review": 0.756
+        },
+        "scenario_latency_ms": 1116.214,
+        "database_calls": 9,
+        "revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0,
+        "deterministic_rejections": 0,
+        "evidence_corrections": 3,
+        "reviewer": {
+          "incorrect_rejected": 0,
+          "incorrect_approved": 0,
+          "correct_rejected": 0,
+          "correct_approved": 11,
+          "useful_revisions": 0,
+          "unproductive_revisions": 0
+        },
+        "usage_coverage": {
+          "numerator": 0,
+          "denominator": 33,
+          "value": 0.0
+        },
+        "tokens": null,
+        "estimated_cost": null,
+        "cost_status": "No independently verified pricing metadata supplied",
+        "failing_trajectories": [],
+        "protocol": {
+          "issued": 21,
+          "valid": 11
+        },
+        "database_latency_ms": 102.776,
+        "recovery_latency_ms": 0,
+        "calls_per_complete_report": {
+          "numerator": 33,
+          "denominator": 9,
+          "value": 3.6666666666666665
+        },
+        "missing_clarifications": 0,
+        "recovery_success": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "unauthorized_reads": 0,
+        "clarification_turnaround_ms": null,
+        "usage_details": {
+          "cached_input": {
+            "observed_calls": 0,
+            "tokens": null
+          },
+          "reasoning": {
+            "observed_calls": 0,
+            "tokens": null
+          }
+        },
+        "diagnostic_call_coverage": {
+          "numerator": 33,
+          "denominator": 33,
+          "value": 1.0
+        },
+        "completion_over_planned_supported_turns": {
+          "numerator": 9,
+          "denominator": 9,
+          "value": 1.0
+        },
+        "correct_over_planned_trajectories": {
+          "numerator": 4,
+          "denominator": 4,
+          "value": 1.0
+        },
+        "stage_correctness": {
+          "decoded_intent": {
+            "numerator": 11,
+            "denominator": 11,
+            "value": 1.0
+          },
+          "effective_intent": {
+            "numerator": 9,
+            "denominator": 11,
+            "value": 0.8181818181818182
+          },
+          "proposal": {
+            "numerator": 9,
+            "denominator": 9,
+            "value": 1.0
+          }
+        },
+        "reviewer_incorrect_plan_rejection": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "reviewer_false_rejection": {
+          "numerator": 0,
+          "denominator": 11,
+          "value": 0.0
+        },
+        "stage_detection": {},
+        "model_sql_attempts_accepted": 0,
+        "payload_isolation_failures": 0
+      },
+      "configuration": {
+        "max_structured_repairs": 1,
+        "mode": "offline",
+        "adapter": "sdk_chat_completions",
+        "model": "scripted",
+        "case_ids": [
+          "R01",
+          "R02",
+          "R03",
+          "R04"
+        ],
+        "selection_sha256": "df335a7e177fbb02f46e3254729a2af80239467d67ae1bcce9e77c9009b97d79",
+        "corpus_sha256": "37bb76b7b568cdf5ed4bca63973ef717742cc4703327a0a4bbee88fc4fce3a7d",
+        "freeze_sha256": "96853226f13a7c36031197bb9f851e143351f81987ffc35eb4ff82ae596b277f",
+        "source_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+        "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec"
+      }
+    }
+  },
+  "clean_core_smoke": {
+    "schema_version": 1,
+    "environment": {
+      "python": "3.10.22",
+      "implementation": "CPython",
+      "platform": "Windows-10-10.0.26200-SP0",
+      "sqlite": "3.53.1",
+      "executable": "<user-home>\\AppData\\Local\\Temp\\sageql-phase13-core-_bqa2d4l\\venv\\Scripts\\python.exe",
+      "dependencies": {
+        "sageql": "0.1.0",
+        "sqlglot": "26.0.0",
+        "python-dotenv": "1.2.0",
+        "openai": null,
+        "pyodbc": null,
+        "pytest": null,
+        "build": null,
+        "hatchling": null
+      }
+    },
+    "import_origin": "<user-home>\\AppData\\Local\\Temp\\sageql-phase13-core-_bqa2d4l\\venv\\Lib\\site-packages\\sageql\\__init__.py",
+    "installed_source_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+    "module_count": 45,
+    "modules": [
+      "sageql",
+      "sageql.catalog_input",
+      "sageql.chat_cli",
+      "sageql.chat_provider",
+      "sageql.cli",
+      "sageql.context",
+      "sageql.conversation",
+      "sageql.core",
+      "sageql.discovery",
+      "sageql.errors",
+      "sageql.execution",
+      "sageql.localization",
+      "sageql.odbc_catalog",
+      "sageql.openai_provider",
+      "sageql.planning",
+      "sageql.report_validation",
+      "sageql.schema",
+      "sageql.sdk",
+      "sageql.sdk.adapters",
+      "sageql.sdk.agents",
+      "sageql.sdk.business",
+      "sageql.sdk.calendars",
+      "sageql.sdk.comparisons",
+      "sageql.sdk.consistency",
+      "sageql.sdk.day_counts",
+      "sageql.sdk.decreases",
+      "sageql.sdk.engine",
+      "sageql.sdk.evidence",
+      "sageql.sdk.grounding",
+      "sageql.sdk.intent",
+      "sageql.sdk.labels",
+      "sageql.sdk.lookups",
+      "sageql.sdk.models",
+      "sageql.sdk.names",
+      "sageql.sdk.periods",
+      "sageql.sdk.phrases",
+      "sageql.sdk.provider",
+      "sageql.sdk.relationships",
+      "sageql.sdk.semantics",
+      "sageql.sdk.sessions",
+      "sageql.sdk.vocabulary",
+      "sageql.sql_generation",
+      "sageql.tsql",
+      "sageql.understanding",
+      "sageql.validation"
+    ],
+    "examples": [
+      "multi_domain.py",
+      "value_vocabulary.py"
+    ],
+    "network": "blocked",
+    "core_only": true,
+    "editable": false,
+    "optional_client_construction": false,
+    "outcome": "passed"
+  },
+  "old_approval_rejection": {
+    "current_configuration": {
+      "max_structured_repairs": 1,
+      "mode": "live",
+      "adapter": "sdk_chat_completions",
+      "endpoint": "https://api.avalai.ir/v1",
+      "model": "gpt-5-nano",
+      "case_ids": [
+        "N02",
+        "N03",
+        "N04"
+      ],
+      "selection_sha256": "147277cf5383bc3052c8515c8b3eef7d83801ddd8f0e68da98fabe352516089d",
+      "corpus_sha256": "9d8d92c44467b430385620fec2ce0981e5da527fb33f1669047439e15f34cfe6",
+      "freeze_sha256": "41e3e4253051003687afadeda73768f68e0e43688f6e628b02dd01557eae84b3",
+      "source_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+      "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec"
+    },
+    "old_approval_rejected": true,
+    "only_configuration_difference": "source_sha256",
+    "counts": {
+      "credential_reads": 0,
+      "clients": 0,
+      "network": 0
+    }
+  },
+  "next_proposal": {
+    "path": "dist/phase14/completion/approval-scope.v5.json",
+    "sha256": "f711eb76344955349677c7f707c2401bfb59ce525b5e66e90eed82af783b720b",
+    "authorized": false,
+    "scope": {
+      "schema_version": 1,
+      "phase": 14,
+      "purpose": "Unexecuted final proposal: preserve known-year fallback and total grouping; supersedes disabled V4 draft after compatibility correction",
+      "authorization_status": "requires new explicit human approval; no dispatch authorized",
+      "provider": "AvalAI",
+      "endpoint": "https://api.avalai.ir/v1",
+      "model": "gpt-5-nano",
+      "accounting_mode": "exploratory",
+      "execution_order": [
+        "development",
+        "replacements"
+      ],
+      "SDK_source_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+      "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec",
+      "pipeline": {
+        "max_revisions": 1,
+        "max_structured_repairs": 1,
+        "shared_repair_allowance": true,
+        "transport_retries": 0,
+        "database_retries": 0
+      },
+      "combined_limits": {
+        "max_requests": 160,
+        "max_seconds": 2700,
+        "estimated_cost_stop_usd": "8.00",
+        "max_input_tokens": 3000000,
+        "max_output_tokens": 1310720,
+        "max_total_tokens": 4310720
+      },
+      "stop_batch_on_incorrect_accepted_report_or_security_violation": true,
+      "stop_batch_on_transport_or_usage_uncertainty": true,
+      "no_automatic_failed_case_repeat": true,
+      "previous_unused_allowance_reused": false,
+      "production_data_allowed": false,
+      "billing_guaranteed": false,
+      "pricing_observed_date": "2026-10-28",
+      "selections": [
+        {
+          "name": "development",
+          "configuration": {
+            "max_structured_repairs": 1,
+            "mode": "live",
+            "adapter": "sdk_chat_completions",
+            "endpoint": "https://api.avalai.ir/v1",
+            "model": "gpt-5-nano",
+            "case_ids": [
+              "N02",
+              "N04"
+            ],
+            "selection_sha256": "27ac625b782d60018c0d198d94d07c19cae3ed7374b9b02477d5770f80c79974",
+            "corpus_sha256": "9d8d92c44467b430385620fec2ce0981e5da527fb33f1669047439e15f34cfe6",
+            "freeze_sha256": "41e3e4253051003687afadeda73768f68e0e43688f6e628b02dd01557eae84b3",
+            "source_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+            "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec"
+          },
+          "case_ids": [
+            "N02",
+            "N04"
+          ],
+          "corpus_directory": "<workspace>\\evaluations\\phase14",
+          "corpus_version": "v2",
+          "approval_path": "<workspace>\\dist\\phase14\\completion\\development.review-required.v5.json",
+          "approval_sha256": "b157f981cb97b8a2cad276c9eb6cfbfd48f484df641ec2ca7ff584f9a6a6a45b",
+          "output_directory": "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-targeted-development-v5",
+          "turns": 8,
+          "report_goals": 5,
+          "exposure": "Development-exposed original failures",
+          "limits": {
+            "max_requests": 80,
+            "max_input_tokens": 1500000,
+            "max_output_tokens": 655360,
+            "max_total_tokens": 2155360,
+            "max_seconds": 1350,
+            "max_cost_usd": "4.00",
+            "per_call_output_tokens": 8192,
+            "call_timeout_seconds": 120,
+            "turn_timeout_seconds": 240
+          }
+        },
+        {
+          "name": "replacements",
+          "configuration": {
+            "max_structured_repairs": 1,
+            "mode": "live",
+            "adapter": "sdk_chat_completions",
+            "endpoint": "https://api.avalai.ir/v1",
+            "model": "gpt-5-nano",
+            "case_ids": [
+              "R01",
+              "R02",
+              "R03",
+              "R04"
+            ],
+            "selection_sha256": "df335a7e177fbb02f46e3254729a2af80239467d67ae1bcce9e77c9009b97d79",
+            "corpus_sha256": "37bb76b7b568cdf5ed4bca63973ef717742cc4703327a0a4bbee88fc4fce3a7d",
+            "freeze_sha256": "96853226f13a7c36031197bb9f851e143351f81987ffc35eb4ff82ae596b277f",
+            "source_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+            "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec"
+          },
+          "case_ids": [
+            "R01",
+            "R02",
+            "R03",
+            "R04"
+          ],
+          "corpus_directory": "<workspace>\\evaluations\\phase14_replacements",
+          "corpus_version": "v3",
+          "approval_path": "<workspace>\\dist\\phase14\\completion\\replacements.review-required.v5.json",
+          "approval_sha256": "96d2d611a66265e63060123cda9c80e0c8ad23adc3dad2f59b1ae7eebbc805dc",
+          "output_directory": "<user-home>\\AppData\\Local\\Temp\\sageql-phase14-targeted-replacements-v5",
+          "turns": 13,
+          "report_goals": 9,
+          "exposure": "Offline-exposed replacements; live-unexecuted; familiar author/hosts",
+          "limits": {
+            "max_requests": 80,
+            "max_input_tokens": 1500000,
+            "max_output_tokens": 655360,
+            "max_total_tokens": 2155360,
+            "max_seconds": 1350,
+            "max_cost_usd": "4.00",
+            "per_call_output_tokens": 8192,
+            "call_timeout_seconds": 120,
+            "turn_timeout_seconds": 240
+          }
+        }
+      ],
+      "disabled_preflight_counters": {
+        "credential_reads": 0,
+        "env_file_reads": 0,
+        "clients_constructed": 0,
+        "network_attempts": 0
+      }
+    },
+    "disabled_V4_draft_preserved_and_superseded": true,
+    "new_source_live_calls": 0
+  },
+  "exposure": {
+    "schema_version": 5,
+    "phase": 14,
+    "date": "2026-10-28",
+    "previous_ledger": "exposure.v4.json",
+    "latest_live_SDK_sha256": "ccc6dae186ccb424138f8d3832a2bd8ff72d5dfe334ce991cf8178d4c56ad680",
+    "latest_offline_SDK_sha256": "c7a139cc15db3a7cba64cb5011aceef818f93c24089551442848be7038de0320",
+    "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec",
+    "new_model_requests": 17,
+    "current_scope_executed": {
+      "N02": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "N03": [
+        1,
+        2,
+        3
+      ],
+      "N04": [
+        1
+      ]
+    },
+    "current_scope_unexecuted": {
+      "N04": [
+        2,
+        3
+      ],
+      "R01-R04": "all 13 turns"
+    },
+    "N01_previous_live_complete_development_exposure_preserved": true,
+    "N04_prior_28_call_all_turn_development_exposure_preserved": true,
+    "N05_prior_live_observed_turns": [
+      1
+    ],
+    "N05_live_unexecuted_turns": [
+      2
+    ],
+    "live_unexecuted": [
+      "N06",
+      "A01",
+      "A02",
+      "A03",
+      "A04",
+      "A05",
+      "A06",
+      "A07",
+      "A08",
+      "A09",
+      "A10",
+      "A11",
+      "A12",
+      "R01",
+      "R02",
+      "R03",
+      "R04"
+    ],
+    "replacements_offline_exposed": true,
+    "replacements_live_exposed": false,
+    "questions_expected_answers_modified": false,
+    "externally_blind_claimed": false,
+    "scope_v3": "authorized then closed by first wrong accepted specification",
+    "scope_v4": "disabled superseded intermediate draft",
+    "scope_v5": "disabled final proposal; not authorized",
+    "new_source_live_calls": 0,
+    "unused_allowance_reused": false,
+    "pooled_source_accuracy_claimed": false
+  },
+  "preservation": {
+    "changed_starting_paths": [
+      "docs/PHASE14_ENGINEERING.md",
+      "docs/ROADMAP.md",
+      "docs/SDK_AGENTS.md",
+      "evaluations/PHASE14.md",
+      "evaluations/README.md",
+      "src/sageql/sdk/agents.py",
+      "src/sageql/sdk/evidence.py"
+    ],
+    "all_other_starting_files_byte_preserved": true,
+    "all_prior_evaluation_JSON_byte_preserved": true,
+    "all_existing_tests_byte_preserved": true,
+    "frozen_N_A_R_questions_answers_hosts_oracles_byte_preserved": true,
+    "approved_V3_and_disabled_review_packets_byte_preserved": true,
+    "original_live_output_and_preserved_copy_identical": true
+  },
+  "remaining": [
+    "Final c7a1 source has no live verification",
+    "N02 continuation still incomplete live",
+    "N04 comparison turns and all replacements unexecuted live in V3",
+    "N06 scripted-incomplete and live-unexecuted",
+    "A01-A12 live-unexecuted",
+    "Prior request-28 cause and provider bills unknown",
+    "SQLite does not verify native SQL Server/ODBC/types/collation/isolation",
+    "Broad reliability goal remains unmet"
+  ],
+  "safety": {
+    "production_access": false,
+    "Rahtal_env_read": false,
+    "native_SQL_Server_enabled": false,
+    "private_data_transmission": false,
+    "further_live_calls_after_stop": 0
+  },
+  "head": "b74c10974265dcac522b3e23623e0f4f9a8ae582",
+  "branch": "main",
+  "index_empty": true,
+  "phase15_started": false,
+  "commit_push_publish_deploy": false,
+  "package_verification": "dist/phase14/completion/live-v3/package-verification.json final sidecar",
+  "proposed_commit": "fix: preserve year clarification and reject unrequested report grouping"
+}

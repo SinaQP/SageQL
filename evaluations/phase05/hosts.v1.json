@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "profiles": {
+    "workshop-values-v1": {"domain": "workshop", "values": [
+      ["jobs", "channel_filter", "text", "Web", ["Web", "Online", "آنلاین"]],
+      ["jobs", "channel_filter", "text", "Desk", ["Desk", "Counter", "حضوری"]],
+      ["jobs", "service_filter", "text", "Repair", ["Repair", "Maintenance", "تعمیر"]]
+    ]},
+    "workshop-ambiguous-v1": {"domain": "workshop", "values": [
+      ["jobs", "channel_filter", "text", "Web", ["Web", "Portal"]],
+      ["jobs", "service_filter", "text", "Web", ["Web", "Portal"]]
+    ]},
+    "workshop-collision-v1": {"domain": "workshop", "values": [
+      ["jobs", "channel_filter", "text", "Web", ["Completed jobs"]]
+    ]},
+    "workshop-typed-v1": {"domain": "workshop", "extra_filters": [
+      ["fee_filter", "Price tier", "fee"],
+      ["completed_filter", "Completion date", "completed"],
+      ["voided_filter", "Record state", "voided"],
+      ["minutes_filter", "Duration tier", "minutes"]
+    ], "values": [
+      ["jobs", "fee_filter", "decimal", "80.00", ["Budget fee", "اقتصادی"]],
+      ["jobs", "completed_filter", "date", "2026-07-01", ["Opening day", "روز افتتاح"]],
+      ["jobs", "voided_filter", "boolean", false, ["Active records"]],
+      ["jobs", "minutes_filter", "integer", 30, ["Half hour"]]
+    ]},
+    "retail-values-v1": {"domain": "retail", "values": [
+      ["products", "department_filter", "text", "Books", ["Books", "Reading", "کتاب"]],
+      ["products", "department_filter", "text", "Garden", ["Garden", "Plants", "باغ"]]
+    ]},
+    "library-values-v1": {"domain": "library", "values": [
+      ["books", "shelf_filter", "text", "Science", ["Science", "Scientific", "علمی"]],
+      ["books", "shelf_filter", "text", "History", ["History", "Historical", "تاریخی"]]
+    ]}
+  }
+}

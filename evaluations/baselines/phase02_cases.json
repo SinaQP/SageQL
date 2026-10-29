@@ -1,0 +1,1852 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "retail_groups_en",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "relationship",
+        "policy"
+      ],
+      "request": "Show Net sales by department in September 2026 as a bar chart.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ],
+          [
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "bar",
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "visualization": {
+          "kind": "bar",
+          "x": "department",
+          "y": "revenue"
+        }
+      }
+    },
+    {
+      "id": "library_groups_en",
+      "domain": "library",
+      "tags": [
+        "en",
+        "independent_domain",
+        "count"
+      ],
+      "request": "Show Borrowings by History and Science shelves in September 2026.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "shelf",
+          "borrowings"
+        ],
+        "rows": [
+          [
+            "Science",
+            3
+          ],
+          [
+            "History",
+            1
+          ]
+        ],
+        "chart": "table",
+        "types": [
+          "text",
+          "integer"
+        ]
+      }
+    },
+    {
+      "id": "retail_jalali_fa",
+      "domain": "retail",
+      "tags": [
+        "fa",
+        "jalali"
+      ],
+      "request": "فروش به تفکیک بخش در شهریور ۱۴۰۵ به صورت جدول",
+      "spec": {
+        "period": {
+          "kind": "jalali_month",
+          "year": 1405,
+          "month": 6
+        },
+        "chart": "table"
+      },
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ],
+          [
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "table",
+        "bounds": [
+          "2026-08-23",
+          "2026-09-23"
+        ],
+        "types": [
+          "text",
+          "decimal"
+        ]
+      }
+    },
+    {
+      "id": "library_jalali_fa",
+      "domain": "library",
+      "tags": [
+        "fa",
+        "jalali"
+      ],
+      "request": "تعداد امانت به تفکیک قفسه در شهریور ۱۴۰۵",
+      "spec": {
+        "period": {
+          "kind": "jalali_month",
+          "year": 1405,
+          "month": 6
+        }
+      },
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "shelf",
+          "borrowings"
+        ],
+        "rows": [
+          [
+            "Science",
+            3
+          ],
+          [
+            "History",
+            1
+          ]
+        ],
+        "chart": "table",
+        "bounds": [
+          "2026-08-23",
+          "2026-09-23"
+        ],
+        "types": [
+          "text",
+          "integer"
+        ]
+      }
+    },
+    {
+      "id": "retail_daily_filter",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "filter",
+        "dates"
+      ],
+      "request": "Show daily Net sales for Books in September 2026 as a line chart.",
+      "template": "refined",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "time_bucket",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "2026-09-01",
+            "30"
+          ],
+          [
+            "2026-09-02",
+            "40"
+          ]
+        ],
+        "chart": "line",
+        "types": [
+          "date",
+          "decimal"
+        ],
+        "visualization": {
+          "kind": "line",
+          "x": "time_bucket",
+          "y": "revenue"
+        }
+      }
+    },
+    {
+      "id": "library_mean",
+      "domain": "library",
+      "tags": [
+        "en",
+        "average",
+        "filter"
+      ],
+      "request": "Show Mean loan duration by History and Science shelves in September 2026 as a bar chart.",
+      "template": "refined",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "shelf",
+          "mean_duration"
+        ],
+        "rows": [
+          [
+            "History",
+            "14"
+          ],
+          [
+            "Science",
+            "6"
+          ]
+        ],
+        "chart": "bar",
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "visualization": {
+          "kind": "bar",
+          "x": "shelf",
+          "y": "mean_duration"
+        }
+      }
+    },
+    {
+      "id": "retail_top_group",
+      "domain": "retail",
+      "tags": [
+        "ranking",
+        "aggregate_filter"
+      ],
+      "request": "Show the top department by Net sales over 50 in September 2026.",
+      "spec": {
+        "chart": "table",
+        "limit": 1,
+        "aggregate_filters": [
+          {
+            "metric_id": "revenue",
+            "operator": "gt",
+            "values": [
+              50
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ]
+        ],
+        "chart": "table",
+        "types": [
+          "text",
+          "decimal"
+        ]
+      }
+    },
+    {
+      "id": "retail_listing",
+      "domain": "retail",
+      "tags": [
+        "listing",
+        "policy"
+      ],
+      "request": "List product titles.",
+      "spec": {
+        "dataset_id": "products",
+        "metric_ids": [],
+        "dimension_ids": [
+          "title"
+        ],
+        "chart": "table",
+        "order_by": "title",
+        "descending": false,
+        "period": {
+          "kind": "all"
+        }
+      },
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "title"
+        ],
+        "rows": [
+          [
+            "Field guide"
+          ],
+          [
+            "Seeds"
+          ]
+        ],
+        "chart": "table",
+        "bounds": [
+          null,
+          null
+        ],
+        "types": [
+          "text"
+        ]
+      }
+    },
+    {
+      "id": "retail_lookup",
+      "domain": "retail",
+      "tags": [
+        "lookup",
+        "policy"
+      ],
+      "request": "Show Net sales for the product named Field guide in September 2026.",
+      "spec": {
+        "dimension_ids": [],
+        "chart": "table",
+        "filters": [
+          {
+            "filter_id": "named_product",
+            "operator": "eq",
+            "values": [
+              "Field guide"
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "revenue"
+        ],
+        "rows": [
+          [
+            "70"
+          ]
+        ],
+        "chart": "table",
+        "types": [
+          "decimal"
+        ]
+      }
+    },
+    {
+      "id": "retail_labels",
+      "domain": "retail",
+      "tags": [
+        "label",
+        "ranking"
+      ],
+      "request": "Show Net sales by product name in September 2026 ordered by sales.",
+      "spec": {
+        "dimension_ids": [
+          "product_name"
+        ],
+        "chart": "table"
+      },
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "product_name",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Field guide",
+            "70"
+          ],
+          [
+            "Seeds",
+            "45"
+          ]
+        ],
+        "chart": "table",
+        "types": [
+          "text",
+          "decimal"
+        ]
+      }
+    },
+    {
+      "id": "library_participant_mean",
+      "domain": "library",
+      "tags": [
+        "participant_mean",
+        "aggregation"
+      ],
+      "request": "Show mean Loan days per reader for History and Science shelves in September 2026.",
+      "spec": {
+        "metric_ids": [
+          "days_per_reader"
+        ],
+        "dimension_ids": [],
+        "order_by": null
+      },
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "days_per_reader"
+        ],
+        "rows": [
+          [
+            16.0
+          ]
+        ],
+        "chart": "table",
+        "types": [
+          "number"
+        ]
+      }
+    },
+    {
+      "id": "retail_comparison",
+      "domain": "retail",
+      "tags": [
+        "comparison",
+        "null"
+      ],
+      "request": "Compare total Net sales in September 2026 versus August.",
+      "spec": {
+        "dimension_ids": [],
+        "chart": "table",
+        "comparison": {
+          "kind": "month",
+          "year": 2026,
+          "month": 8
+        },
+        "order_by": "period_label",
+        "descending": false
+      },
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "period_label",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "base",
+            "115"
+          ],
+          [
+            "comparison",
+            null
+          ]
+        ],
+        "chart": "table",
+        "types": [
+          "text",
+          "decimal"
+        ]
+      }
+    },
+    {
+      "id": "retail_change",
+      "domain": "retail",
+      "tags": [
+        "comparison",
+        "fixed_change"
+      ],
+      "request": "Show absolute and percentage change in Net sales for stock code B1 in September 2026 versus October 2026.",
+      "spec": {
+        "dimension_ids": [],
+        "chart": "table",
+        "comparison": {
+          "kind": "month",
+          "year": 2026,
+          "month": 10
+        },
+        "comparison_calculation": "change",
+        "order_by": null,
+        "filters": [
+          {
+            "filter_id": "sku_filter",
+            "operator": "eq",
+            "values": [
+              "B1"
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "metric_label",
+          "comparison_value",
+          "base_value",
+          "absolute_change",
+          "percent_change",
+          "change_status"
+        ],
+        "rows": [
+          [
+            "Net sales (USD)",
+            "700",
+            "70",
+            "-630",
+            "-90",
+            "Decrease"
+          ]
+        ],
+        "chart": "table",
+        "types": [
+          "text",
+          "number",
+          "number",
+          "number",
+          "number",
+          "text"
+        ]
+      }
+    },
+    {
+      "id": "retail_year_question",
+      "domain": "retail",
+      "tags": [
+        "clarification",
+        "en"
+      ],
+      "request": "Net sales by department in September.",
+      "missing": [
+        "year"
+      ],
+      "expect": {
+        "kind": "clarification",
+        "question_contains": "year"
+      }
+    },
+    {
+      "id": "retail_year_answer",
+      "domain": "retail",
+      "tags": [
+        "conversation",
+        "clarification",
+        "fa"
+      ],
+      "request": "Net sales by department in September.",
+      "missing": [
+        "year"
+      ],
+      "answer": "۲۰۲۶",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ],
+          [
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "bar",
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "visualization": {
+          "kind": "bar",
+          "x": "department",
+          "y": "revenue"
+        }
+      }
+    },
+    {
+      "id": "library_refinement",
+      "domain": "library",
+      "tags": [
+        "conversation",
+        "persistence"
+      ],
+      "request": "Show Borrowings by History and Science shelves in September 2026.",
+      "refine": true,
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "shelf",
+          "mean_duration"
+        ],
+        "rows": [
+          [
+            "History",
+            "14"
+          ],
+          [
+            "Science",
+            "6"
+          ]
+        ],
+        "chart": "bar",
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "visualization": {
+          "kind": "bar",
+          "x": "shelf",
+          "y": "mean_duration"
+        }
+      }
+    },
+    {
+      "id": "unsupported_shares_en",
+      "domain": "retail",
+      "tags": [
+        "unsupported",
+        "en"
+      ],
+      "request": "Show Net sales and their share of the total in September 2026.",
+      "expect": {
+        "kind": "unsupported"
+      }
+    },
+    {
+      "id": "unsupported_absence_fa",
+      "domain": "library",
+      "tags": [
+        "unsupported",
+        "fa"
+      ],
+      "request": "در شهریور ۱۴۰۵ کدام کتاب‌ها هیچ امانتی ثبت نکرده‌اند؟",
+      "expect": {
+        "kind": "unsupported"
+      }
+    },
+    {
+      "id": "unauthorized_actor",
+      "domain": "retail",
+      "tags": [
+        "authorization"
+      ],
+      "request": "Show Net sales by department in September 2026.",
+      "fault": "actor",
+      "expect": {
+        "kind": "denial"
+      }
+    },
+    {
+      "id": "wrong_period_recovery",
+      "domain": "retail",
+      "tags": [
+        "recovery",
+        "period"
+      ],
+      "request": "Show Net sales by department in September 2026.",
+      "fault": "wrong_period",
+      "recovery_expected": true,
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ],
+          [
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "bar",
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "visualization": {
+          "kind": "bar",
+          "x": "department",
+          "y": "revenue"
+        }
+      }
+    },
+    {
+      "id": "malformed_intent_recovery",
+      "domain": "library",
+      "tags": [
+        "recovery",
+        "structured"
+      ],
+      "request": "Show Borrowings by History and Science shelves in September 2026.",
+      "fault": "malformed",
+      "recovery_expected": true,
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "shelf",
+          "borrowings"
+        ],
+        "rows": [
+          [
+            "Science",
+            3
+          ],
+          [
+            "History",
+            1
+          ]
+        ],
+        "chart": "table",
+        "types": [
+          "text",
+          "integer"
+        ]
+      }
+    },
+    {
+      "id": "provider_failure",
+      "domain": "retail",
+      "tags": [
+        "failure",
+        "redaction"
+      ],
+      "request": "Show Net sales in September 2026.",
+      "fault": "provider",
+      "baseline_outcome": "operational_failure",
+      "expect": {
+        "kind": "failure",
+        "error_code": "provider_failed"
+      }
+    },
+    {
+      "id": "database_failure",
+      "domain": "library",
+      "tags": [
+        "failure",
+        "no_replay"
+      ],
+      "request": "Show Borrowings by History and Science shelves in September 2026.",
+      "fault": "database",
+      "baseline_outcome": "operational_failure",
+      "expect": {
+        "kind": "failure",
+        "error_code": "database_unavailable"
+      }
+    },
+    {
+      "id": "model_sql_rejected",
+      "domain": "retail",
+      "tags": [
+        "untrusted_output"
+      ],
+      "request": "Show Net sales in September 2026.",
+      "fault": "sql",
+      "expect": {
+        "kind": "blocked",
+        "error_code": "invalid_interpretation"
+      }
+    },
+    {
+      "id": "known_negated_share",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "negation"
+      ],
+      "request": "Show Net sales by department in September 2026; do not show the share of total.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ],
+          [
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "bar",
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "visualization": {
+          "kind": "bar",
+          "x": "department",
+          "y": "revenue"
+        }
+      }
+    },
+    {
+      "id": "known_negated_daily",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "negation",
+        "correlated_error"
+      ],
+      "request": "Show Net sales by department in September 2026, not daily, as a table.",
+      "spec": {
+        "chart": "table"
+      },
+      "fault": "correlated_daily",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ],
+          [
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "table",
+        "types": [
+          "text",
+          "decimal"
+        ]
+      }
+    },
+    {
+      "id": "known_exact_mean_label",
+      "domain": "library",
+      "tags": [
+        "participant_mean",
+        "aggregation"
+      ],
+      "request": "Show Loan days per reader for History and Science shelves in September 2026.",
+      "spec": {
+        "metric_ids": [
+          "days_per_reader"
+        ],
+        "dimension_ids": [],
+        "order_by": null
+      },
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "days_per_reader"
+        ],
+        "rows": [
+          [
+            16.0
+          ]
+        ],
+        "chart": "table",
+        "types": [
+          "number"
+        ]
+      }
+    },
+    {
+      "id": "p02_share_omit",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Omit the share of total; show Net sales by department in September 2026.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ],
+          [
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "bar",
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "visualization": {
+          "kind": "bar",
+          "x": "department",
+          "y": "revenue"
+        }
+      }
+    },
+    {
+      "id": "p02_share_exclude_fa",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "فروش به تفکیک بخش در سپتامبر ۲۰۲۶؛ سهم از کل را نمایش نده.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ],
+          [
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "bar",
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "visualization": {
+          "kind": "bar",
+          "x": "department",
+          "y": "revenue"
+        }
+      }
+    },
+    {
+      "id": "p02_share_literal_example",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "The example says \"calculate share of total\"; show Net sales by department in September 2026.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ],
+          [
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "bar",
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "visualization": {
+          "kind": "bar",
+          "x": "department",
+          "y": "revenue"
+        }
+      }
+    },
+    {
+      "id": "p02_unsupported_quoted",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show \"share of total\" in September 2026.",
+      "expect": {
+        "kind": "unsupported"
+      }
+    },
+    {
+      "id": "p02_unsupported_quoted_fa",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "«سهم از کل» را در شهریور ۱۴۰۵ نشان بده.",
+      "expect": {
+        "kind": "unsupported"
+      }
+    },
+    {
+      "id": "p02_unsupported_mixed_ratio",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Do not show share of total, but calculate another unsupported ratio in September 2026.",
+      "expect": {
+        "kind": "unsupported"
+      }
+    },
+    {
+      "id": "p02_unsupported_mixed_ratio_fa",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "سهم از کل را نمایش نده؛ اما نسبت ثبت‌نشده را در شهریور ۱۴۰۵ محاسبه کن.",
+      "expect": {
+        "kind": "unsupported"
+      }
+    },
+    {
+      "id": "p02_unsupported_mixed_same",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Do not show share of total, but show share of total anyway in September 2026.",
+      "expect": {
+        "kind": "unsupported"
+      }
+    },
+    {
+      "id": "p02_unsupported_negative_grain",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Not daily; show shares of total in September 2026.",
+      "expect": {
+        "kind": "unsupported"
+      }
+    },
+    {
+      "id": "p02_unsupported_positive_fa",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "سهم از کل را در شهریور ۱۴۰۵ نشان بده.",
+      "expect": {
+        "kind": "unsupported"
+      }
+    },
+    {
+      "id": "p02_grain_daily",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show daily Net sales by department in September 2026.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "time_bucket",
+          "department",
+          "revenue"
+        ],
+        "types": [
+          "date",
+          "text",
+          "decimal"
+        ],
+        "rows": [
+          [
+            "2026-09-01",
+            "Books",
+            "30"
+          ],
+          [
+            "2026-09-02",
+            "Books",
+            "40"
+          ],
+          [
+            "2026-09-02",
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "table"
+      },
+      "spec": {
+        "chart": "table",
+        "time_grain": "day",
+        "order_by": "time_bucket",
+        "descending": false
+      }
+    },
+    {
+      "id": "p02_grain_monthly_not_daily",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show monthly Net sales by department in September 2026, not daily.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "time_bucket",
+          "department",
+          "revenue"
+        ],
+        "types": [
+          "date",
+          "text",
+          "decimal"
+        ],
+        "rows": [
+          [
+            "2026-09-01",
+            "Books",
+            "70"
+          ],
+          [
+            "2026-09-01",
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "table"
+      },
+      "spec": {
+        "chart": "table",
+        "time_grain": "month",
+        "order_by": "time_bucket",
+        "descending": false
+      }
+    },
+    {
+      "id": "p02_grain_example_daily",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "The example says \"show daily\"; show monthly Net sales by department in September 2026.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "time_bucket",
+          "department",
+          "revenue"
+        ],
+        "types": [
+          "date",
+          "text",
+          "decimal"
+        ],
+        "rows": [
+          [
+            "2026-09-01",
+            "Books",
+            "70"
+          ],
+          [
+            "2026-09-01",
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "table"
+      },
+      "spec": {
+        "chart": "table",
+        "time_grain": "month",
+        "order_by": "time_bucket",
+        "descending": false
+      }
+    },
+    {
+      "id": "p02_grain_quoted_daily",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Use \"daily\" grouping for Net sales by department in September 2026.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "time_bucket",
+          "department",
+          "revenue"
+        ],
+        "types": [
+          "date",
+          "text",
+          "decimal"
+        ],
+        "rows": [
+          [
+            "2026-09-01",
+            "Books",
+            "30"
+          ],
+          [
+            "2026-09-02",
+            "Books",
+            "40"
+          ],
+          [
+            "2026-09-02",
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "table"
+      },
+      "spec": {
+        "chart": "table",
+        "time_grain": "day",
+        "order_by": "time_bucket",
+        "descending": false
+      }
+    },
+    {
+      "id": "p02_jalali_monthly_exclusion",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "فروش ماهانه به تفکیک بخش در شهریور ۱۴۰۵؛ روزانه نباشد.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "time_bucket",
+          "department",
+          "revenue"
+        ],
+        "types": [
+          "date",
+          "text",
+          "decimal"
+        ],
+        "rows": [
+          [
+            "2026-08-23",
+            "Books",
+            "70"
+          ],
+          [
+            "2026-08-23",
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "table",
+        "bounds": [
+          "2026-08-23",
+          "2026-09-23"
+        ]
+      },
+      "spec": {
+        "chart": "table",
+        "time_grain": "jalali_month",
+        "order_by": "time_bucket",
+        "descending": false,
+        "period": {
+          "kind": "jalali_month",
+          "year": 1405,
+          "month": 6
+        }
+      }
+    },
+    {
+      "id": "p02_clarify_quoted",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "\"daily\" Net sales in September 2026",
+      "expect": {
+        "kind": "clarification"
+      }
+    },
+    {
+      "id": "p02_clarify_conflict",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show Net sales daily and not daily in September 2026",
+      "expect": {
+        "kind": "clarification"
+      }
+    },
+    {
+      "id": "p02_clarify_no_replacement",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show Net sales in September 2026, not daily",
+      "expect": {
+        "kind": "clarification"
+      }
+    },
+    {
+      "id": "p02_clarify_alternative",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show Net sales daily or monthly in September 2026",
+      "expect": {
+        "kind": "clarification"
+      }
+    },
+    {
+      "id": "p02_clarify_unknown_operation_quote",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "\"Share of total\" in September 2026",
+      "expect": {
+        "kind": "clarification"
+      }
+    },
+    {
+      "id": "p02_unsupported_hourly",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show Net sales hourly in September 2026.",
+      "expect": {
+        "kind": "unsupported"
+      }
+    },
+    {
+      "id": "p02_mean_alias",
+      "domain": "library",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show per reader for History and Science shelves in September 2026.",
+      "spec": {
+        "metric_ids": [
+          "days_per_reader"
+        ],
+        "dimension_ids": [],
+        "order_by": null
+      },
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "days_per_reader"
+        ],
+        "rows": [
+          [
+            16.0
+          ]
+        ],
+        "chart": "table",
+        "types": [
+          "number"
+        ]
+      }
+    },
+    {
+      "id": "p02_mean_quoted_label",
+      "domain": "library",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show the metric \"Loan days per reader\" for History and Science shelves in September 2026.",
+      "spec": {
+        "metric_ids": [
+          "days_per_reader"
+        ],
+        "dimension_ids": [],
+        "order_by": null
+      },
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "days_per_reader"
+        ],
+        "rows": [
+          [
+            16.0
+          ]
+        ],
+        "chart": "table",
+        "types": [
+          "number"
+        ]
+      }
+    },
+    {
+      "id": "p02_mean_exclusion",
+      "domain": "library",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show Mean loan duration, not Loan days per reader, for History and Science shelves in September 2026.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "mean_duration"
+        ],
+        "types": [
+          "decimal"
+        ],
+        "rows": [
+          [
+            "8"
+          ]
+        ],
+        "chart": "table"
+      },
+      "spec": {
+        "metric_ids": [
+          "mean_duration"
+        ],
+        "dimension_ids": [],
+        "order_by": null
+      }
+    },
+    {
+      "id": "p02_units_excluding_sales",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show Units sold, not Net sales, in September 2026.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "units"
+        ],
+        "types": [
+          "decimal"
+        ],
+        "rows": [
+          [
+            "14"
+          ]
+        ],
+        "chart": "table"
+      },
+      "spec": {
+        "metric_ids": [
+          "units"
+        ],
+        "dimension_ids": [],
+        "chart": "table",
+        "order_by": null
+      }
+    },
+    {
+      "id": "p02_two_distinct_averages",
+      "domain": "library",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show Mean loan duration and Loan days per reader for History and Science shelves in September 2026.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "mean_duration",
+          "days_per_reader"
+        ],
+        "types": [
+          "decimal",
+          "number"
+        ],
+        "rows": [
+          [
+            "8",
+            16
+          ]
+        ],
+        "chart": "table"
+      },
+      "spec": {
+        "metric_ids": [
+          "mean_duration",
+          "days_per_reader"
+        ],
+        "dimension_ids": [],
+        "order_by": null
+      }
+    },
+    {
+      "id": "p02_literal_mean_example",
+      "domain": "library",
+      "tags": [
+        "phase02"
+      ],
+      "request": "The example says \"Loan days per reader\"; show Borrowings by History and Science shelves in September 2026.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "shelf",
+          "borrowings"
+        ],
+        "rows": [
+          [
+            "Science",
+            3
+          ],
+          [
+            "History",
+            1
+          ]
+        ],
+        "chart": "table",
+        "types": [
+          "text",
+          "integer"
+        ]
+      }
+    },
+    {
+      "id": "p02_remove_dimension_refinement",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show Net sales by department in September 2026 as a bar chart.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "revenue"
+        ],
+        "types": [
+          "decimal"
+        ],
+        "rows": [
+          [
+            "115"
+          ]
+        ],
+        "chart": "table"
+      },
+      "spec": {
+        "dimension_ids": [],
+        "chart": "table",
+        "order_by": null
+      },
+      "initial_spec": {},
+      "initial_expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ],
+          [
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "bar",
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "visualization": {
+          "kind": "bar",
+          "x": "department",
+          "y": "revenue"
+        }
+      },
+      "follow_up": "Remove Department grouping; keep Net sales as a table."
+    },
+    {
+      "id": "p02_remove_grain_refinement",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show daily Net sales by department in September 2026 as a table.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ],
+          [
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "table",
+        "types": [
+          "text",
+          "decimal"
+        ]
+      },
+      "spec": {
+        "chart": "table",
+        "order_by": null
+      },
+      "initial_spec": {
+        "chart": "table",
+        "time_grain": "day",
+        "order_by": "time_bucket",
+        "descending": false
+      },
+      "initial_expect": {
+        "kind": "report",
+        "fields": [
+          "time_bucket",
+          "department",
+          "revenue"
+        ],
+        "types": [
+          "date",
+          "text",
+          "decimal"
+        ],
+        "rows": [
+          [
+            "2026-09-01",
+            "Books",
+            "30"
+          ],
+          [
+            "2026-09-02",
+            "Books",
+            "40"
+          ],
+          [
+            "2026-09-02",
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "table"
+      },
+      "follow_up": "Use the previous report, but remove daily grouping."
+    },
+    {
+      "id": "p02_remove_excluded_operation",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show Net sales by department in September 2026 as a bar chart.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ],
+          [
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "bar",
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "visualization": {
+          "kind": "bar",
+          "x": "department",
+          "y": "revenue"
+        }
+      },
+      "initial_spec": {},
+      "initial_expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ],
+          [
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "bar",
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "visualization": {
+          "kind": "bar",
+          "x": "department",
+          "y": "revenue"
+        }
+      },
+      "follow_up": "Remove the share of total from this report."
+    },
+    {
+      "id": "p02_negated_requirement_ledger",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "request": "Show Net sales by department in September 2026; do not show share of total.",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ],
+          [
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "bar",
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "visualization": {
+          "kind": "bar",
+          "x": "department",
+          "y": "revenue"
+        }
+      },
+      "ledger": [
+        {
+          "operation": "percentage_share",
+          "evidence": "share of total"
+        }
+      ]
+    },
+    {
+      "id": "p02_quote_answer_literal",
+      "domain": "retail",
+      "tags": [
+        "phase02",
+        "quote",
+        "conversation"
+      ],
+      "request": "\"Share of total\"; Net sales by Department in September 2026",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "revenue"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ],
+          [
+            "Garden",
+            "45"
+          ]
+        ],
+        "chart": "bar",
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "visualization": {
+          "kind": "bar",
+          "x": "department",
+          "y": "revenue"
+        }
+      },
+      "answer": "It is only an example",
+      "ledger": [
+        {
+          "operation": "percentage_share",
+          "evidence": "share of total"
+        }
+      ]
+    },
+    {
+      "id": "p02_quote_answer_actual",
+      "domain": "retail",
+      "tags": [
+        "phase02",
+        "quote",
+        "conversation"
+      ],
+      "request": "\"Share of total\"; Net sales by Department in September 2026",
+      "expect": {
+        "kind": "unsupported"
+      },
+      "answer": "It is a requested operation"
+    },
+    {
+      "id": "p02_pending_grouping_answer",
+      "domain": "retail",
+      "tags": [
+        "phase02",
+        "conversation",
+        "period"
+      ],
+      "request": "Show Net sales in September 2026, not daily",
+      "expect": {
+        "kind": "report",
+        "fields": [
+          "time_bucket",
+          "revenue"
+        ],
+        "types": [
+          "date",
+          "decimal"
+        ],
+        "rows": [
+          [
+            "2026-09-01",
+            "115"
+          ]
+        ],
+        "chart": "table"
+      },
+      "answer": "monthly",
+      "spec": {
+        "dimension_ids": [],
+        "time_grain": "month",
+        "chart": "table",
+        "order_by": "time_bucket",
+        "descending": false
+      }
+    }
+  ]
+}

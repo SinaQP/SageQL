@@ -1,0 +1,1682 @@
+{
+  "schema_version": 5,
+  "phase": 14,
+  "date": "2026-10-28",
+  "SDK_sha256": "df46aee74f313b26e4dbed0a9472ea62c602d61b56f3da120ffa42c913506f43",
+  "evaluator_sha256": "c4d1db5c16ed86b30895fab07f3a7669f2b3242f730bd9c16ad274b7bec1b4ec",
+  "source": "Immutable V6 first attempts; shared frozen scoring unchanged",
+  "rows": [
+    {
+      "selection": "development",
+      "case": "N04",
+      "turn": 1,
+      "request": "For July 2026, Billed amount with Channel = Counter; show the entire period in one table, not daily.",
+      "expected": {
+        "kind": "report",
+        "fields": [
+          "billed"
+        ],
+        "types": [
+          "decimal"
+        ],
+        "rows": [
+          [
+            "280"
+          ]
+        ],
+        "chart": "table",
+        "visualization": {
+          "kind": "table"
+        },
+        "truncated": false,
+        "bounds": [
+          "2026-07-01",
+          "2026-08-01"
+        ]
+      },
+      "expected_spec": {
+        "dataset_id": "jobs",
+        "metric_ids": [
+          "billed"
+        ],
+        "dimension_ids": [],
+        "filters": [
+          {
+            "filter_id": "channel_filter",
+            "operator": "eq",
+            "values": [
+              "Desk"
+            ]
+          }
+        ],
+        "aggregate_filters": [],
+        "period": {
+          "kind": "month",
+          "year": 2026,
+          "month": 7
+        },
+        "comparison": null,
+        "comparison_calculation": "none",
+        "include_matching_day_count": false,
+        "time_grain": "none",
+        "chart": "table",
+        "order_by": null,
+        "descending": false,
+        "limit": 100
+      },
+      "actual_status": "blocked",
+      "actual_outcome": "incorrect_rejection",
+      "earliest_cause": "raw_Intent_and_both_Planner_proposals_add_filter_owner_as_group; evidence_corrects_Intent_but_both_Plans_rejected",
+      "checks": {
+        "invariants": true,
+        "receipt": true,
+        "persisted": true,
+        "previous_preserved": true,
+        "payload_isolation": true
+      },
+      "requirements": {
+        "metric_ids": false,
+        "dimension_ids": false,
+        "filters": false,
+        "aggregate_filters": false,
+        "period": false,
+        "comparison": false,
+        "comparison_calculation": false,
+        "include_matching_day_count": false,
+        "time_grain": false,
+        "chart": false,
+        "order_by": false,
+        "descending": false,
+        "limit": false
+      },
+      "stage_requirements": [
+        {
+          "stage": "decoded_intent",
+          "checks": {
+            "metrics": true,
+            "dimensions": false,
+            "filters": true,
+            "period": true,
+            "comparison": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": false,
+            "limit": false,
+            "aggregate_filters": false,
+            "missing": true
+          }
+        },
+        {
+          "stage": "effective_intent",
+          "checks": {
+            "metrics": true,
+            "dimensions": true,
+            "filters": true,
+            "period": true,
+            "comparison": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "aggregate_filters": false,
+            "missing": true
+          }
+        },
+        {
+          "stage": "proposal",
+          "checks": {
+            "dataset_id": true,
+            "metric_ids": true,
+            "dimension_ids": false,
+            "filters": true,
+            "period": true,
+            "time_grain": true,
+            "chart": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true,
+            "aggregate_filters": true
+          }
+        },
+        {
+          "stage": "proposal",
+          "checks": {
+            "dataset_id": true,
+            "metric_ids": true,
+            "dimension_ids": false,
+            "filters": true,
+            "period": true,
+            "time_grain": true,
+            "chart": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true,
+            "aggregate_filters": true
+          }
+        }
+      ],
+      "safe_errors": [
+        {
+          "code": "intent_mismatch",
+          "stage": "semantic_validation",
+          "reason": "repeated_conflict"
+        }
+      ],
+      "database_calls": 0,
+      "reviews": [],
+      "captured_outputs": [
+        {
+          "call": 1,
+          "stage": "intent",
+          "content": "{\"metrics\":[{\"dataset_id\":\"jobs\",\"concept_id\":\"billed\"}],\"dimensions\":[{\"dataset_id\":\"jobs\",\"concept_id\":\"channel\"}],\"missing\":[],\"turn_kind\":\"new\",\"unsupported_reason\":\"\",\"chart\":\"table\",\"time_grain\":\"none\",\"unsupported_requirements\":[],\"period\":{\"kind\":\"month\",\"start\":null,\"end\":null,\"year\":2026,\"month\":7,\"count\":null,\"unit\":null},\"comparison\":null,\"comparison_specified\":false,\"comparison_calculation\":null,\"include_matching_day_count\":null,\"filters\":[{\"filter_id\":\"channel_filter\",\"operator\":\"eq\",\"values\":[\"__sageql_value_0_1_1__\"]}],\"aggregate_filters\":null,\"order_by\":null,\"ordering_specified\":false,\"descending\":null,\"limit\":null}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 4414,
+            "output": 2996,
+            "total": 7410,
+            "cached_input": 0,
+            "reasoning": 2816
+          }
+        },
+        {
+          "call": 2,
+          "stage": "planning",
+          "content": "{\"status\":\"ready\",\"spec\":{\"dataset_id\":\"jobs\",\"metric_ids\":[\"billed\"],\"dimension_ids\":[\"channel\"],\"filters\":[{\"filter_id\":\"channel_filter\",\"operator\":\"eq\",\"values\":[\"__sageql_value_0_1_1__\"]}],\"period\":{\"kind\":\"month\",\"start\":null,\"end\":null,\"year\":2026,\"month\":7,\"count\":null,\"unit\":null},\"time_grain\":\"none\",\"chart\":\"table\",\"order_by\":null,\"descending\":false,\"limit\":100,\"comparison\":null,\"comparison_calculation\":\"none\",\"include_matching_day_count\":false,\"aggregate_filters\":[]},\"question\":\"\" ,\"message\":\"\"}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 4575,
+            "output": 3035,
+            "total": 7610,
+            "cached_input": 0,
+            "reasoning": 2880
+          }
+        },
+        {
+          "call": 3,
+          "stage": "planning",
+          "content": "{\"status\":\"ready\",\"spec\":{\"dataset_id\":\"jobs\",\"metric_ids\":[\"billed\"],\"dimension_ids\":[\"channel\"],\"filters\":[{\"filter_id\":\"channel_filter\",\"operator\":\"eq\",\"values\":[\"__sageql_value_0_1_1__\"]}],\"period\":{\"kind\":\"month\",\"start\":null,\"end\":null,\"year\":2026,\"month\":7,\"count\":null,\"unit\":null},\"time_grain\":\"none\",\"chart\":\"table\",\"order_by\":null,\"descending\":false,\"limit\":100,\"comparison\":null,\"comparison_calculation\":\"none\",\"include_matching_day_count\":false,\"aggregate_filters\":[] },\"question\":\"\" ,\"message\":\"\"}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 4582,
+            "output": 4123,
+            "total": 8705,
+            "cached_input": 4224,
+            "reasoning": 3968
+          }
+        }
+      ]
+    },
+    {
+      "selection": "development",
+      "case": "N04",
+      "turn": 2,
+      "request": "Also compare that total with June 2026; keep the same Channel restriction.",
+      "expected": {
+        "kind": "report",
+        "fields": [
+          "period_label",
+          "billed"
+        ],
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "rows": [
+          [
+            "base",
+            "280"
+          ],
+          [
+            "comparison",
+            "100"
+          ]
+        ],
+        "chart": "table",
+        "visualization": {
+          "kind": "table"
+        },
+        "truncated": false,
+        "bounds": [
+          "2026-07-01",
+          "2026-08-01"
+        ]
+      },
+      "expected_spec": {
+        "dataset_id": "jobs",
+        "metric_ids": [
+          "billed"
+        ],
+        "dimension_ids": [],
+        "filters": [
+          {
+            "filter_id": "channel_filter",
+            "operator": "eq",
+            "values": [
+              "Desk"
+            ]
+          }
+        ],
+        "aggregate_filters": [],
+        "period": {
+          "kind": "month",
+          "year": 2026,
+          "month": 7
+        },
+        "comparison": {
+          "kind": "month",
+          "year": 2026,
+          "month": 6
+        },
+        "comparison_calculation": "none",
+        "include_matching_day_count": false,
+        "time_grain": "none",
+        "chart": "table",
+        "order_by": null,
+        "descending": false,
+        "limit": 100
+      },
+      "actual_status": "needs_clarification",
+      "actual_outcome": "incorrect_rejection",
+      "earliest_cause": "no_successful_base_report_after_turn1; comparison_cannot_be_completed; unnecessary_question",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "previous_preserved": true,
+        "payload_isolation": true
+      },
+      "requirements": {
+        "metric_ids": false,
+        "dimension_ids": false,
+        "filters": false,
+        "aggregate_filters": false,
+        "period": false,
+        "comparison": false,
+        "comparison_calculation": false,
+        "include_matching_day_count": false,
+        "time_grain": false,
+        "chart": false,
+        "order_by": false,
+        "descending": false,
+        "limit": false
+      },
+      "stage_requirements": [],
+      "safe_errors": [],
+      "database_calls": 0,
+      "reviews": [],
+      "captured_outputs": []
+    },
+    {
+      "selection": "development",
+      "case": "N04",
+      "turn": 3,
+      "request": "Reverse the comparison: June 2026 is the base and July 2026 is the comparison; keep Channel = Counter.",
+      "expected": {
+        "kind": "report",
+        "fields": [
+          "period_label",
+          "billed"
+        ],
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "rows": [
+          [
+            "base",
+            "100"
+          ],
+          [
+            "comparison",
+            "280"
+          ]
+        ],
+        "chart": "table",
+        "visualization": {
+          "kind": "table"
+        },
+        "truncated": false,
+        "bounds": [
+          "2026-06-01",
+          "2026-07-01"
+        ]
+      },
+      "expected_spec": {
+        "dataset_id": "jobs",
+        "metric_ids": [
+          "billed"
+        ],
+        "dimension_ids": [],
+        "filters": [
+          {
+            "filter_id": "channel_filter",
+            "operator": "eq",
+            "values": [
+              "Desk"
+            ]
+          }
+        ],
+        "aggregate_filters": [],
+        "period": {
+          "kind": "month",
+          "year": 2026,
+          "month": 6
+        },
+        "comparison": {
+          "kind": "month",
+          "year": 2026,
+          "month": 7
+        },
+        "comparison_calculation": "none",
+        "include_matching_day_count": false,
+        "time_grain": "none",
+        "chart": "table",
+        "order_by": null,
+        "descending": false,
+        "limit": 100
+      },
+      "actual_status": "needs_clarification",
+      "actual_outcome": "incorrect_rejection",
+      "earliest_cause": "continuation_cascade_without_base_report; malformed_semantic_controls; role_fix_not_exercised_by_successful_report",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "previous_preserved": true,
+        "payload_isolation": true
+      },
+      "requirements": {
+        "metric_ids": false,
+        "dimension_ids": false,
+        "filters": false,
+        "aggregate_filters": false,
+        "period": false,
+        "comparison": false,
+        "comparison_calculation": false,
+        "include_matching_day_count": false,
+        "time_grain": false,
+        "chart": false,
+        "order_by": false,
+        "descending": false,
+        "limit": false
+      },
+      "stage_requirements": [
+        {
+          "stage": "decoded_intent",
+          "checks": {
+            "metrics": true,
+            "dimensions": true,
+            "filters": true,
+            "period": false,
+            "comparison": false,
+            "chart": false,
+            "time_grain": false,
+            "order_by": false,
+            "descending": false,
+            "limit": false,
+            "aggregate_filters": true,
+            "missing": true
+          }
+        },
+        {
+          "stage": "effective_intent",
+          "checks": {
+            "metrics": true,
+            "dimensions": true
+          }
+        }
+      ],
+      "safe_errors": [],
+      "database_calls": 0,
+      "reviews": [],
+      "captured_outputs": [
+        {
+          "call": 4,
+          "stage": "intent",
+          "content": "{\"metrics\":[{\"dataset_id\":\"jobs\",\"concept_id\":\"billed\"}],\"dimensions\":[],\"missing\":[],\"turn_kind\":\"refine\",\"unsupported_reason\":\"\" ,\"chart\":null,\"time_grain\":\"month\",\"unsupported_requirements\":[],\"period\":{\"kind\":\"month\",\"start\":null,\"end\":null,\"year\":2026,\"month\":7,\"count\":null,\"unit\":null},\"comparison\":{\"kind\":\"month\",\"start\":null,\"end\":null,\"year\":2026,\"month\":6,\"count\":null,\"unit\":null},\"comparison_specified\":true,\"comparison_calculation\":\"change\",\"include_matching_day_count\":null,\"filters\":[{\"filter_id\":\"channel_filter\",\"operator\":\"eq\",\"values\":[\"__sageql_value_0_1_1__\"]}],\"aggregate_filters\":[],\"order_by\":\"time_bucket\",\"ordering_specified\":true,\"descending\":true,\"limit\":null}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 4464,
+            "output": 5191,
+            "total": 9655,
+            "cached_input": 4224,
+            "reasoning": 4992
+          }
+        }
+      ]
+    },
+    {
+      "selection": "replacement_development",
+      "case": "R02",
+      "turn": 1,
+      "request": "Prepare a table of Billed amount by Service for July, only Portal, excluding Technician T2.",
+      "expected": {
+        "kind": "clarification",
+        "missing_business_detail": "filter_value",
+        "question_keywords_any": [
+          "filter",
+          "owner",
+          "field",
+          "فیلتر"
+        ]
+      },
+      "expected_spec": {
+        "dataset_id": "jobs",
+        "metric_ids": [
+          "billed"
+        ],
+        "dimension_ids": [
+          "service"
+        ],
+        "filters": [
+          {
+            "filter_id": "technician_filter",
+            "operator": "neq",
+            "values": [
+              "T2"
+            ]
+          }
+        ],
+        "aggregate_filters": [],
+        "period": {
+          "kind": "month",
+          "year": 2026,
+          "month": 7
+        },
+        "comparison": null,
+        "comparison_calculation": "none",
+        "include_matching_day_count": false,
+        "time_grain": "none",
+        "chart": "table",
+        "order_by": null,
+        "descending": false,
+        "limit": 100
+      },
+      "actual_status": "needs_clarification",
+      "actual_outcome": "correct_clarification",
+      "earliest_cause": "correct_local_filter_owner_question",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "clarification_detail": true,
+        "receipt": true,
+        "persisted": true,
+        "previous_preserved": true,
+        "payload_isolation": true
+      },
+      "requirements": {},
+      "stage_requirements": [],
+      "safe_errors": [],
+      "database_calls": 0,
+      "reviews": [],
+      "captured_outputs": []
+    },
+    {
+      "selection": "replacement_development",
+      "case": "R02",
+      "turn": 2,
+      "request": "Not Service.",
+      "expected": {
+        "kind": "blocked",
+        "error_code": "clarification_stalled"
+      },
+      "expected_spec": {
+        "dataset_id": "jobs",
+        "metric_ids": [
+          "billed"
+        ],
+        "dimension_ids": [
+          "service"
+        ],
+        "filters": [
+          {
+            "filter_id": "technician_filter",
+            "operator": "neq",
+            "values": [
+              "T2"
+            ]
+          }
+        ],
+        "aggregate_filters": [],
+        "period": {
+          "kind": "month",
+          "year": 2026,
+          "month": 7
+        },
+        "comparison": null,
+        "comparison_calculation": "none",
+        "include_matching_day_count": false,
+        "time_grain": "none",
+        "chart": "table",
+        "order_by": null,
+        "descending": false,
+        "limit": 100
+      },
+      "actual_status": "blocked",
+      "actual_outcome": "correct_block",
+      "earliest_cause": "correct_stall_for_negative_nonanswer",
+      "checks": {
+        "invariants": true,
+        "receipt": true,
+        "persisted": true,
+        "previous_preserved": true,
+        "payload_isolation": true
+      },
+      "requirements": {},
+      "stage_requirements": [],
+      "safe_errors": [
+        {
+          "code": "clarification_stalled"
+        }
+      ],
+      "database_calls": 0,
+      "reviews": [],
+      "captured_outputs": []
+    },
+    {
+      "selection": "replacement_development",
+      "case": "R02",
+      "turn": 3,
+      "request": "Choose the Channel filter for Portal.",
+      "expected": {
+        "kind": "clarification",
+        "missing_business_detail": "year",
+        "question_keywords_any": [
+          "year",
+          "سال"
+        ]
+      },
+      "expected_spec": {
+        "dataset_id": "jobs",
+        "metric_ids": [
+          "billed"
+        ],
+        "dimension_ids": [
+          "service"
+        ],
+        "filters": [
+          {
+            "filter_id": "channel_filter",
+            "operator": "eq",
+            "values": [
+              "Web"
+            ]
+          },
+          {
+            "filter_id": "technician_filter",
+            "operator": "neq",
+            "values": [
+              "T2"
+            ]
+          }
+        ],
+        "aggregate_filters": [],
+        "period": {
+          "kind": "month",
+          "year": 2026,
+          "month": 7
+        },
+        "comparison": null,
+        "comparison_calculation": "none",
+        "include_matching_day_count": false,
+        "time_grain": "none",
+        "chart": "table",
+        "order_by": null,
+        "descending": false,
+        "limit": 100
+      },
+      "actual_status": "needs_clarification",
+      "actual_outcome": "correct_clarification",
+      "earliest_cause": "invalid_null_year_month_then_correct_confirmed_year_fallback",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "clarification_detail": true,
+        "receipt": true,
+        "persisted": true,
+        "previous_preserved": true,
+        "payload_isolation": true
+      },
+      "requirements": {},
+      "stage_requirements": [
+        {
+          "stage": "decoded_intent",
+          "checks": {
+            "metrics": true,
+            "dimensions": true,
+            "filters": true,
+            "period": false,
+            "comparison": true,
+            "chart": true,
+            "time_grain": false,
+            "order_by": true,
+            "descending": false,
+            "limit": false,
+            "aggregate_filters": true,
+            "missing": false
+          }
+        }
+      ],
+      "safe_errors": [],
+      "database_calls": 0,
+      "reviews": [],
+      "captured_outputs": [
+        {
+          "call": 1,
+          "stage": "intent",
+          "content": "{\"metrics\":[{\"dataset_id\":\"jobs\",\"concept_id\":\"billed\"}],\"dimensions\":[{\"dataset_id\":\"jobs\",\"concept_id\":\"service\"}],\"missing\":[],\"turn_kind\":\"new\",\"unsupported_reason\":\"\" ,\"chart\":\"table\",\"time_grain\":null,\"unsupported_requirements\":[],\"period\":{\"kind\":\"month\",\"start\":null,\"end\":null,\"year\":null,\"month\":7,\"count\":null,\"unit\":null},\"comparison\":null,\"comparison_specified\":false,\"comparison_calculation\":null,\"include_matching_day_count\":null,\"filters\":[{\"filter_id\":\"channel_filter\",\"operator\":\"eq\",\"values\":[\"__sageql_value_0_1_0__\"]},{\"filter_id\":\"technician_filter\",\"operator\":\"neq\",\"values\":[\"T2\"]}],\"aggregate_filters\":[],\"order_by\":null,\"ordering_specified\":false,\"descending\":null,\"limit\":null}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 4459,
+            "output": 4486,
+            "total": 8945,
+            "cached_input": 3712,
+            "reasoning": 4288
+          }
+        }
+      ]
+    },
+    {
+      "selection": "replacement_development",
+      "case": "R02",
+      "turn": 4,
+      "request": "2026.",
+      "expected": {
+        "kind": "report",
+        "fields": [
+          "service",
+          "billed"
+        ],
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "rows": [
+          [
+            "Repair",
+            "220"
+          ],
+          [
+            "Tune",
+            "60"
+          ]
+        ],
+        "chart": "table",
+        "visualization": {
+          "kind": "table"
+        },
+        "truncated": false,
+        "bounds": [
+          "2026-07-01",
+          "2026-08-01"
+        ]
+      },
+      "expected_spec": {
+        "dataset_id": "jobs",
+        "metric_ids": [
+          "billed"
+        ],
+        "dimension_ids": [
+          "service"
+        ],
+        "filters": [
+          {
+            "filter_id": "channel_filter",
+            "operator": "eq",
+            "values": [
+              "Web"
+            ]
+          },
+          {
+            "filter_id": "technician_filter",
+            "operator": "neq",
+            "values": [
+              "T2"
+            ]
+          }
+        ],
+        "aggregate_filters": [],
+        "period": {
+          "kind": "month",
+          "year": 2026,
+          "month": 7
+        },
+        "comparison": null,
+        "comparison_calculation": "none",
+        "include_matching_day_count": false,
+        "time_grain": "none",
+        "chart": "table",
+        "order_by": null,
+        "descending": false,
+        "limit": 100
+      },
+      "actual_status": "report_ready",
+      "actual_outcome": "correct_report",
+      "earliest_cause": "correct_report_with_preserved_owner_year_filters_service_and_unsorted_table",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "previous_preserved": true,
+        "payload_isolation": true
+      },
+      "requirements": {
+        "metric_ids": true,
+        "dimension_ids": true,
+        "filters": true,
+        "aggregate_filters": true,
+        "period": true,
+        "comparison": true,
+        "comparison_calculation": true,
+        "include_matching_day_count": true,
+        "time_grain": true,
+        "chart": true,
+        "order_by": true,
+        "descending": true,
+        "limit": true
+      },
+      "stage_requirements": [
+        {
+          "stage": "decoded_intent",
+          "checks": {
+            "metrics": true,
+            "dimensions": true,
+            "filters": true,
+            "period": true,
+            "comparison": true,
+            "chart": false,
+            "time_grain": true,
+            "order_by": true,
+            "descending": false,
+            "limit": false,
+            "aggregate_filters": false,
+            "missing": true
+          }
+        },
+        {
+          "stage": "effective_intent",
+          "checks": {
+            "metrics": true,
+            "dimensions": true,
+            "filters": false,
+            "period": true,
+            "comparison": true,
+            "chart": false,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "aggregate_filters": false,
+            "missing": true
+          }
+        },
+        {
+          "stage": "proposal",
+          "checks": {
+            "dataset_id": true,
+            "metric_ids": true,
+            "dimension_ids": true,
+            "filters": true,
+            "period": true,
+            "time_grain": true,
+            "chart": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true,
+            "aggregate_filters": true
+          }
+        }
+      ],
+      "safe_errors": [],
+      "database_calls": 1,
+      "reviews": [
+        {
+          "candidate_correct": true,
+          "approved": true
+        }
+      ],
+      "captured_outputs": [
+        {
+          "call": 2,
+          "stage": "intent",
+          "content": "{\n  \"metrics\": [\n    {\"dataset_id\": \"jobs\", \"concept_id\": \"billed\"}\n  ],\n  \"dimensions\": [\n    {\"dataset_id\": \"jobs\", \"concept_id\": \"service\"}\n  ],\n  \"missing\": [],\n  \"turn_kind\": \"refine\",\n  \"unsupported_reason\": \"\",\n  \"chart\": null,\n  \"time_grain\": \"none\",\n  \"unsupported_requirements\": [],\n  \"period\": {\n    \"kind\": \"month\",\n    \"start\": null,\n    \"end\": null,\n    \"year\": 2026,\n    \"month\": 7,\n    \"count\": null,\n    \"unit\": null\n  },\n  \"comparison\": null,\n  \"comparison_specified\": false,\n  \"comparison_calculation\": null,\n  \"include_matching_day_count\": null,\n  \"filters\": [\n    {\"filter_id\": \"channel_filter\", \"operator\": \"eq\", \"values\": [\"__sageql_value_0_1_0__\"]},\n    {\"filter_id\": \"technician_filter\", \"operator\": \"neq\", \"values\": [\"T2\"]}\n  ],\n  \"aggregate_filters\": null,\n  \"order_by\": null,\n  \"ordering_specified\": false,\n  \"descending\": null,\n  \"limit\": null\n}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 4557,
+            "output": 4194,
+            "total": 8751,
+            "cached_input": 4224,
+            "reasoning": 3904
+          }
+        },
+        {
+          "call": 3,
+          "stage": "planning",
+          "content": "{\"status\":\"ready\",\"spec\":{\"dataset_id\":\"jobs\",\"metric_ids\":[\"billed\"],\"dimension_ids\":[\"service\"],\"filters\":[{\"filter_id\":\"channel_filter\",\"operator\":\"eq\",\"values\":[\"__sageql_value_0_1_0__\"]},{\"filter_id\":\"technician_filter\",\"operator\":\"neq\",\"values\":[\"T2\"]}],\"period\":{\"kind\":\"month\",\"start\":null,\"end\":null,\"year\":2026,\"month\":7,\"count\":null,\"unit\":null},\"time_grain\":\"none\",\"chart\":\"table\",\"order_by\":null,\"descending\":false,\"limit\":100,\"comparison\":null,\"comparison_calculation\":\"none\",\"include_matching_day_count\":false,\"aggregate_filters\":[]},\"question\":\"\" ,\"message\":\"\"}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 4754,
+            "output": 3052,
+            "total": 7806,
+            "cached_input": 3712,
+            "reasoning": 2880
+          }
+        },
+        {
+          "call": 4,
+          "stage": "review",
+          "content": "{\"approved\": true, \"feedback\": \"\"}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 3726,
+            "output": 1113,
+            "total": 4839,
+            "cached_input": 0,
+            "reasoning": 1088
+          }
+        }
+      ]
+    },
+    {
+      "selection": "replacements",
+      "case": "R03",
+      "turn": 1,
+      "request": "در October 2026 جدول Units sold به تفکیک Department را بده؛ Department = باغ باشد.",
+      "expected": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "units"
+        ],
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "rows": [],
+        "chart": "table",
+        "visualization": {
+          "kind": "table"
+        },
+        "truncated": false,
+        "bounds": [
+          "2026-10-01",
+          "2026-11-01"
+        ]
+      },
+      "expected_spec": {
+        "dataset_id": "sales",
+        "metric_ids": [
+          "units"
+        ],
+        "dimension_ids": [
+          "department"
+        ],
+        "filters": [
+          {
+            "filter_id": "department_filter",
+            "operator": "eq",
+            "values": [
+              "Garden"
+            ]
+          }
+        ],
+        "aggregate_filters": [],
+        "period": {
+          "kind": "month",
+          "year": 2026,
+          "month": 10
+        },
+        "comparison": null,
+        "comparison_calculation": "none",
+        "include_matching_day_count": false,
+        "time_grain": "none",
+        "chart": "table",
+        "order_by": null,
+        "descending": false,
+        "limit": 100
+      },
+      "actual_status": "report_ready",
+      "actual_outcome": "correct_report",
+      "earliest_cause": "correct_registered_alias_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "previous_preserved": true,
+        "payload_isolation": true
+      },
+      "requirements": {
+        "metric_ids": true,
+        "dimension_ids": true,
+        "filters": true,
+        "aggregate_filters": true,
+        "period": true,
+        "comparison": true,
+        "comparison_calculation": true,
+        "include_matching_day_count": true,
+        "time_grain": true,
+        "chart": true,
+        "order_by": true,
+        "descending": true,
+        "limit": true
+      },
+      "stage_requirements": [
+        {
+          "stage": "decoded_intent",
+          "checks": {
+            "metrics": true,
+            "dimensions": true,
+            "filters": true,
+            "period": true,
+            "comparison": true,
+            "chart": true,
+            "time_grain": false,
+            "order_by": true,
+            "descending": false,
+            "limit": false,
+            "aggregate_filters": false,
+            "missing": true
+          }
+        },
+        {
+          "stage": "effective_intent",
+          "checks": {
+            "metrics": true,
+            "dimensions": true,
+            "filters": true,
+            "period": true,
+            "comparison": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "aggregate_filters": false,
+            "missing": true
+          }
+        },
+        {
+          "stage": "proposal",
+          "checks": {
+            "dataset_id": true,
+            "metric_ids": true,
+            "dimension_ids": true,
+            "filters": true,
+            "period": true,
+            "time_grain": true,
+            "chart": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true,
+            "aggregate_filters": true
+          }
+        }
+      ],
+      "safe_errors": [],
+      "database_calls": 1,
+      "reviews": [
+        {
+          "candidate_correct": true,
+          "approved": true
+        }
+      ],
+      "captured_outputs": [
+        {
+          "call": 1,
+          "stage": "intent",
+          "content": "{\"metrics\":[{\"dataset_id\":\"sales\",\"concept_id\":\"units\"}],\"dimensions\":[{\"dataset_id\":\"sales\",\"concept_id\":\"department\"}],\"missing\":[],\"turn_kind\":\"new\",\"unsupported_reason\":\"\",\"chart\":\"table\",\"time_grain\":null,\"unsupported_requirements\":[],\"period\":{\"kind\":\"month\",\"start\":null,\"end\":null,\"year\":2026,\"month\":10,\"count\":null,\"unit\":null},\"comparison\":null,\"comparison_specified\":false,\"comparison_calculation\":null,\"include_matching_day_count\":null,\"filters\":[{\"filter_id\":\"department_filter\",\"operator\":\"eq\",\"values\":[\"__sageql_value_0_1_1__\"]}],\"aggregate_filters\":null,\"order_by\":null,\"ordering_specified\":false,\"descending\":null,\"limit\":null}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 4612,
+            "output": 4467,
+            "total": 9079,
+            "cached_input": 2816,
+            "reasoning": 4288
+          }
+        },
+        {
+          "call": 2,
+          "stage": "planning",
+          "content": "{\"status\":\"ready\",\"spec\":{\"dataset_id\":\"sales\",\"metric_ids\":[\"units\"],\"dimension_ids\":[\"department\"],\"filters\":[{\"filter_id\":\"department_filter\",\"operator\":\"eq\",\"values\":[\"__sageql_value_0_1_1__\"]}],\"period\":{\"kind\":\"month\",\"start\":null,\"end\":null,\"year\":2026,\"month\":10,\"count\":null,\"unit\":null},\"time_grain\":\"none\",\"chart\":\"table\",\"order_by\":null,\"descending\":false,\"limit\":100,\"comparison\":null,\"comparison_calculation\":\"none\",\"include_matching_day_count\":false,\"aggregate_filters\":[]},\"question\":\"\" ,\"message\":\"\"}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 4784,
+            "output": 3738,
+            "total": 8522,
+            "cached_input": 2944,
+            "reasoning": 3584
+          }
+        },
+        {
+          "call": 3,
+          "stage": "review",
+          "content": "{\"approved\": true, \"feedback\": \"\"}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 3721,
+            "output": 793,
+            "total": 4514,
+            "cached_input": 2432,
+            "reasoning": 768
+          }
+        }
+      ]
+    },
+    {
+      "selection": "replacements",
+      "case": "R03",
+      "turn": 2,
+      "request": "فیلتر Department را حذف کن؛ همان معیار و تفکیک و بازه را حفظ کن.",
+      "expected": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "units"
+        ],
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ]
+        ],
+        "chart": "table",
+        "visualization": {
+          "kind": "table"
+        },
+        "truncated": false,
+        "bounds": [
+          "2026-10-01",
+          "2026-11-01"
+        ]
+      },
+      "expected_spec": {
+        "dataset_id": "sales",
+        "metric_ids": [
+          "units"
+        ],
+        "dimension_ids": [
+          "department"
+        ],
+        "filters": [],
+        "aggregate_filters": [],
+        "period": {
+          "kind": "month",
+          "year": 2026,
+          "month": 10
+        },
+        "comparison": null,
+        "comparison_calculation": "none",
+        "include_matching_day_count": false,
+        "time_grain": "none",
+        "chart": "table",
+        "order_by": null,
+        "descending": false,
+        "limit": 100
+      },
+      "actual_status": "report_ready",
+      "actual_outcome": "correct_report",
+      "earliest_cause": "correct_filter_removal",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "previous_preserved": true,
+        "payload_isolation": true
+      },
+      "requirements": {
+        "metric_ids": true,
+        "dimension_ids": true,
+        "filters": true,
+        "aggregate_filters": true,
+        "period": true,
+        "comparison": true,
+        "comparison_calculation": true,
+        "include_matching_day_count": true,
+        "time_grain": true,
+        "chart": true,
+        "order_by": true,
+        "descending": true,
+        "limit": true
+      },
+      "stage_requirements": [
+        {
+          "stage": "decoded_intent",
+          "checks": {
+            "metrics": true,
+            "dimensions": true,
+            "filters": true,
+            "period": true,
+            "comparison": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "aggregate_filters": true,
+            "missing": true
+          }
+        },
+        {
+          "stage": "effective_intent",
+          "checks": {
+            "metrics": true,
+            "dimensions": true,
+            "filters": true,
+            "period": true,
+            "comparison": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "aggregate_filters": true,
+            "missing": true
+          }
+        },
+        {
+          "stage": "proposal",
+          "checks": {
+            "dataset_id": true,
+            "metric_ids": true,
+            "dimension_ids": true,
+            "filters": true,
+            "period": false,
+            "time_grain": true,
+            "chart": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true,
+            "aggregate_filters": true
+          }
+        }
+      ],
+      "safe_errors": [],
+      "database_calls": 1,
+      "reviews": [
+        {
+          "candidate_correct": true,
+          "approved": true
+        }
+      ],
+      "captured_outputs": [
+        {
+          "call": 4,
+          "stage": "intent",
+          "content": "{\n  \"metrics\": [{\"dataset_id\": \"sales\", \"concept_id\": \"units\"}],\n  \"dimensions\": [{\"dataset_id\": \"sales\", \"concept_id\": \"department\"}],\n  \"missing\": [],\n  \"turn_kind\": \"refine\",\n  \"unsupported_reason\": \"\",\n  \"chart\": \"table\",\n  \"time_grain\": \"none\",\n  \"unsupported_requirements\": [],\n  \"period\": {\"kind\": \"range\", \"start\": \"2026-10-01\", \"end\": \"2026-11-01\", \"year\": null, \"month\": null, \"count\": null, \"unit\": null},\n  \"comparison\": null,\n  \"comparison_specified\": false,\n  \"comparison_calculation\": \"none\",\n  \"include_matching_day_count\": false,\n  \"filters\": [],\n  \"aggregate_filters\": [],\n  \"order_by\": null,\n  \"ordering_specified\": false,\n  \"descending\": false,\n  \"limit\": 100\n}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 4795,
+            "output": 5088,
+            "total": 9883,
+            "cached_input": 4352,
+            "reasoning": 4864
+          }
+        },
+        {
+          "call": 5,
+          "stage": "planning",
+          "content": "{\"status\":\"ready\",\"spec\":{\"dataset_id\":\"sales\",\"metric_ids\":[\"units\"],\"dimension_ids\":[\"department\"],\"filters\":[],\"period\":{\"kind\":\"range\",\"start\":\"2026-10-01\",\"end\":\"2026-11-01\",\"year\":null,\"month\":null,\"count\":null,\"unit\":null},\"time_grain\":\"none\",\"chart\":\"table\",\"order_by\":null,\"descending\":false,\"limit\":100,\"comparison\":null,\"comparison_calculation\":\"none\",\"include_matching_day_count\":false,\"aggregate_filters\":[]}, \"question\": \"\" , \"message\": \"\"}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 4947,
+            "output": 2250,
+            "total": 7197,
+            "cached_input": 4352,
+            "reasoning": 2112
+          }
+        },
+        {
+          "call": 6,
+          "stage": "review",
+          "content": "{\"approved\": true, \"feedback\": \"\"}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 3854,
+            "output": 1625,
+            "total": 5479,
+            "cached_input": 3072,
+            "reasoning": 1600
+          }
+        }
+      ]
+    },
+    {
+      "selection": "replacements",
+      "case": "R03",
+      "turn": 3,
+      "request": "همان گزارش؛ Units sold صعودی، حداکثر ۱ ردیف در جدول.",
+      "expected": {
+        "kind": "report",
+        "fields": [
+          "department",
+          "units"
+        ],
+        "types": [
+          "text",
+          "decimal"
+        ],
+        "rows": [
+          [
+            "Books",
+            "70"
+          ]
+        ],
+        "chart": "table",
+        "visualization": {
+          "kind": "table"
+        },
+        "truncated": false,
+        "bounds": [
+          "2026-10-01",
+          "2026-11-01"
+        ]
+      },
+      "expected_spec": {
+        "dataset_id": "sales",
+        "metric_ids": [
+          "units"
+        ],
+        "dimension_ids": [
+          "department"
+        ],
+        "filters": [],
+        "aggregate_filters": [],
+        "period": {
+          "kind": "month",
+          "year": 2026,
+          "month": 10
+        },
+        "comparison": null,
+        "comparison_calculation": "none",
+        "include_matching_day_count": false,
+        "time_grain": "none",
+        "chart": "table",
+        "order_by": "units",
+        "descending": false,
+        "limit": 1
+      },
+      "actual_status": "report_ready",
+      "actual_outcome": "correct_report",
+      "earliest_cause": "correct_requested_ranking",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "previous_preserved": true,
+        "payload_isolation": true
+      },
+      "requirements": {
+        "metric_ids": true,
+        "dimension_ids": true,
+        "filters": true,
+        "aggregate_filters": true,
+        "period": true,
+        "comparison": true,
+        "comparison_calculation": true,
+        "include_matching_day_count": true,
+        "time_grain": true,
+        "chart": true,
+        "order_by": true,
+        "descending": true,
+        "limit": true
+      },
+      "stage_requirements": [
+        {
+          "stage": "decoded_intent",
+          "checks": {
+            "metrics": true,
+            "dimensions": true,
+            "filters": true,
+            "period": true,
+            "comparison": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "aggregate_filters": true,
+            "missing": true
+          }
+        },
+        {
+          "stage": "effective_intent",
+          "checks": {
+            "metrics": true,
+            "dimensions": true,
+            "filters": true,
+            "period": true,
+            "comparison": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "aggregate_filters": true,
+            "missing": true
+          }
+        },
+        {
+          "stage": "proposal",
+          "checks": {
+            "dataset_id": true,
+            "metric_ids": true,
+            "dimension_ids": true,
+            "filters": true,
+            "period": false,
+            "time_grain": true,
+            "chart": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true,
+            "aggregate_filters": true
+          }
+        }
+      ],
+      "safe_errors": [],
+      "database_calls": 1,
+      "reviews": [
+        {
+          "candidate_correct": true,
+          "approved": true
+        }
+      ],
+      "captured_outputs": [
+        {
+          "call": 7,
+          "stage": "intent",
+          "content": "{\"metrics\":[{\"dataset_id\":\"sales\",\"concept_id\":\"units\"}],\"dimensions\":[{\"dataset_id\":\"sales\",\"concept_id\":\"department\"}],\"missing\":[],\"turn_kind\":\"refine\",\"unsupported_reason\":\"\",\"chart\":\"table\",\"time_grain\":\"none\",\"unsupported_requirements\":[],\"period\":{\"kind\":\"range\",\"start\":\"2026-10-01\",\"end\":\"2026-11-01\",\"year\":null,\"month\":null,\"count\":null,\"unit\":null},\"comparison\":null,\"comparison_specified\":false,\"comparison_calculation\":\"none\",\"include_matching_day_count\":false,\"filters\":[],\"aggregate_filters\":[],\"order_by\":\"units\",\"ordering_specified\":true,\"descending\":false,\"limit\":1}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 4773,
+            "output": 3041,
+            "total": 7814,
+            "cached_input": 4480,
+            "reasoning": 2880
+          }
+        },
+        {
+          "call": 8,
+          "stage": "planning",
+          "content": "{\"status\":\"ready\",\"spec\":{\"dataset_id\":\"sales\",\"metric_ids\":[\"units\"],\"dimension_ids\":[\"department\"],\"filters\":[],\"period\":{\"kind\":\"range\",\"start\":\"2026-10-01\",\"end\":\"2026-11-01\",\"year\":null,\"month\":null,\"count\":null,\"unit\":null},\"time_grain\":\"none\",\"chart\":\"table\",\"order_by\":\"units\",\"descending\":false,\"limit\":1,\"comparison\":null,\"comparison_calculation\":\"none\",\"include_matching_day_count\":false,\"aggregate_filters\":[]},\"question\":\"\",\"message\":\"\"}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 4925,
+            "output": 2055,
+            "total": 6980,
+            "cached_input": 4352,
+            "reasoning": 1920
+          }
+        },
+        {
+          "call": 9,
+          "stage": "review",
+          "content": "{\"approved\":true,\"feedback\":\"\"}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 3833,
+            "output": 1177,
+            "total": 5010,
+            "cached_input": 0,
+            "reasoning": 1152
+          }
+        }
+      ]
+    },
+    {
+      "selection": "replacements",
+      "case": "R04",
+      "turn": 1,
+      "request": "Give a table total of Borrowings for September 2026 with Shelf = Scientific; no time buckets.",
+      "expected": {
+        "kind": "report",
+        "fields": [
+          "borrowings"
+        ],
+        "types": [
+          "integer"
+        ],
+        "rows": [
+          [
+            3
+          ]
+        ],
+        "chart": "table",
+        "visualization": {
+          "kind": "table"
+        },
+        "truncated": false,
+        "bounds": [
+          "2026-09-01",
+          "2026-10-01"
+        ]
+      },
+      "expected_spec": {
+        "dataset_id": "loans",
+        "metric_ids": [
+          "borrowings"
+        ],
+        "dimension_ids": [],
+        "filters": [
+          {
+            "filter_id": "shelf_filter",
+            "operator": "eq",
+            "values": [
+              "Science"
+            ]
+          }
+        ],
+        "aggregate_filters": [],
+        "period": {
+          "kind": "month",
+          "year": 2026,
+          "month": 9
+        },
+        "comparison": null,
+        "comparison_calculation": "none",
+        "include_matching_day_count": false,
+        "time_grain": "none",
+        "chart": "table",
+        "order_by": null,
+        "descending": false,
+        "limit": 100
+      },
+      "actual_status": "report_ready",
+      "actual_outcome": "semantic_error",
+      "earliest_cause": "raw_Intent_Planner_and_Reviewer_accept_extra_Shelf; empty_projection_not_represented_by_evidence",
+      "checks": {
+        "invariants": true,
+        "specification": false,
+        "fields": false,
+        "types": false,
+        "rows": false,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "previous_preserved": true,
+        "payload_isolation": true
+      },
+      "requirements": {
+        "metric_ids": true,
+        "dimension_ids": false,
+        "filters": true,
+        "aggregate_filters": true,
+        "period": true,
+        "comparison": true,
+        "comparison_calculation": true,
+        "include_matching_day_count": true,
+        "time_grain": true,
+        "chart": true,
+        "order_by": true,
+        "descending": true,
+        "limit": true
+      },
+      "stage_requirements": [
+        {
+          "stage": "decoded_intent",
+          "checks": {
+            "metrics": true,
+            "dimensions": false,
+            "filters": true,
+            "period": true,
+            "comparison": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": false,
+            "limit": false,
+            "aggregate_filters": true,
+            "missing": true
+          }
+        },
+        {
+          "stage": "effective_intent",
+          "checks": {
+            "metrics": true,
+            "dimensions": false,
+            "filters": true,
+            "period": true,
+            "comparison": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "aggregate_filters": true,
+            "missing": true
+          }
+        },
+        {
+          "stage": "proposal",
+          "checks": {
+            "dataset_id": true,
+            "metric_ids": true,
+            "dimension_ids": false,
+            "filters": true,
+            "period": true,
+            "time_grain": true,
+            "chart": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true,
+            "aggregate_filters": true
+          }
+        }
+      ],
+      "safe_errors": [],
+      "database_calls": 1,
+      "reviews": [
+        {
+          "candidate_correct": false,
+          "approved": true
+        }
+      ],
+      "captured_outputs": [
+        {
+          "call": 10,
+          "stage": "intent",
+          "content": "{\"metrics\":[{\"dataset_id\":\"loans\",\"concept_id\":\"borrowings\"}],\"dimensions\":[{\"dataset_id\":\"loans\",\"concept_id\":\"shelf\"}],\"missing\":[],\"turn_kind\":\"new\",\"unsupported_reason\":\"\" ,\"chart\":\"table\",\"time_grain\":\"none\",\"unsupported_requirements\":[],\"period\":{\"kind\":\"month\",\"start\":null,\"end\":null,\"year\":2026,\"month\":9,\"count\":null,\"unit\":null},\"comparison\":null,\"comparison_specified\":false,\"comparison_calculation\":null,\"include_matching_day_count\":null,\"filters\":[{\"filter_id\":\"shelf_filter\",\"operator\":\"eq\",\"values\":[\"__sageql_value_0_1_0__\"]}],\"aggregate_filters\":[],\"order_by\":null,\"ordering_specified\":false,\"descending\":null,\"limit\":null}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 4685,
+            "output": 4218,
+            "total": 8903,
+            "cached_input": 2816,
+            "reasoning": 4032
+          }
+        },
+        {
+          "call": 11,
+          "stage": "planning",
+          "content": "{\"status\":\"ready\",\"spec\":{\"dataset_id\":\"loans\",\"metric_ids\":[\"borrowings\"],\"dimension_ids\":[\"shelf\"],\"filters\":[{\"filter_id\":\"shelf_filter\",\"operator\":\"eq\",\"values\":[\"__sageql_value_0_1_0__\"]}],\"period\":{\"kind\":\"month\",\"start\":null,\"end\":null,\"year\":2026,\"month\":9,\"count\":null,\"unit\":null},\"time_grain\":\"none\",\"chart\":\"table\",\"order_by\":null,\"descending\":false,\"limit\":100,\"comparison\":null,\"comparison_calculation\":\"none\",\"include_matching_day_count\":false,\"aggregate_filters\":[]},\"question\":\"\" ,\"message\":\"\"}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 4860,
+            "output": 2910,
+            "total": 7770,
+            "cached_input": 2944,
+            "reasoning": 2752
+          }
+        },
+        {
+          "call": 12,
+          "stage": "review",
+          "content": "{\"approved\": true, \"feedback\": \"\"}",
+          "finish_reason": "stop",
+          "usage": {
+            "input": 3784,
+            "output": 1306,
+            "total": 5090,
+            "cached_input": 2432,
+            "reasoning": 1280
+          }
+        }
+      ]
+    }
+  ],
+  "incorrect_accepted_specifications": 1,
+  "stage_diagnostic_caveat": "Nullable Intent/default and equivalent period representation differences are retained diagnostic mismatches, not automatically wrong final reports. Final requirements, fields and independent rows decide correctness."
+}

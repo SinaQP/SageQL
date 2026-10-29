@@ -1,5 +1,28 @@
 # Embed SageQL in an application
 
+Hosts may select `SageQL(..., read_consistency="snapshot")` for one database view
+across lookup, aggregate and label reads. The default `"compatibility"` retains
+per-execution connections. SQLite uses one read-only file transaction. SQL Server
+requires `SQLServerAdapter(factory, snapshot_connection_factory=prepared_snapshot_lease)`:
+a fresh disposable manual-commit connection with SNAPSHOT selected through driver
+attributes before SQL. The SDK verifies capability and finishes cleanup before
+publication; unavailable capability returns unsupported without fallback. See
+[the consistency contract](SDK_READ_CONSISTENCY.md) for saved/cached migration,
+current authorization, pooling, resource bounds and actual verification limits.
+
+For Python/runtime evidence, installation methods, optional extras and repeatable
+offline package checks, see the [release guide](SDK_RELEASE.md) and
+[Phase 10 compatibility report](PHASE10_ENGINEERING.md). Actual measured runtimes
+and dependency samples are distinct from the open-ended Python >=3.10 declaration.
+
+Optional categorical semantics can be registered on an existing filter with
+`value_vocabulary=(FilterValueDefinition(canonical_value, terms),)`. The field is
+keyword-only; existing constructors/free-form typed filters remain valid. Only
+permitted host mappings can independently establish an owner. New vocabulary is
+local-only; standard transports use private references for grounded predicates.
+See [the contract](SDK_VALUE_VOCABULARY.md) and run
+`python examples/value_vocabulary.py` for two independent synthetic integrations.
+
 Reporting correctness and bounded recovery are documented in the [Phase 3 reliability report](REPORTING_RELIABILITY_PHASE3.md). Unsupported requirements produce transparent outcomes; request evidence also constrains custom providers before execution.
 
 
@@ -216,6 +239,16 @@ if reply.report:
 `session_ready`, `needs_clarification`, `report_ready`, `unsupported`, `blocked`, and `failed` are the reply statuses. Every reply supplies `session_id`, `revision`, assistant text, optional clarification, optional report and optional safe error. A report supplies fields/units, rows, a table/bar/line/KPI specification, effective periods and provenance, plus truncation/completeness. Decimal values serialize as strings and dates as ISO strings; retain that precision in tables and treat chart numeric conversions as display approximations. Result rows are never sent to the interpreter.
 
 After clarification or a successful report, submit the next message with the returned revision and a new request ID. On a lost HTTP response, retry the identical request with the same ID and expected revision. A completed retry returns the cached reply without another model or database call. A deliberate retry after a returned failure uses a new ID. Revision conflicts require reloading session metadata. Failed revisions preserve the previous successful report.
+
+[Scoped clarification answers](SDK_CLARIFICATION_CONTINUATION.md) resolve the
+outstanding detail while preserving prior metrics, grouping, filters, periods,
+exclusions and ordering. Tested forms include `I mean Channel`, `The Channel
+filter` and Persian wrappers around registered labels. Unknown, negative-only,
+questioning or conflicting choices remain unresolved; translations and missing
+business associations are not inferred. Explicit `Start a new report:` clears
+the old pending/current context, and final validation rejects stale predicates,
+ordering and limits. This uses existing session JSON and both stores; it does
+not add unrestricted natural-language understanding or automatic retries.
 
 The built-in stores allow one active turn per session and retain the last 20 reports and 100 full request replies. Older IDs remain tombstones and return `request_retired`, so they cannot repeat execution. A session accepts at most 1,000 request IDs; create a new session after that limit. An expired turn returns an interrupted-request receipt; the package cannot infer whether a driver finished an interrupted read. Store files contain messages and report rows and require host-owned access, backup and retention rules. The package does not log transcripts or emit telemetry by default.
 

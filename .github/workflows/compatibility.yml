@@ -1,0 +1,122 @@
+name: Offline compatibility and package integrity
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip --isolated install --index-url https://pypi.org/simple 'build>=1,<2'
+      - run: python -m build --outdir dist/packages
+        env:
+          SOURCE_DATE_EPOCH: '1735689600'
+      - run: >-
+          python tools/release_check.py archives --source .
+          --wheel dist/packages/sageql-0.1.0-py3-none-any.whl
+          --sdist dist/packages/sageql-0.1.0.tar.gz
+          --output dist/inventory.json
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: reviewed-packages
+          path: |
+            dist/packages/*
+            dist/inventory.json
+
+  runtime:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-latest, python: '3.10', bounds: lower}
+          - {os: windows-latest, python: '3.10', bounds: lower}
+          - {os: ubuntu-latest, python: '3.11', bounds: current}
+          - {os: windows-latest, python: '3.12', bounds: extras}
+          - {os: ubuntu-latest, python: '3.13', bounds: current}
+          - {os: windows-latest, python: '3.13', bounds: current}
+          - {os: ubuntu-latest, python: '3.14', bounds: current}
+          - {os: ubuntu-latest, python: '3.15', bounds: current}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Create a clean runtime environment
+        run: |
+          python -m venv dist/runtime
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            echo "RUNTIME_PYTHON=$PWD/dist/runtime/Scripts/python.exe" >> "$GITHUB_ENV"
+          else
+            echo "RUNTIME_PYTHON=$PWD/dist/runtime/bin/python" >> "$GITHUB_ENV"
+          fi
+      - name: Install core with declared lower bounds
+        if: matrix.bounds == 'lower'
+        run: '"$RUNTIME_PYTHON" -m pip --isolated install --index-url https://pypi.org/simple . sqlglot==26.0.0 python-dotenv==1.2.0'
+      - name: Install independently resolved current core
+        if: matrix.bounds != 'lower'
+        run: '"$RUNTIME_PYTHON" -m pip --isolated install --index-url https://pypi.org/simple .'
+      - name: Installed core imports and examples (before testing extras)
+        run: '"$RUNTIME_PYTHON" -I tools/release_check.py smoke --source . --core-only --output dist/core-smoke.json'
+      - name: Install current optional extras
+        if: matrix.bounds == 'extras'
+        run: '"$RUNTIME_PYTHON" -m pip --isolated install --index-url https://pypi.org/simple ".[openai,odbc,dev]"'
+      - name: Real optional imports and client construction without network
+        if: matrix.bounds == 'extras'
+        run: '"$RUNTIME_PYTHON" -I tools/release_check.py smoke --source . --extras --output dist/extras-smoke.json'
+      - name: Install minimum test tooling
+        if: matrix.bounds == 'lower'
+        run: '"$RUNTIME_PYTHON" -m pip --isolated install --index-url https://pypi.org/simple pytest==8.0.0'
+      - name: Install current test tooling
+        if: matrix.bounds == 'current'
+        run: '"$RUNTIME_PYTHON" -m pip --isolated install --index-url https://pypi.org/simple "pytest>=8,<10"'
+      - name: SQLite-first tests and every offline evaluation
+        run: '"$RUNTIME_PYTHON" tools/release_check.py offline --source . --output dist/gates/results.json'
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: always()
+        with:
+          name: evidence-${{ matrix.os }}-${{ matrix.python }}-${{ matrix.bounds }}
+          path: |
+            dist/gates/
+            dist/*smoke.json
+          retention-days: 14
+
+  source-install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip --isolated install --index-url https://pypi.org/simple 'build>=1,<2'
+      - run: python -m build --outdir dist/packages
+      - run: python -m venv dist/from-sdist
+      - run: dist/from-sdist/bin/python -m pip --isolated install --index-url https://pypi.org/simple dist/packages/sageql-0.1.0.tar.gz
+      - run: dist/from-sdist/bin/python -I tools/release_check.py smoke --source . --core-only --output dist/sdist-smoke.json
+      - run: python -m venv dist/editable
+      - run: dist/editable/bin/python -m pip --isolated install --index-url https://pypi.org/simple -e .
+      - run: dist/editable/bin/python -I tools/release_check.py smoke --source . --core-only --editable --output dist/editable-smoke.json

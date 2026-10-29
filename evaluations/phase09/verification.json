@@ -1,0 +1,210 @@
+{
+  "phase": 9,
+  "date": "2026-10-26",
+  "execution": "offline",
+  "live_model_status": "not_authorized_not_executed",
+  "revision": "b74c10974265dcac522b3e23623e0f4f9a8ae582",
+  "branch": "main",
+  "index_empty": true,
+  "commit_created": false,
+  "git_status": {
+    "tracked_modifications": 17,
+    "untracked_files": 197
+  },
+  "preservation": {
+    "starting_repository_files": 303,
+    "unchanged_prior_files": 294,
+    "intentional_changed_paths": [
+      "README.md",
+      "docs/ROADMAP.md",
+      "docs/SDK_AGENTS.md",
+      "docs/SDK_CLARIFICATION_CONTINUATION.md",
+      "evaluations/README.md",
+      "evaluations/phase06_transport.py",
+      "src/sageql/sdk/evidence.py",
+      "src/sageql/sdk/grounding.py",
+      "src/sageql/sdk/phrases.py"
+    ],
+    "earlier_measurement_json_unchanged": 690,
+    "starting_manifest_sha256": "52c38f185e3a5b8198eb06217ab22a3dc35d9475971322c6b4531f394a6eb9a6",
+    "phase08_disabled_packets": "unchanged, disabled, stale source/evaluator binding"
+  },
+  "bindings": {
+    "starting_sdk_source_sha256": "1f4fe6d4e99933a2636fd2f1ccb16c0ca82004d2178be136c3e3fedffab06c06",
+    "final_sdk_source_sha256": "74ee880e1af76afc317501b51528beba663a42c674895dfc3f146b20c4925fe1",
+    "corrected_evaluator_sha256": "4a5e09182594685c21674fab877c5cad004480f4461a2820c07cf063f0ecd5c8",
+    "corpus_sha256": "06bfcbde73549e40699dc66e4a65eeaee12685d84fd4764fa3ab34d0ad003b72",
+    "freeze_sha256": "1f0287cd898548fc1048b0e0687f9d2fa1c31213b109be95a4041076506fce29"
+  },
+  "phase08_matrix": {
+    "observed_starting_sdk_original_script": {
+      "trajectories": [
+        8,
+        14
+      ],
+      "reports": [
+        8,
+        16
+      ]
+    },
+    "final_sdk_original_script": {
+      "trajectories": [
+        12,
+        14
+      ],
+      "reports": [
+        12,
+        16
+      ],
+      "invalid_enum_cases": [
+        "A04",
+        "A06"
+      ]
+    },
+    "starting_sdk_corrected_script": {
+      "trajectories": [
+        8,
+        14
+      ],
+      "reports": [
+        10,
+        16
+      ]
+    },
+    "final_sdk_corrected_script": {
+      "trajectories": [
+        14,
+        14
+      ],
+      "reports": [
+        16,
+        16
+      ]
+    }
+  },
+  "checks": {
+    "pytest_passed": 2119,
+    "optional_sql_server_skip": 1,
+    "new_semantic_tests": 71,
+    "phase06_vocabulary_tests": 215,
+    "strict_cases": [
+      61,
+      61
+    ],
+    "holdout": [
+      30,
+      30
+    ],
+    "phase04": [
+      26,
+      26
+    ],
+    "phase05": [
+      37,
+      37
+    ],
+    "historical_phase03": [
+      40,
+      42
+    ],
+    "phase03_expected_exit": 1,
+    "historical_unfulfilled": [
+      "D02",
+      "D03"
+    ],
+    "phase06": [
+      45,
+      45
+    ],
+    "phase06_reports": [
+      36,
+      36
+    ],
+    "phase07": [
+      27,
+      27
+    ],
+    "phase07_reports": [
+      24,
+      24
+    ],
+    "phase09_trajectories": [
+      13,
+      13
+    ],
+    "phase09_reports": [
+      18,
+      18
+    ],
+    "development": [
+      7,
+      7
+    ],
+    "assessment": [
+      6,
+      6
+    ],
+    "incorrect_accepted_specifications": 0,
+    "unauthorized_reads": 0,
+    "examples": "passed",
+    "browser": "passed_with_bundled_Playwright",
+    "pip_check": "passed",
+    "compileall": "passed",
+    "python310_ast_files": 63,
+    "python310_runtime": "unavailable",
+    "wheel_sdist": "passed",
+    "isolated_installed_wheel": "passed",
+    "installed_modules": 44,
+    "archive_source_bytes": "verified",
+    "private_archive_artifacts": 0,
+    "git_diff_check": "passed"
+  },
+  "interruptions": {
+    "phase08_earlier_run": {
+      "reason": "local_io",
+      "first_trajectories": [
+        13,
+        14
+      ],
+      "first_reports": [
+        16,
+        16
+      ],
+      "resume_extra_model_calls": 0,
+      "resume_extra_adapter_calls": 0,
+      "first_evidence_preserved": true
+    },
+    "phase06_delivery": {
+      "first_exit": 2,
+      "reason": "local_io",
+      "first_finished_trajectories": 6,
+      "active_request": null,
+      "resume_exit": 0,
+      "completed_prefix_unchanged": true,
+      "uncertain_operations_repeated": 0
+    },
+    "underlying_os_cause": "unverified",
+    "final_phase07_phase08_phase09": "uninterrupted"
+  },
+  "assets": {
+    "D:/Coding/SageQL/evaluations/phase09/cases.v1.json": "778267c9835496d1bd3819e59e0994c10beb33ff9ccfb082f7fc7e4f966368e6",
+    "D:/Coding/SageQL/evaluations/phase09/cases.v2.json": "06bfcbde73549e40699dc66e4a65eeaee12685d84fd4764fa3ab34d0ad003b72",
+    "D:/Coding/SageQL/evaluations/phase09/exposure.v1.json": "04c8c2156c2284dba343645cfe696f9cbdf7af4180015c54654e5197b25de7e3",
+    "D:/Coding/SageQL/evaluations/phase09/first-after.v1.json": "070f04d7b4414e6184405d6ca24479f42de45e512399756d7940eb8941b3e90b",
+    "D:/Coding/SageQL/evaluations/phase09/freeze.v1.json": "f0e6eea01028985dac300ef48c4cdc098b62d29d8251113bb87161d0bc023e2e",
+    "D:/Coding/SageQL/evaluations/phase09/freeze.v2.json": "1f0287cd898548fc1048b0e0687f9d2fa1c31213b109be95a4041076506fce29",
+    "D:/Coding/SageQL/evaluations/phase09/script.v2.json": "4bba946a80b6dffb3ee9b5e7079e84d28f1074da39a5d17acf5dee4ac7c5f813",
+    "evaluations/baselines/phase09_all.json": "539af46a19152cc31432901c0ef903b310640faaf1cc5df0d30a70dc805b8fc4",
+    "evaluations/baselines/phase09_before.json": "1ddd5d213ed61d905b653f2558ae0cf44b1474d49516f29b0ff0ab7eac67ac13",
+    "evaluations/baselines/phase09_before_initial_v1.json": "dc89b40456261e1a9a1dec42500e4ff5220907ec8b1f9b04f339820a877a81af",
+    "evaluations/baselines/phase09_phase06.json": "6556e7c68810c2493d242219f32ebda88473e678c45bce5a9f956daf8ba7fc2c",
+    "evaluations/baselines/phase09_phase06_interruption.json": "990dfc2b9601691d4f3aa37b5ba396de3b4672b552d3a9bc6af0db2389f905c0",
+    "evaluations/baselines/phase09_phase07.json": "90a7bfa0a5ad1fd3280dc2c706d0399076559803fd7391c9b56524c348f42a52",
+    "evaluations/baselines/phase09_phase08.json": "a836ad5305388f665aa84e9bffd3cb42eed158f7f12af366c2979ac932680e3e",
+    "evaluations/baselines/phase09_phase08_before.json": "960b62b2d9506dafd54396c4c16d49fb6107fa32c343903263885f6a51a064c9",
+    "evaluations/baselines/phase09_phase08_interruption.json": "c40d24120a5a57655a9ff69697fe5b6dc875ac22d7c3f465fba882834352e009",
+    "evaluations/baselines/phase09_phase08_observed_before.json": "ba08aa152146bbc57019ae3605914bdf23e8dbfd30a544b023c648ac76968e77",
+    "evaluations/baselines/phase09_phase08_original_script_after.json": "26d29e1c7927e55606f06599e52bd53015f2728be8337b2d1aceccd2d323f831"
+  },
+  "commit_message": "fix(sdk): preserve semantic requirements across clarification and refinement"
+}

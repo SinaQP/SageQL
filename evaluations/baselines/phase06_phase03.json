@@ -1,0 +1,6016 @@
+{
+  "schema_version": 2,
+  "mode": "scripted_offline",
+  "live_model_status": "not_executed",
+  "python": "3.12.0",
+  "corpus_sha256": "9446e9aac61c3ab5a4287a327469282c351b56f9738c1c5587a9cc7c2e30dbc4",
+  "freeze_sha256": "c260f7ca764603e6e9c993db91ef4dcf68be62487ca6ff622f05de5ce2ab33c6",
+  "source_sha256": "ce9838e621e15248faf2cb656c640db8a2336ae5191dc134769e15dc458da70a",
+  "evaluator_sha256": "e81ada4763750b7a514b4e74e5938510f92b61f96d973474dd0c56606497f7ed",
+  "model": "scripted",
+  "endpoint_sha256": null,
+  "budget_exhausted": false,
+  "budget_accounting": null,
+  "unexecuted_trajectories": 0,
+  "summary": {
+    "trajectories": 42,
+    "turns": 55,
+    "trajectory_correctness": {
+      "numerator": 40,
+      "denominator": 42,
+      "value": 0.9523809523809523
+    },
+    "supported_completion": {
+      "numerator": 40,
+      "denominator": 42,
+      "value": 0.9523809523809523
+    },
+    "semantic_correctness": {
+      "numerator": 40,
+      "denominator": 40,
+      "value": 1.0
+    },
+    "requirement_completeness": {
+      "numerator": 520,
+      "denominator": 546,
+      "value": 0.9523809523809523
+    },
+    "complete_supported_turns": {
+      "numerator": 40,
+      "denominator": 42,
+      "value": 0.9523809523809523
+    },
+    "clarification_precision": {
+      "numerator": 4,
+      "denominator": 5,
+      "value": 0.8
+    },
+    "unnecessary_clarifications": 1,
+    "correct_unsupported": {
+      "numerator": 5,
+      "denominator": 5,
+      "value": 1.0
+    },
+    "incorrect_unsupported": 0,
+    "unauthorized_prevention": {
+      "numerator": 2,
+      "denominator": 2,
+      "value": 1.0
+    },
+    "incorrect_accepted_specifications": 0,
+    "outcomes": {
+      "correct_report": 40,
+      "correct_unsupported": 5,
+      "correct_clarification": 4,
+      "correct_denial": 2,
+      "incorrect_rejection": 2,
+      "operational_failure": 2
+    },
+    "diagnoses": {
+      "correct_report": 40,
+      "unsupported_capability": 5,
+      "required_clarification": 4,
+      "authorization_denial": 2,
+      "deterministic_semantic_mismatch": 1,
+      "unnecessary_clarification": 1,
+      "provider_transport_failure": 1,
+      "database_execution_failure": 1
+    },
+    "failure_origins": {},
+    "model_calls_by_stage": {
+      "intent": 49,
+      "planning": 50,
+      "review": 45
+    },
+    "stage_latency_ms": {
+      "intent": 1.95,
+      "planning": 1.741,
+      "review": 0.72
+    },
+    "scenario_latency_ms": 1169.602,
+    "database_calls": 41,
+    "revisions": 6,
+    "structured_repairs": 0,
+    "intent_reconsiderations": 0,
+    "deterministic_rejections": 5,
+    "evidence_corrections": 13,
+    "reviewer": {
+      "incorrect_rejected": 0,
+      "incorrect_approved": 0,
+      "correct_rejected": 1,
+      "correct_approved": 44,
+      "useful_revisions": 0,
+      "unproductive_revisions": 1
+    },
+    "usage_coverage": {
+      "numerator": 0,
+      "denominator": 144,
+      "value": 0.0
+    },
+    "tokens": null,
+    "estimated_cost": null,
+    "cost_status": "No independently verified pricing metadata supplied",
+    "failing_trajectories": [
+      "D02",
+      "D03"
+    ]
+  },
+  "results": [
+    {
+      "id": "H01",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "managerial",
+        "ranking"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 23.863,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.031,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.026,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.014,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H02",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "informal",
+        "single_metric"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 21.304,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.028,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.025,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H03",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "fa",
+        "mixed",
+        "multiple_metrics"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 23.318,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.033,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.029,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 1,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H04",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "multiple_filters"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 23.566,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.033,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.031,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H05",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "daily",
+        "filter"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 27.341,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.037,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.031,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.029,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H06",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "range",
+        "monthly"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 24.305,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.034,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.049,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.015,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H07",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "top_n"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 22.965,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.031,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.028,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H08",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "quoted_title",
+        "multiple_metrics"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 28.858,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.035,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.074,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.014,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H09",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "exact_label",
+        "average"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 24.167,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.056,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.03,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.015,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H10",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "unsupported",
+        "relationship"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "unsupported",
+          "status": "unsupported",
+          "outcome": "correct_unsupported",
+          "diagnosis": "unsupported_capability",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {},
+          "checks": {
+            "invariants": true,
+            "explanation": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 0,
+          "elapsed_ms": 12.448,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.033,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H11",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "unsupported",
+        "time"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "unsupported",
+          "status": "unsupported",
+          "outcome": "correct_unsupported",
+          "diagnosis": "unsupported_capability",
+          "first_disagreement_stage": null,
+          "stage_requirements": [],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {},
+          "checks": {
+            "invariants": true,
+            "explanation": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 0,
+          "elapsed_ms": 11.482,
+          "model_calls": [],
+          "reviews": [],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H12",
+      "cohort": "development",
+      "domain": "workshop",
+      "tags": [
+        "excluded_operation"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 23.987,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.032,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.029,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.014,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 1,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H13",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "date_bounds",
+        "multiple_filters"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 30.294,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.038,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.036,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.02,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H14",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "multi_turn",
+        "missing_year"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "clarification",
+          "status": "needs_clarification",
+          "outcome": "correct_clarification",
+          "diagnosis": "required_clarification",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {},
+          "checks": {
+            "invariants": true,
+            "clarification": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 0,
+          "elapsed_ms": 12.893,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.031,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.016,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 1,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        },
+        {
+          "index": 2,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 21.201,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.031,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.026,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H15",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "ambiguity",
+        "missing_period"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "clarification",
+          "status": "needs_clarification",
+          "outcome": "correct_clarification",
+          "diagnosis": "required_clarification",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {},
+          "checks": {
+            "invariants": true,
+            "clarification": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 0,
+          "elapsed_ms": 12.614,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.028,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.015,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H16",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "ambiguity",
+        "ranking"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "clarification",
+          "status": "needs_clarification",
+          "outcome": "correct_clarification",
+          "diagnosis": "required_clarification",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {},
+          "checks": {
+            "invariants": true,
+            "clarification": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 0,
+          "elapsed_ms": 11.58,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.028,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H17",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "unregistered_concept"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "unsupported",
+          "status": "unsupported",
+          "outcome": "correct_unsupported",
+          "diagnosis": "unsupported_capability",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {},
+          "checks": {
+            "invariants": true,
+            "explanation": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 0,
+          "elapsed_ms": 12.124,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.032,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H18",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "injection",
+        "quoted_title"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 21.603,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.034,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.026,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H19",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "cross_tenant"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "unsupported",
+          "status": "unsupported",
+          "outcome": "correct_unsupported",
+          "diagnosis": "unsupported_capability",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {},
+          "checks": {
+            "invariants": true,
+            "explanation": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 0,
+          "elapsed_ms": 12.476,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.065,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H20",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "unauthorized_concept"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "denial",
+          "status": "blocked",
+          "outcome": "correct_denial",
+          "diagnosis": "authorization_denial",
+          "first_disagreement_stage": null,
+          "stage_requirements": [],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {},
+          "checks": {
+            "invariants": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 0,
+          "elapsed_ms": 9.482,
+          "model_calls": [],
+          "reviews": [],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H21",
+      "cohort": "holdout",
+      "domain": "retail",
+      "tags": [
+        "retail",
+        "multiple_metrics"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 35.081,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.034,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.029,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.012,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H22",
+      "cohort": "holdout",
+      "domain": "library",
+      "tags": [
+        "library",
+        "count"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 30.371,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.029,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.026,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.012,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H23",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "multi_turn",
+        "several_refinements",
+        "restart"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 24.518,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.033,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.046,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 1,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        },
+        {
+          "index": 2,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 27.163,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.034,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.03,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.029,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        },
+        {
+          "index": 3,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 25.813,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.032,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.031,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.014,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        },
+        {
+          "index": 4,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 25.11,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.03,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.044,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H24",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "multi_turn",
+        "unsupported_reformulated"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "unsupported",
+          "status": "unsupported",
+          "outcome": "correct_unsupported",
+          "diagnosis": "unsupported_capability",
+          "first_disagreement_stage": null,
+          "stage_requirements": [],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {},
+          "checks": {
+            "invariants": true,
+            "explanation": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 0,
+          "elapsed_ms": 11.021,
+          "model_calls": [],
+          "reviews": [],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        },
+        {
+          "index": 2,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 21.313,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.03,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.05,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H25",
+      "cohort": "development",
+      "domain": "workshop",
+      "tags": [
+        "multi_turn",
+        "replace_metric",
+        "remove_group"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 24.51,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.033,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.029,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.014,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 1,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        },
+        {
+          "index": 2,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 24.869,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.046,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.026,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.012,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        },
+        {
+          "index": 3,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 25.601,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.03,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.029,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H26",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "multi_turn",
+        "comparison"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 26.474,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.036,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.032,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.014,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        },
+        {
+          "index": 2,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 26.029,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.034,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.032,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        },
+        {
+          "index": 3,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 32.268,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.03,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.028,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.014,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H27",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "multi_turn",
+        "revocation"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 26.073,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.032,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.029,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.014,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 1,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        },
+        {
+          "index": 2,
+          "goal": "denial",
+          "status": "blocked",
+          "outcome": "correct_denial",
+          "diagnosis": "authorization_denial",
+          "first_disagreement_stage": null,
+          "stage_requirements": [],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {},
+          "checks": {
+            "invariants": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 0,
+          "elapsed_ms": 0.337,
+          "model_calls": [],
+          "reviews": [],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H28",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "multi_turn",
+        "earlier_report"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 21.967,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.03,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.026,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.012,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 1,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        },
+        {
+          "index": 2,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 22.447,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.03,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.026,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        },
+        {
+          "index": 3,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 22.21,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.029,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.027,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H29",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "ambiguity",
+        "comparison"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "clarification",
+          "status": "needs_clarification",
+          "outcome": "correct_clarification",
+          "diagnosis": "required_clarification",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {},
+          "checks": {
+            "invariants": true,
+            "clarification": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 0,
+          "elapsed_ms": 12.349,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.028,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.015,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H30",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "fa",
+        "negation",
+        "grouping"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 24.799,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.029,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.026,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.014,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 1,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "D01",
+      "cohort": "development",
+      "domain": "workshop",
+      "tags": [
+        "correlated_error",
+        "group_omission"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": "decoded_intent",
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": false,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": false,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 25.705,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.096,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.055,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.056,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.024,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 1,
+          "deterministic_rejections": 1,
+          "evidence_corrections": 1,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "D02",
+      "cohort": "development",
+      "domain": "workshop",
+      "tags": [
+        "custom_provider",
+        "group_omission"
+      ],
+      "correct": false,
+      "first_failing_turn": 1,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "blocked",
+          "outcome": "incorrect_rejection",
+          "diagnosis": "deterministic_semantic_mismatch",
+          "first_disagreement_stage": null,
+          "stage_requirements": [],
+          "failure_origin": null,
+          "correct": false,
+          "requirements": {
+            "metric_ids": false,
+            "dimension_ids": false,
+            "period": false,
+            "chart": false,
+            "time_grain": false,
+            "order_by": false,
+            "descending": false,
+            "limit": false,
+            "filters": false,
+            "aggregate_filters": false,
+            "comparison": false,
+            "comparison_calculation": false,
+            "include_matching_day_count": false
+          },
+          "checks": {
+            "invariants": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 0,
+          "elapsed_ms": 10.507,
+          "model_calls": [],
+          "reviews": [],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "D03",
+      "cohort": "development",
+      "domain": "workshop",
+      "tags": [
+        "correlated_error",
+        "filter_omission"
+      ],
+      "correct": false,
+      "first_failing_turn": 1,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "needs_clarification",
+          "outcome": "incorrect_rejection",
+          "diagnosis": "unnecessary_clarification",
+          "first_disagreement_stage": null,
+          "stage_requirements": [],
+          "failure_origin": null,
+          "correct": false,
+          "requirements": {
+            "metric_ids": false,
+            "dimension_ids": false,
+            "period": false,
+            "chart": false,
+            "time_grain": false,
+            "order_by": false,
+            "descending": false,
+            "limit": false,
+            "filters": false,
+            "aggregate_filters": false,
+            "comparison": false,
+            "comparison_calculation": false,
+            "include_matching_day_count": false
+          },
+          "checks": {
+            "invariants": true,
+            "clarification": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 0,
+          "elapsed_ms": 10.082,
+          "model_calls": [],
+          "reviews": [],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "D04",
+      "cohort": "development",
+      "domain": "workshop",
+      "tags": [
+        "multi_turn",
+        "context_loss"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 24.095,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.053,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.045,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.043,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        },
+        {
+          "index": 2,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": "decoded_intent",
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": false
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": false,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 24.221,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.068,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.052,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.058,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.024,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 1,
+          "deterministic_rejections": 1,
+          "evidence_corrections": 1,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "P01",
+      "cohort": "pipeline",
+      "domain": "workshop",
+      "tags": [
+        "reviewer",
+        "useful_revision"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": "proposal",
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": false,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 25.914,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.183,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.058,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.059,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.032,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 1,
+          "deterministic_rejections": 1,
+          "evidence_corrections": 1,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "P02",
+      "cohort": "pipeline",
+      "domain": "workshop",
+      "tags": [
+        "reviewer",
+        "false_approval"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": "proposal",
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": false,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 23.781,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.08,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.059,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.057,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.026,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 1,
+          "deterministic_rejections": 1,
+          "evidence_corrections": 1,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "P03",
+      "cohort": "pipeline",
+      "domain": "workshop",
+      "tags": [
+        "reviewer",
+        "false_rejection"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 25.042,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.044,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.029,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.015,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.027,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.014,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": false
+            },
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 1,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "P04",
+      "cohort": "pipeline",
+      "domain": "workshop",
+      "tags": [
+        "planner",
+        "local_gate"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": "proposal",
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": false,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 22.672,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.031,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.027,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.026,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 1,
+          "deterministic_rejections": 1,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "P05",
+      "cohort": "pipeline",
+      "domain": "workshop",
+      "tags": [
+        "provider_failure"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "failure",
+          "status": "failed",
+          "outcome": "operational_failure",
+          "diagnosis": "provider_transport_failure",
+          "first_disagreement_stage": null,
+          "stage_requirements": [],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {},
+          "checks": {
+            "invariants": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 0,
+          "elapsed_ms": 10.503,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.006,
+              "usage": null,
+              "failed": true
+            }
+          ],
+          "reviews": [],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "P06",
+      "cohort": "pipeline",
+      "domain": "workshop",
+      "tags": [
+        "database_failure"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "failure",
+          "status": "failed",
+          "outcome": "operational_failure",
+          "diagnosis": "database_execution_failure",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {},
+          "checks": {
+            "invariants": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 17.458,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.029,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.026,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H31",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "replacement_holdout",
+        "presentation"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 24.138,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.047,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.026,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 1,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    },
+    {
+      "id": "H32",
+      "cohort": "holdout",
+      "domain": "workshop",
+      "tags": [
+        "replacement_holdout",
+        "filter"
+      ],
+      "correct": true,
+      "first_failing_turn": null,
+      "unexecuted_turns": 0,
+      "turns": [
+        {
+          "index": 1,
+          "goal": "report",
+          "status": "report_ready",
+          "outcome": "correct_report",
+          "diagnosis": "correct_report",
+          "first_disagreement_stage": null,
+          "stage_requirements": [
+            {
+              "stage": "decoded_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true,
+                "filters": true
+              }
+            },
+            {
+              "stage": "proposal",
+              "checks": {
+                "dataset_id": true,
+                "metric_ids": true,
+                "dimension_ids": true,
+                "filters": true,
+                "period": true,
+                "time_grain": true,
+                "chart": true,
+                "order_by": true,
+                "descending": true,
+                "limit": true,
+                "comparison": true,
+                "aggregate_filters": true,
+                "comparison_calculation": true,
+                "include_matching_day_count": true
+              }
+            },
+            {
+              "stage": "effective_intent",
+              "checks": {
+                "metrics": true,
+                "dimensions": true
+              }
+            }
+          ],
+          "failure_origin": null,
+          "correct": true,
+          "requirements": {
+            "metric_ids": true,
+            "dimension_ids": true,
+            "period": true,
+            "chart": true,
+            "time_grain": true,
+            "order_by": true,
+            "descending": true,
+            "limit": true,
+            "filters": true,
+            "aggregate_filters": true,
+            "comparison": true,
+            "comparison_calculation": true,
+            "include_matching_day_count": true
+          },
+          "checks": {
+            "invariants": true,
+            "specification": true,
+            "fields": true,
+            "types": true,
+            "rows": true,
+            "truncation": true,
+            "presentation": true,
+            "axes": true,
+            "response": true,
+            "receipt": true,
+            "persisted": true,
+            "previous_preserved": true,
+            "payload_isolation": true
+          },
+          "accepted_specification_incorrect": false,
+          "database_calls": 1,
+          "elapsed_ms": 23.29,
+          "model_calls": [
+            {
+              "stage": "intent",
+              "elapsed_ms": 0.034,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "planning",
+              "elapsed_ms": 0.029,
+              "usage": null,
+              "failed": false
+            },
+            {
+              "stage": "review",
+              "elapsed_ms": 0.013,
+              "usage": null,
+              "failed": false
+            }
+          ],
+          "reviews": [
+            {
+              "candidate_correct": true,
+              "approved": true
+            }
+          ],
+          "revisions": 0,
+          "deterministic_rejections": 0,
+          "evidence_corrections": 0,
+          "structured_repairs": 0,
+          "intent_reconsiderations": 0
+        }
+      ]
+    }
+  ],
+  "live_excluded_cases": []
+}

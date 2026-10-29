@@ -1,0 +1,205 @@
+{
+  "schema_version": 2,
+  "phase": 12,
+  "date": "2026-10-27",
+  "completion_level": "A. Native verification blocked by connection failure; full integration remains unauthorized",
+  "native_objective_complete": false,
+  "previous_record": "evaluations/phase12/verification.v1.json",
+  "previous_record_sha256": "9673261c1d88222bdf9fe27fb412e63cf4d36ed28ca5d6a415091266d5d2d43b",
+  "authorization": {
+    "kind": "explicit production read-only follow-up",
+    "target": "existing Rahtal production database only",
+    "credential_file_read": true,
+    "credential_file_unchanged": true,
+    "credentials_logged": false,
+    "permitted": [
+      "one bounded connection attempt",
+      "necessary current-server/database/driver/isolation metadata",
+      "independently safe parameterized reporting-source SELECTs only after read-only access verification"
+    ],
+    "prohibited": [
+      "writes and DDL",
+      "fixtures or temporary tables",
+      "database/isolation/permission changes",
+      "concurrent write simulations",
+      "stress or cancellation experiments",
+      "sensitive-row export",
+      "automatic retries"
+    ],
+    "full_synthetic_suite_authorized": false,
+    "synthetic_manifest_unchanged": true
+  },
+  "source": {
+    "branch": "main",
+    "revision": "b74c10974265dcac522b3e23623e0f4f9a8ae582",
+    "uncommitted": true,
+    "package_python_sha256": "460eb7424baaf5d0e86235b9803eb96faf98a3de6e43bd6651cdb2b951aeef8e",
+    "python_module_count": 45,
+    "SDK_changed": false,
+    "test_infrastructure_changed": false
+  },
+  "starting_state": {
+    "files": 350,
+    "tracked_modified": 23,
+    "untracked_files": 220,
+    "index_empty": true,
+    "ledger_sha256": "76b4346009e634880578a37e65fd73a72625ab1522a3f920047941c080493af2"
+  },
+  "local_environment": {
+    "python": "3.12.0",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "pyodbc_package": "5.3.0",
+    "configured_driver_available": true,
+    "connected_driver_version": null
+  },
+  "production_attempt": {
+    "schema_version": 1,
+    "phase": 12,
+    "authorization": "explicit limited production read-only verification",
+    "started_utc": "2026-10-27T15:32:24.742022+00:00",
+    "target": "existing Rahtal database only; identifiers suppressed",
+    "credential_file": "sageql_rahtal/.env",
+    "credential_values_logged": false,
+    "llm_configuration_used": false,
+    "budgets": {
+      "login_timeout_seconds": 3,
+      "query_timeout_seconds": 2,
+      "maximum_statements": 1
+    },
+    "policy": {
+      "tls_encryption_required": true,
+      "certificate_validation_required": true,
+      "autocommit": true,
+      "pooling": false,
+      "driver_connection_retries": 0,
+      "access_mode_hint_is_permission_proof": false,
+      "isolation_changes": false
+    },
+    "connection_attempts": 1,
+    "sql_statements_attempted": 0,
+    "business_source_reads": 0,
+    "fixture_suite_enabled": false,
+    "writes_attempted": false,
+    "retries": 0,
+    "read_only_gate": {
+      "verified": false,
+      "status": "not evaluated"
+    },
+    "query_sha256": "74a998258a7822993a4dab4ae8c699636b0dbcd37af88427207c8e0a59b8b18f",
+    "database_metadata": null,
+    "driver": null,
+    "sqlstate": "08001",
+    "outcome": "connection or metadata failed; no retry; sensitive driver diagnostics suppressed",
+    "cleanup": {
+      "cursor_close": null,
+      "connection_close": null,
+      "server_session_termination": "unverified"
+    },
+    "credential_file_unchanged": true,
+    "seconds": 1.75,
+    "finished_utc": "2026-10-27T15:32:26.497320+00:00"
+  },
+  "classification": {
+    "stage": "database_connection",
+    "sqlstate": "08001",
+    "meaning": "client unable to establish connection",
+    "underlying_cause": "unverified; no raw driver diagnostics retained",
+    "SDK_compatibility_defect": "not established",
+    "read_only_principal": "not assessed; no metadata query issued",
+    "connected_server_driver_metadata": "not obtained",
+    "SQL_parameter_binding": "not executed",
+    "Unicode_Decimal_date_aggregate_result_handling": "not executed",
+    "SNAPSHOT_RCSI_settings": "not observed",
+    "snapshot_concurrency": "not executed; production experiment prohibited",
+    "server_cleanup_and_pooling": "unverified",
+    "new_native_passes": 0,
+    "new_SQL_failures": 0,
+    "connection_failures": 1,
+    "automatic_retries": 0
+  },
+  "safety_review": {
+    "existing_fixture_suite": "not suitable for production; never enabled",
+    "existing_pilot_factory": "read-only routing hint and certificate-trust bypass are not independent read-only proof; not used by this probe",
+    "prepared_metadata_query": "one fixed current-database/current-session SELECT with bound target comparison and effective-right checks",
+    "business_query_cost_review": "not reached; no source query was prepared or dispatched",
+    "permission_gate": "broad rights or lack of independent enforcement blocks data probes; never reached after connection failure"
+  },
+  "offline_verification": {
+    "current_followup": {
+      "name": "offline-gates",
+      "command": [
+        "<workspace>\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_phase11_sqlserver_approval.py",
+        "tests/test_sdk_snapshot_sqlserver.py",
+        "tests/test_sdk_sqlserver_phase11_integration.py",
+        "-q",
+        "-rs"
+      ],
+      "exit_code": 0,
+      "seconds": 4.609,
+      "log_sha256": "8989862ffe71acd5323b51eec5666fb5d9edd71866eec8b55406016fb9908d14",
+      "passed": 31,
+      "skipped": 12,
+      "pytest_seconds": 2.64
+    },
+    "SQL_optins_removed": true,
+    "earlier_full_runtime_results": [
+      {
+        "id": "windows312",
+        "pytest": {
+          "passed": 2201,
+          "skipped": 13,
+          "seconds": 71.15,
+          "log_sha256": "6eb8d97f868290359f927a3e1223417fcd2915a8a6f3de7be54af5f816e66e2a"
+        }
+      },
+      {
+        "id": "windows310",
+        "pytest": {
+          "passed": 2201,
+          "skipped": 13,
+          "seconds": 78.81,
+          "log_sha256": "6ee2f5b6c89c246a481ed709b1e9f654e410d0bb4100d6f7f9dae891f991cb6d"
+        }
+      },
+      {
+        "id": "linux312",
+        "pytest": {
+          "passed": 2201,
+          "skipped": 13,
+          "seconds": 113.76,
+          "log_sha256": "a13f0728bde0b3387dffe5055efae1730dca3a67851c59af56794c4c616199a2"
+        }
+      }
+    ],
+    "earlier_full_runtime_scope": "preserved earlier Phase 12 runs of the same SDK bytes; not rerun in this follow-up",
+    "earlier_package_evidence": "dist/phase12/final-verification.json"
+  },
+  "preservation": {
+    "starting_files": 350,
+    "unchanged_original_files": 344,
+    "intentional_document_updates": [
+      "docs/PHASE11_SQLSERVER_TESTING.md",
+      "docs/PHASE12_ENGINEERING.md",
+      "docs/ROADMAP.md",
+      "docs/SDK_READ_CONSISTENCY.md",
+      "docs/SDK_RELEASE.md",
+      "docs/SDK_SQL_SERVER.md"
+    ],
+    "all_original_evaluation_files_unchanged": true,
+    "all_SDK_tests_tooling_bytes_unchanged": true,
+    "prior_ignored_evidence_not_overwritten": true
+  },
+  "final_artifact_evidence": "dist/phase12-production-readonly/attempt-01/final-verification.json",
+  "next_dependency": "resolve secure connectivity before another separately initiated read-only assessment; verify independent read-only enforcement before business reads; isolated authorization remains required for mutation/concurrency tests",
+  "phase13_started": false,
+  "commit_created": false,
+  "commit_message": "docs: record authorized read-only SQL Server connection failure",
+  "references": {
+    "ODBC_08001": "https://learn.microsoft.com/en-us/sql/odbc/reference/syntax/sqldriverconnect-function",
+    "access_mode_is_advisory": "https://learn.microsoft.com/en-us/sql/odbc/reference/syntax/sqlsetconnectattr-function",
+    "effective_permissions": "https://learn.microsoft.com/en-us/sql/relational-databases/system-functions/sys-fn-my-permissions-transact-sql"
+  }
+}

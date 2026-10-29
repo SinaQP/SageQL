@@ -14,6 +14,12 @@ if TYPE_CHECKING:
     from sageql.sdk.intent import ReportIntent
 
 
+def decline_ranking_requested(text: str) -> bool:
+    """Shared bounded cue for the separately registered absolute-loss ranking."""
+    return bool(re.search(r"(?:بیشترین|most|largest|greatest).{0,35}(?:کاهش|افت|decrease|decline|drop)|"
+                          r"(?:کاهش|افت|decrease|decline|drop).{0,35}(?:بیشترین|most|largest|greatest)", text))
+
+
 def comparison_evidence_context(intent: ReportIntent, messages: tuple[Message, ...],
                                 current_spec: ReportSpec | None) -> ReportIntent:
     """A percentage request must not silently become an ordinary comparison.
@@ -29,8 +35,7 @@ def comparison_evidence_context(intent: ReportIntent, messages: tuple[Message, .
     calculation = intent.comparison_calculation
     removed = bool(re.search(r"بدون.{0,12}درصد|درصد.{0,25}(?:حذف|نشان نده|نمایش نده)|حذف.{0,12}درصد|"
                             r"(?:without|remove|no).{0,15}percent", text))
-    decline_rank = bool(re.search(r"(?:بیشترین|most|largest|greatest).{0,35}(?:کاهش|افت|decrease|decline|drop)|"
-                                  r"(?:کاهش|افت|decrease|decline|drop).{0,35}(?:بیشترین|most|largest|greatest)", text))
+    decline_rank = decline_ranking_requested(text)
     percentage_rank = bool(re.search(r"(?:بیشترین|بالاترین).{0,10}درصد|بیشترین.{0,16}(?:افت|کاهش).{0,6}درصدی|"
                                      r"(?:رتبه|مرتب|ترتیب).{0,20}درصد|(?:highest|largest|greatest).{0,10}percent|"
                                      r"(?:rank|sort).{0,15}percent", text))

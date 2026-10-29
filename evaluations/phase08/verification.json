@@ -1,0 +1,137 @@
+{
+  "phase": 8,
+  "completion_level": "A_preflight_ready",
+  "live_model_status": "not_authorized_not_executed",
+  "sdk_source_changed": false,
+  "branch": "main",
+  "revision": "b74c10974265dcac522b3e23623e0f4f9a8ae582",
+  "index_empty": true,
+  "commit_created": false,
+  "git_status": {
+    "tracked_modifications": 17,
+    "untracked_files": 173
+  },
+  "preservation": {
+    "starting_repository_files": 286,
+    "unchanged_prior_files": 283,
+    "intentional_existing_changes": [
+      "README.md",
+      "docs/ROADMAP.md",
+      "evaluations/README.md"
+    ],
+    "earlier_measurement_json_unchanged": 565,
+    "starting_manifest_sha256": "6bc9b144c689118de0abffb9cdb6116792cfd2d09c5f41b437e5a4a00946227c"
+  },
+  "bindings": {
+    "sdk_source_sha256": "1f4fe6d4e99933a2636fd2f1ccb16c0ca82004d2178be136c3e3fedffab06c06",
+    "evaluator_sha256": "1c60436353cde3e974de391ced6d0d0121fdca4881d35755806cdde15ccbe8ab",
+    "corpus_sha256": "f915e30613ccf2609386a608b0b433fd8919501db7b221529dc42452f4d45b48",
+    "freeze_sha256": "c2c84188dbcdf0db5ec2dead8ecee435dcd99af0ce4c3fd736d4394fb80c4011"
+  },
+  "checks": {
+    "full_pytest_passed": 2048,
+    "optional_sql_server_skip": 1,
+    "existing_readiness_passed": 145,
+    "new_readiness_passed": 10,
+    "strict_cases": [
+      61,
+      61
+    ],
+    "holdout": [
+      30,
+      30
+    ],
+    "phase04": [
+      26,
+      26
+    ],
+    "phase05": [
+      37,
+      37
+    ],
+    "phase03": [
+      40,
+      42
+    ],
+    "phase03_exit": 1,
+    "historical_unfulfilled": [
+      "D02",
+      "D03"
+    ],
+    "phase06_trajectories": [
+      45,
+      45
+    ],
+    "phase06_reports": [
+      36,
+      36
+    ],
+    "phase07_trajectories": [
+      27,
+      27
+    ],
+    "phase07_reports": [
+      24,
+      24
+    ],
+    "new_contract_only_trajectories": [
+      8,
+      14
+    ],
+    "new_contract_only_reports": [
+      8,
+      16
+    ],
+    "contract_exit": 1,
+    "new_contract_incomplete": [
+      "A03",
+      "A04",
+      "A05",
+      "A06",
+      "A10",
+      "A11"
+    ],
+    "new_contract_wrong_accepted": 0,
+    "new_contract_unauthorized_reads": 0,
+    "disabled_preflight_exits": [
+      2,
+      2
+    ],
+    "evaluation_key_reads": 0,
+    "external_model_requests": 0,
+    "live_artifacts_present": false,
+    "examples": "passed",
+    "pip_check": "passed",
+    "compileall": "passed",
+    "python310_ast_files": 62,
+    "python310_runtime": "unavailable",
+    "wheel_sdist": "passed",
+    "isolated_installed_wheel": "passed",
+    "installed_modules": 44,
+    "archive_source_bytes": "verified",
+    "whitespace": "passed"
+  },
+  "approval_prerequisites": [
+    "Explicit exact-scope human authorization",
+    "Verified provider price effective date and worst text rates",
+    "Conservative serialized-input plus framing upper bound",
+    "Reasoning-inclusive completion cap and usage accounting",
+    "No unpriced route/account fees"
+  ],
+  "assets": {
+    "D:/Coding/SageQL/evaluations/phase08/approval-assessment.disabled.json": "7bd2216d45fff6c154f4d8e1cc7f5b65a26ed35c3fc91a44ccd764d1a2c53209",
+    "D:/Coding/SageQL/evaluations/phase08/approval-pilot.disabled.json": "eec010114803de9c0ce8f8d88943c31bc349cba9cc02948250a5b50448715c94",
+    "D:/Coding/SageQL/evaluations/phase08/cases.v1.json": "a5f1c45564addbb80d8778bc07daf90041563ac99902cf43b03b2d2504057be2",
+    "D:/Coding/SageQL/evaluations/phase08/cases.v2.json": "f915e30613ccf2609386a608b0b433fd8919501db7b221529dc42452f4d45b48",
+    "D:/Coding/SageQL/evaluations/phase08/contract-check-first.v1.json": "c3ca48483ecf33ddb38f3d989b131b35553db6c9baa3f2b92e5787a924631e14",
+    "D:/Coding/SageQL/evaluations/phase08/contract-check.v2.json": "4a85a3ce5a759b1de2488c6e8c3aec292d5b373d0e96963108ab7d2f2c6d91fc",
+    "D:/Coding/SageQL/evaluations/phase08/expectations.v1.json": "92ee5207472cecbff87bf609404d64fd79790927d3d7ac0ae0cc5adb002667e2",
+    "D:/Coding/SageQL/evaluations/phase08/expectations.v2.json": "572ee68904fdf96eb71bcf07477931d58c084caa22f81493293266d18093482b",
+    "D:/Coding/SageQL/evaluations/phase08/exposure.v1.json": "d8dab66b54b97eaba0aa4e01a741f4a6f5ec9cbd95c475e5be45c244c90100ad",
+    "D:/Coding/SageQL/evaluations/phase08/freeze.v1.json": "94fc1ffbda6986c03bad8b0492cb0eaabd9416574dba80708bed66a6ec670c79",
+    "D:/Coding/SageQL/evaluations/phase08/freeze.v2.json": "c2c84188dbcdf0db5ec2dead8ecee435dcd99af0ce4c3fd736d4394fb80c4011",
+    "D:/Coding/SageQL/evaluations/phase08/preflight-rejections.json": "51110695e0e580d156fa95322413ffef5735d7c64e5654dc70e305c7454157e9",
+    "D:/Coding/SageQL/evaluations/phase08/verification.json": "e3566b3a06430868d71e9287dfd6c6c520a3da027aabea01951d407ee131dc2f"
+  },
+  "commit_message": "test(evals): prepare gated real-model pilot and record Phase 08 readiness findings"
+}

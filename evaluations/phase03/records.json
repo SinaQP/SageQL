@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "provenance": "Authored synthetic workshop source records; org blue is the trusted actor scope; voided records are excluded. No production data.",
+  "columns": ["org", "voided", "completed", "service", "channel", "technician", "fee", "minutes"],
+  "rows": [
+    ["blue", 0, "2026-07-01", "Repair", "Web", "T1", 120, 30],
+    ["blue", 0, "2026-07-01", "Install", "Desk", "T2", 200, 60],
+    ["blue", 0, "2026-07-02", "Repair", "Desk", "T1", 80, 20],
+    ["blue", 0, "2026-07-03", "Tune", "Web", "T3", 60, 15],
+    ["blue", 0, "2026-07-15", "Install", "Web", "T2", 300, 90],
+    ["blue", 0, "2026-07-31", "Repair", "Web", "T3", 100, 40],
+    ["blue", 0, "2026-06-15", "Repair", "Desk", "T1", 100, 25],
+    ["blue", 0, "2026-06-20", "Install", "Web", "T2", 400, 100],
+    ["blue", 0, "2026-08-01", "Repair", "Web", "T1", 700, 200],
+    ["red", 0, "2026-07-02", "Private service", "Web", "PRIVATE_TECH", 900, 300],
+    ["blue", 1, "2026-07-03", "Repair", "Web", "T1", 800, 400]
+  ]
+}

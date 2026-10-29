@@ -1,0 +1,49 @@
+{
+  "mode": "offline_local_only",
+  "python": "3.12.0",
+  "source_sha256": "46b195e9f2b4fd46b0f362b7afe5af90f10a23edc31450dceebea8032b415af5",
+  "benchmark_sha256": "1719df1f7b05c9cf77383c8eb2e6f2a8f468c8d7c8e7822b1e9f72a28cbf7121",
+  "description": "Full bounded filter_controls call, synthetic short request; no model or DB; one local run, no latency SLA",
+  "results": [
+    {
+      "entries": 0,
+      "aliases": 0,
+      "samples": 5,
+      "median_ms": 0.3310000001874869,
+      "min_ms": 0.32360000022890745,
+      "max_ms": 1.9679999995787512
+    },
+    {
+      "entries": 32,
+      "aliases": 128,
+      "samples": 5,
+      "median_ms": 0.772299999880488,
+      "min_ms": 0.7624999998370185,
+      "max_ms": 3.467599999567028
+    },
+    {
+      "entries": 64,
+      "aliases": 256,
+      "samples": 5,
+      "median_ms": 1.2023999997836654,
+      "min_ms": 1.1864999996760162,
+      "max_ms": 5.5450999998356565
+    },
+    {
+      "entries": 256,
+      "aliases": 1024,
+      "samples": 5,
+      "median_ms": 3.8610999999946216,
+      "min_ms": 3.8260999999693013,
+      "max_ms": 26.793899999574933
+    },
+    {
+      "entries": 1024,
+      "aliases": 4096,
+      "samples": 5,
+      "median_ms": 14.142699999865727,
+      "min_ms": 13.78999999997177,
+      "max_ms": 93.81529999973282
+    }
+  ]
+}

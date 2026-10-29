@@ -6,24 +6,17 @@ import re
 from sageql.conversation import Message
 from sageql.sdk.intent import ConceptRef, ReportIntent
 from sageql.sdk.models import EntityLabelDimension, Interpretation, MetricDefinition, ReportingCatalog, ReportSpec
-
-
-def _words(value: str) -> str:
-    return " ".join(value.casefold().replace("ي", "ی").replace("ك", "ک")
-                    .replace("\u200c", " ").split())
+from sageql.sdk.phrases import ScopedText, concept_evidence, words as _words, GENERIC_MEANS
 
 
 def _participant_mean_requested(metric: MetricDefinition, evidence: list[str]) -> bool:
     for value in reversed(evidence):
-        text = _words(value)
-        removed = re.search(r"(?:میانگین|متوسط).{0,40}(?:حذف|نشان نده|نمایش نده)|"
-                            r"(?:حذف|بدون).{0,20}(?:میانگین|متوسط)|"
-                            r"\b(?:remove|without|no)\b.{0,20}\b(?:average|mean|avg)\b", text)
-        if removed:
+        scoped = ScopedText(value)
+        if any(match.polarity == "negative" for term in (metric.label, *metric.selection_terms, *GENERIC_MEANS)
+               for match in scoped.literal(term)):
             return False
-        if (re.search(r"(?<!\w)(?:میانگین|متوسط|average|mean|avg)(?!\w)", text)
-                and any(re.search(r"(?<!\w)" + re.escape(_words(term)) + r"(?!\w)", text)
-                        for term in metric.selection_terms)):
+        if any(match.polarity == "positive" for term in (metric.label, *metric.selection_terms)
+               for match in scoped.literal(term)):
             return True
     return False
 
@@ -41,18 +34,14 @@ def participant_mean_context(intent: ReportIntent, messages: tuple[Message, ...]
     if len(identifiers) != 1:
         return intent
     dataset = next(item for item in catalog.datasets if item.id == next(iter(identifiers)))
+    requested_refs = concept_evidence(" ".join(evidence), catalog).positive
     requested = [metric for metric in dataset.metrics if metric.aggregation == "sum_per_participant"
-                 and _participant_mean_requested(metric, evidence)]
+                 and (dataset.id, metric.id) in requested_refs and _participant_mean_requested(metric, evidence)]
     if len(requested) != 1:
         return intent
     selected = requested[0]
-    text = " ".join(_words(item) for item in evidence)
-    generic_mean_terms = {"میانگین", "متوسط", "average", "mean", "avg"}
     def explicit_average(metric):
-        return any(
-            _words(term) not in generic_mean_terms
-            and re.search(r"(?<!\w)" + re.escape(_words(term)) + r"(?!\w)", text)
-            for term in (metric.label, *metric.selection_terms))
+        return (dataset.id, metric.id) in requested_refs
 
     removed_ids = {metric.id for metric in dataset.metrics if metric.aggregation == "average"
                    and metric.column == selected.column and not explicit_average(metric)}
@@ -63,8 +52,8 @@ def participant_mean_context(intent: ReportIntent, messages: tuple[Message, ...]
     changes = {"metrics": metrics}
     if intent.order_by in removed_ids:
         changes["order_by"] = selected.id
-    temporal = re.search(r"روزانه|هفتگی|ماهانه|روز به روز|ماه به ماه|هفته به هفته|هر ماه|"
-                         r"به تفکیک (?:روز|هفته|ماه)|\b(?:daily|weekly|monthly|month by month|per month)\b", text)
+    from sageql.sdk.evidence import request_evidence
+    temporal = request_evidence(messages, catalog, current_spec).time_grain not in {None, "none"}
     if intent.turn_kind == "new" and not temporal:
         changes["time_grain"] = "none"
     return replace(intent, **changes)
@@ -80,6 +69,7 @@ def explicit_measure_missing(intent: ReportIntent, messages: tuple[Message, ...]
     """
     users = [item.content for item in messages if item.role == "user"]
     evidence = users if intent.turn_kind == "answer" else users[-1:]
+    selected = concept_evidence(" ".join(evidence), catalog)
     for ref in intent.metrics:
         dataset = next(item for item in catalog.datasets if item.id == ref.dataset_id)
         metric = next(item for item in dataset.metrics if item.id == ref.concept_id)
@@ -89,6 +79,10 @@ def explicit_measure_missing(intent: ReportIntent, messages: tuple[Message, ...]
             terms = metric.ranking_terms
         if not terms:
             continue
+        if (ref.dataset_id, ref.concept_id) in selected.negative:
+            return True
+        if (ref.dataset_id, ref.concept_id) in selected.positive:
+            continue
         if (intent.turn_kind == "refine" and current_spec is not None
                 and current_spec.dataset_id == ref.dataset_id and ref.concept_id in current_spec.metric_ids):
             continue
@@ -96,8 +90,8 @@ def explicit_measure_missing(intent: ReportIntent, messages: tuple[Message, ...]
             if not _participant_mean_requested(metric, evidence):
                 return True
             continue
-        if not any(re.search(r"(?<!\w)" + re.escape(_words(term)) + r"(?!\w)", _words(text))
-                   for term in terms for text in evidence):
+        if not any(match.polarity == "positive" for term in (metric.label, *terms)
+                   for text in evidence for match in ScopedText(text).literal(term)):
             return True
     return False
 

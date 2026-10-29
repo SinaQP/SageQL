@@ -39,18 +39,26 @@ class SDKError(Exception):
             "period_selection", "conditions", "intent_constraints", "specification",
             "review_shape", "requirements", "request_evidence", "repeated_conflict",
             "revision_limit", "transport", "unavailable", "cleanup", "query_failed",
+            "transport_timeout", "transport_connection", "transport_rate_limit",
+            "transport_server", "transport_client",
+            "consistency_unavailable", "read_scope",
         } else ""
         self.field = field if field in {
             "intent", "turn_kind", "unsupported_reason", "chart", "time_grain", "metrics", "dimensions",
             "comparison_calculation", "include_matching_day_count", "period", "comparison",
             "comparison_specified", "filters", "aggregate_filters", "conditions", "order_by",
             "ordering_specified", "descending", "limit", "missing", "unsupported_requirements",
+            "read_consistency",
         } else ""
 
 
 def json_value(value: Any) -> Any:
     """Serialize documented values losslessly; reject accidental object reprs."""
-    if value is None or isinstance(value, (str, bool, int)):
+    if isinstance(value, str):
+        # JSON strings have scalar content, not a Python subclass identity.
+        # Keep string enums consistent with their persisted/provider form.
+        return str.__str__(value)
+    if value is None or isinstance(value, (bool, int)):
         return value
     if isinstance(value, float):
         if not math.isfinite(value):
@@ -131,11 +139,19 @@ class RelatedAttributeDimension(DimensionDefinition):
 
 
 @dataclass(frozen=True)
+class FilterValueDefinition:
+    """Host-owned canonical scalar and accepted terms; local-only semantics."""
+    value: Scalar = field(repr=False)
+    terms: tuple[str, ...] = field(repr=False)
+
+
+@dataclass(frozen=True)
 class FilterDefinition:
     id: str
     label: str
     column: str
     operators: tuple[str, ...] = ("eq", "neq", "in", "is_null", "is_not_null")
+    value_vocabulary: tuple[FilterValueDefinition, ...] = field(default=(), kw_only=True, repr=False)
 
 
 @dataclass(frozen=True)

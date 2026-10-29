@@ -3,7 +3,7 @@
 from sageql.sdk.models import (
     AccessScope, ActorContext, AdapterResult, DatabaseAdapter, DatasetAccess, DatasetDefinition,
     DimensionDefinition, EntityLabelDimension, EntityLookupDefinition, ExecutionLimits, FilterDefinition,
-    FullNameFilterDefinition, Interpretation, LookupQualifier,
+    FullNameFilterDefinition, FilterValueDefinition, Interpretation, LookupQualifier,
     MetricDefinition, PeriodSelection, Reply, ReportArtifact, ReportField,
     ReportingCatalog, ReportPolicy, ReportProvider, ReportSpec, ResolvedPeriod, RowPolicy,
     SDKError, TimeDefinition, UserFilter, ValidatedReport,
@@ -21,7 +21,7 @@ from sageql.sdk.relationships import register_relationships
 __all__ = [
     "AccessScope", "ActorContext", "AdapterResult", "DatabaseAdapter", "DatasetAccess", "DatasetDefinition",
     "DimensionDefinition", "EntityLabelDimension", "EntityLookupDefinition", "ExecutionLimits", "FilterDefinition",
-    "FullNameFilterDefinition", "Interpretation", "LookupQualifier",
+    "FullNameFilterDefinition", "FilterValueDefinition", "Interpretation", "LookupQualifier",
     "MetricDefinition", "PeriodSelection", "Reply", "ReportArtifact", "ReportField",
     "ReportingCatalog", "ReportPolicy", "ReportProvider", "ReportSpec", "ResolvedPeriod", "RowPolicy",
     "SDKError", "TimeDefinition", "UserFilter", "ValidatedReport",

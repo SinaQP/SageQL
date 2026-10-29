@@ -1,0 +1,140 @@
+{
+  "version": 2,
+  "scope": "Separately frozen replacement candidates; offline only, not added to any approved live selection",
+  "cases": [
+    {
+      "id": "R01",
+      "cohort": "phase14_replacement",
+      "domain": "workshop",
+      "host_version": "original",
+      "tags": [
+        "replacement_N01",
+        "missing_year",
+        "reopen",
+        "metric_and_grouping_replacement"
+      ],
+      "actor": "existing trusted synthetic actor and mandatory source policies",
+      "initial_state": "fresh persistent synthetic SQLite session",
+      "live_eligible": false,
+      "exposure": "Fresh replacement wording after original live failures; author knows SDK/corpora/fixtures. Not externally blind. No live authorization.",
+      "turns": [
+        {
+          "request": "For the service review, show a table of Work minutes by Service for June; ask me for the year.",
+          "missing": [
+            "year"
+          ],
+          "question": "Which year should June use?"
+        },
+        {
+          "request": "The year is 2026.",
+          "turn_kind": "answer",
+          "reopen": true
+        },
+        {
+          "request": "Replace the report with Completed jobs by Channel for July 2026 in a table, without filters or sorting.",
+          "turn_kind": "refine"
+        }
+      ]
+    },
+    {
+      "id": "R02",
+      "cohort": "phase14_replacement",
+      "domain": "workshop",
+      "host_version": "workshop-ambiguous-v1",
+      "tags": [
+        "replacement_N02",
+        "negative_owner",
+        "multiple_missing",
+        "reopen"
+      ],
+      "actor": "existing trusted synthetic actor and mandatory source policies",
+      "initial_state": "fresh persistent synthetic SQLite session",
+      "live_eligible": false,
+      "exposure": "Fresh replacement wording after original live failures; author knows SDK/corpora/fixtures. Not externally blind. No live authorization.",
+      "turns": [
+        {
+          "request": "Prepare a table of Billed amount by Service for July, only Portal, excluding Technician T2.",
+          "missing": [
+            "filter_value"
+          ]
+        },
+        {
+          "request": "Not Service.",
+          "turn_kind": "answer"
+        },
+        {
+          "request": "Choose the Channel filter for Portal.",
+          "turn_kind": "answer",
+          "missing": [
+            "year"
+          ],
+          "question": "Which year should July use?"
+        },
+        {
+          "request": "2026.",
+          "turn_kind": "answer",
+          "reopen": true
+        }
+      ]
+    },
+    {
+      "id": "R03",
+      "cohort": "phase14_replacement",
+      "domain": "retail",
+      "host_version": "retail-values-v1",
+      "tags": [
+        "replacement_N03",
+        "Persian",
+        "registered_alias",
+        "remove_filter",
+        "ascending"
+      ],
+      "actor": "existing trusted synthetic actor and mandatory source policies",
+      "initial_state": "fresh persistent synthetic SQLite session",
+      "live_eligible": false,
+      "exposure": "Fresh replacement wording after original live failures; author knows SDK/corpora/fixtures. Not externally blind. No live authorization.",
+      "turns": [
+        {
+          "request": "در October 2026 جدول Units sold به تفکیک Department را بده؛ Department = باغ باشد."
+        },
+        {
+          "request": "فیلتر Department را حذف کن؛ همان معیار و تفکیک و بازه را حفظ کن.",
+          "turn_kind": "refine",
+          "reopen": true
+        },
+        {
+          "request": "همان گزارش؛ Units sold صعودی، حداکثر ۱ ردیف در جدول.",
+          "turn_kind": "refine"
+        }
+      ]
+    },
+    {
+      "id": "R04",
+      "cohort": "phase14_replacement",
+      "domain": "library",
+      "host_version": "library-values-v1",
+      "tags": [
+        "replacement_N04",
+        "month_structure",
+        "comparison_reversal"
+      ],
+      "actor": "existing trusted synthetic actor and mandatory source policies",
+      "initial_state": "fresh persistent synthetic SQLite session",
+      "live_eligible": false,
+      "exposure": "New period-structure replacement; familiar author/source/hosts, no external blind review or live authorization.",
+      "turns": [
+        {
+          "request": "Give a table total of Borrowings for September 2026 with Shelf = Scientific; no time buckets."
+        },
+        {
+          "request": "Compare the September 2026 total with October 2026; keep Shelf = Scientific.",
+          "turn_kind": "refine"
+        },
+        {
+          "request": "October 2026 is now the base; compare it with September 2026, keeping Shelf = Scientific.",
+          "turn_kind": "refine"
+        }
+      ]
+    }
+  ]
+}

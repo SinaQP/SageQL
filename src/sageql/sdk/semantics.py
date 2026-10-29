@@ -206,6 +206,8 @@ def _validate_dataset(dataset: DatasetDefinition) -> None:
                 _tuple(definition.operators, code, "Filter operators must be a tuple.", maximum=9)
                 if not definition.operators or any(not isinstance(operator, str) or operator not in _OPERATORS for operator in definition.operators) or len(set(definition.operators)) != len(definition.operators):
                     _fail(code, "A filter has unsupported operators.")
+                from sageql.sdk.vocabulary import validate_values
+                validate_values(definition, columns[definition.column])
                 if isinstance(definition, FullNameFilterDefinition):
                     _tuple(definition.name_columns, code, "Name columns must be a bounded tuple.", maximum=4)
                     if (not 1 <= len(definition.name_columns) <= 4
@@ -250,6 +252,9 @@ def validate_catalog(catalog: ReportingCatalog) -> None:
         if dataset.id.casefold() in ids:
             _fail("invalid_catalog", "Dataset IDs must be unique.")
         ids.add(dataset.id.casefold())
+    entries = [entry for dataset in catalog.datasets for definition in dataset.filters for entry in definition.value_vocabulary]
+    if len(entries) > 1024 or sum(len(entry.terms) for entry in entries) > 4096:
+        _fail("invalid_catalog", "The value vocabulary exceeds the catalog bound.")
     _validate_labels(catalog)
     _validate_lookups(catalog)
     from sageql.sdk.relationships import validate_relationships

@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "frozen_before_first_execution": true,
+  "live_exposure": "none",
+  "files": {
+    "evaluations/phase06/cases.v1.json": "a67e71733ca9125391eb9d308f93584e1dd844080f12a471ed3b1b56ad6dd488",
+    "evaluations/phase05/hosts.v1.json": "7fcf86418f6434103517fb856d8beec820d44bb48163036e19e934a1dc724a04",
+    "evaluations/phase05_hosts.py": "aa7320cb90718bccc50d5d2c28041a23e89048ba7c2f267b58404c3720c68c09",
+    "evaluations/phase05_reference.py": "2e9c3ba24fd8f51ed5eccc1ec924f66b39d3b23e4916d02b840c35686b4b8e9d",
+    "evaluations/reference.py": "c57658afc27433b5ea25b777b509cfabe36d6d19f72ae0712c7958cb0f4809ab",
+    "evaluations/phase03_hosts.py": "fe8d167d11748f72ebb1f2175e1ebf944cb9c7c1e693c552f4fc5d0fc87a19b9",
+    "evaluations/phase03/records.json": "ede03aa9e006781539678b2c7a4034cf24bcb2af6ba6b0eb1178b4c0881d0abe",
+    "examples/multi_domain.py": "c776c3f014c1e510a785ad8b8ab8d63600f682a29477e6da137c2b7898eff816"
+  },
+  "counts": {
+    "assessment": 26,
+    "development": 5,
+    "protocol": 14
+  }
+}

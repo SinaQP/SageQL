@@ -21,8 +21,9 @@ also apply to each batch; source truncation fails closed.
 Source and target dimension/filter permissions are mandatory. A denied mapping
 is omitted from model metadata and rejected before execution if requested.
 The engine checks the complete access fingerprint before and after every read.
-Both sources remain separate single-source SELECTs; there is no cross-source
-snapshot guarantee. No database object is created.
+Both sources remain separate SELECTs. Compatibility mode has no shared snapshot;
+the additive [snapshot mode](SDK_READ_CONSISTENCY.md) keeps contributing reads in
+one supported transaction, including all label batches. No database object is created.
 
 The engine replaces the selected label dimension's internal identity cells with
 locally assembled text and declares the output field as text. Group membership,

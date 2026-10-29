@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "phase": 14,
+  "date": "2026-10-28",
+  "prior_ledger": "exposure.v1.json",
+  "live_SDK_sha256": "d1f480543ec32c4552422b1f606b22e3319b7230f0620b5e507b235f2b87da75",
+  "subsequent_offline_SDK_sha256": "c60b35c5d381ae5624a78e5d710d7c2ffcbb4a1c01175f45867a7303311affac",
+  "live_exposure": [
+    {"case_id": "N01", "executed_turns": [1, 2, 3], "status": "development_regression_before_continuation", "eligible_for_untouched_generalization_claim": false},
+    {"case_id": "N02", "executed_turns": [1, 2, 3, 4, 5], "status": "promoted_to_development_after_live_owner_continuation_failure", "eligible_for_untouched_generalization_claim": false},
+    {"case_id": "N03", "executed_turns": [1, 2, 3], "status": "promoted_to_development_after_live_period_and_alias_failures", "eligible_for_untouched_generalization_claim": false},
+    {"case_id": "N04", "executed_turns": [1, 2, 3], "status": "development_exposed_after_period_structure_prompt_investigation", "eligible_for_untouched_generalization_claim": false},
+    {"case_id": "N05", "executed_turns": [1], "unexecuted_turns": [2], "status": "partial_live_observation_transport_stop", "eligible_for_untouched_generalization_claim": false}
+  ],
+  "live_unexecuted_cases": ["N06", "A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08", "A09", "A10", "A11", "A12"],
+  "frozen_original_questions_and_expectations_modified": false,
+  "replacements": {
+    "directory": "evaluations/phase14_replacements",
+    "active_version": "v2",
+    "ids": ["R01", "R02", "R03", "R04"],
+    "replaces": ["N01", "N02", "N03", "N04"],
+    "independent_specification_method": "New wording/report requirements, manual dates and existing Python/Decimal reference; no generated SQL or model oracle",
+    "author_exposure": "Familiar SDK, earlier corpora and synthetic hosts; no independent human/blind authorship",
+    "v1_preserved": true,
+    "v2_author_metadata_correction": "R02's expected negative-answer code changed from the historical author's obsolete generic code to the existing clarification_stalled contract. V1 first result retained; no V1 question or report answer changed. R04 added before its first offline execution.",
+    "live_eligible": false,
+    "live_authorized": false,
+    "live_executed": false,
+    "scripted_execution_exposed": true,
+    "generalization_claim": false
+  },
+  "corrected_after_baseline_source_live_verified": false,
+  "batch_status": "Closed after request 28 transport failure with missing usage; no retry or remaining-allowance reuse",
+  "additional_live_experiments_authorized": false
+}

@@ -35,7 +35,8 @@ Output columns: entity label, reference/current values, absolute/percentage
 decrease. Preserve metric units/types and period captions. Provenance records the
 fixed ranking/denominator, candidate/eligible counts and excluded category counts.
 Access checks, execution opt-in, deadline, receipts, refinements and stored reports
-retain SDK rules. Existing separate source reads have no cross-source snapshot.
+retain SDK rules. Compatibility-mode reads have no shared snapshot; the additive
+[snapshot mode](SDK_READ_CONSISTENCY.md) also covers the selected identities' labels.
 
 Non-goals: arbitrary dimensions/relations, multiple metrics, average/min/max zero
 filling, time alignment, percentage ranking, arbitrary formulas, profile-universe

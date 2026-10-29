@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "frozen_before_targeted_production_repair": false,
+  "frozen_before_first_execution": false,
+  "live_exposure": "none",
+  "source_before_sha256": "1f4fe6d4e99933a2636fd2f1ccb16c0ca82004d2178be136c3e3fedffab06c06",
+  "files": {
+    "evaluations/phase09/cases.v1.json": "778267c9835496d1bd3819e59e0994c10beb33ff9ccfb082f7fc7e4f966368e6",
+    "evaluations/phase08/cases.v2.json": "f915e30613ccf2609386a608b0b433fd8919501db7b221529dc42452f4d45b48",
+    "evaluations/phase08/expectations.v2.json": "572ee68904fdf96eb71bcf07477931d58c084caa22f81493293266d18093482b",
+    "evaluations/phase08/freeze.v2.json": "c2c84188dbcdf0db5ec2dead8ecee435dcd99af0ce4c3fd736d4394fb80c4011",
+    "evaluations/phase05/hosts.v1.json": "7fcf86418f6434103517fb856d8beec820d44bb48163036e19e934a1dc724a04",
+    "evaluations/phase05_hosts.py": "aa7320cb90718bccc50d5d2c28041a23e89048ba7c2f267b58404c3720c68c09",
+    "evaluations/phase05_reference.py": "2e9c3ba24fd8f51ed5eccc1ec924f66b39d3b23e4916d02b840c35686b4b8e9d",
+    "evaluations/reference.py": "c57658afc27433b5ea25b777b509cfabe36d6d19f72ae0712c7958cb0f4809ab",
+    "evaluations/phase03_hosts.py": "fe8d167d11748f72ebb1f2175e1ebf944cb9c7c1e693c552f4fc5d0fc87a19b9",
+    "evaluations/phase03/records.json": "ede03aa9e006781539678b2c7a4034cf24bcb2af6ba6b0eb1178b4c0881d0abe",
+    "examples/multi_domain.py": "c776c3f014c1e510a785ad8b8ab8d63600f682a29477e6da137c2b7898eff816",
+    "evaluations/phase09/cases.v2.json": "06bfcbde73549e40699dc66e4a65eeaee12685d84fd4764fa3ab34d0ad003b72"
+  },
+  "counts": {
+    "development": 7,
+    "assessment": 6,
+    "turns": 30,
+    "reports": 18
+  },
+  "frozen_before_R01_year_context_fix": true,
+  "frozen_before_R07_execution": true
+}

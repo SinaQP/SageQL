@@ -16,7 +16,7 @@ Both adapters reject unregistered joins, arbitrary expressions and objects.
 
 from __future__ import annotations
 
-from contextlib import closing
+from contextlib import AbstractContextManager, closing
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
@@ -30,7 +30,7 @@ from typing import Any, Callable
 
 from sageql.errors import InvalidSQL
 from sageql.sdk.models import (
-    AdapterResult, EntityLabelDimension, ExecutionLimits, FullNameFilterDefinition, ReportField, SDKError, ValidatedReport,
+    AdapterResult, DatabaseAdapter, EntityLabelDimension, ExecutionLimits, FullNameFilterDefinition, ReportField, SDKError, ValidatedReport,
 )
 from sageql.sdk.names import NAME_REPLACEMENTS, normalize_name
 from sageql.sdk.semantics import column_type, validate_report
@@ -460,11 +460,20 @@ class SQLServerAdapter:
     state. Each checkout must be dedicated to this report until close().
     """
 
-    def __init__(self, connection_factory: Callable[[], Any], *, max_concurrent_queries: int = 4):
+    def __init__(self, connection_factory: Callable[[], Any], *, max_concurrent_queries: int = 4,
+                 snapshot_connection_factory: Callable[[], Any] | None = None):
         if not callable(connection_factory) or type(max_concurrent_queries) is not int or not 1 <= max_concurrent_queries <= 100:
             raise ValueError("a connection factory and bounded concurrency are required")
         self._connect = connection_factory
         self._slots = BoundedSemaphore(max_concurrent_queries)
+        if snapshot_connection_factory is not None and not callable(snapshot_connection_factory):
+            raise ValueError("snapshot connection factory must be callable")
+        self._snapshot_connect = snapshot_connection_factory
+
+    def read_scope(self, limits: ExecutionLimits, *, cancel: Event | None = None) -> AbstractContextManager[DatabaseAdapter]:
+        """Own one host-prepared manual-commit SNAPSHOT lease across report reads."""
+        from sageql.sdk.consistency import sql_server_read_scope
+        return sql_server_read_scope(self, limits, cancel=cancel)
 
     def _verify_schema(self, cursor: Any, report: ValidatedReport) -> None:
         for dataset in (report.dataset, *(bound.source for bound in report.related_sources)):
@@ -587,6 +596,11 @@ class SQLiteAdapter:
         self._path = database_path
         self._max_vm_steps = max_vm_steps
 
+    def read_scope(self, limits: ExecutionLimits, *, cancel: Event | None = None) -> AbstractContextManager[DatabaseAdapter]:
+        """Own one read-only file transaction across report reads."""
+        from sageql.sdk.consistency import sqlite_read_scope
+        return sqlite_read_scope(self, limits, cancel=cancel)
+
     def execute(
         self, report: ValidatedReport, limits: ExecutionLimits, *, cancel: Event | None = None,
     ) -> AdapterResult:
@@ -603,24 +617,8 @@ class SQLiteAdapter:
         steps = 0
         work_exceeded = False
         error = result = None
-        dataset = report.dataset
-        datasets = (dataset, *(bound.source for bound in report.related_sources))
-        allowed = {}
-        for source_dataset in datasets:
-            allowed.setdefault(source_dataset.table.name, set()).update(
-                column.name for column in source_dataset.columns if column.name not in source_dataset.related_columns)
-
-        def authorizer(action: int, arg1: Any, arg2: Any, db_name: Any, source: Any) -> int:
-            if action == sqlite3.SQLITE_SELECT:
-                return sqlite3.SQLITE_OK
-            if action == sqlite3.SQLITE_READ:
-                return (sqlite3.SQLITE_OK if db_name == "main" and arg1 in allowed
-                        and (not arg2 or arg2 in allowed[arg1]) else sqlite3.SQLITE_DENY)
-            if action == sqlite3.SQLITE_FUNCTION:
-                return (sqlite3.SQLITE_OK if (arg2 or "").casefold() in
-                        {"sum", "avg", "min", "max", "count", "date", "strftime", "printf", "replace", "coalesce", "nullif"}
-                        else sqlite3.SQLITE_DENY)
-            return sqlite3.SQLITE_DENY
+        datasets = (report.dataset, *(bound.source for bound in report.related_sources))
+        authorizer = _sqlite_authorizer(report)
 
         def progress() -> int:
             nonlocal steps, work_exceeded
@@ -661,6 +659,26 @@ class SQLiteAdapter:
         if cleanup_failed:
             raise SDKError("execution_failed", "Report connection cleanup failed.", retryable=True)
         return result
+
+
+def _sqlite_authorizer(report):
+    allowed = {}
+    for dataset in (report.dataset, *(bound.source for bound in report.related_sources)):
+        allowed.setdefault(dataset.table.name, set()).update(
+            column.name for column in dataset.columns if column.name not in dataset.related_columns)
+
+    def authorizer(action, arg1, arg2, db_name, source):
+        if action == sqlite3.SQLITE_SELECT:
+            return sqlite3.SQLITE_OK
+        if action == sqlite3.SQLITE_READ:
+            return (sqlite3.SQLITE_OK if db_name == "main" and arg1 in allowed
+                    and (not arg2 or arg2 in allowed[arg1]) else sqlite3.SQLITE_DENY)
+        if action == sqlite3.SQLITE_FUNCTION:
+            return (sqlite3.SQLITE_OK if (arg2 or "").casefold() in
+                    {"sum", "avg", "min", "max", "count", "date", "strftime", "printf", "replace", "coalesce", "nullif"}
+                    else sqlite3.SQLITE_DENY)
+        return sqlite3.SQLITE_DENY
+    return authorizer
 
 
 def _verify_sqlite_dataset(connection, dataset):

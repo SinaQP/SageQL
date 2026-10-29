@@ -1,0 +1,7690 @@
+{
+  "schema_version": 1,
+  "mode": "scripted_offline",
+  "corpus_sha256": "86656ecc57c75760930ee4eafddbb55e71d688c712a21c5c86151dcb2ffad43c",
+  "package_source_sha256": "ce9838e621e15248faf2cb656c640db8a2336ae5191dc134769e15dc458da70a",
+  "evaluator_sha256": "e81ada4763750b7a514b4e74e5938510f92b61f96d973474dd0c56606497f7ed",
+  "host_fixture_sha256": "c776c3f014c1e510a785ad8b8ab8d63600f682a29477e6da137c2b7898eff816",
+  "environment": {
+    "python": "3.12.0",
+    "sqlglot": "30.19.0",
+    "sageql": "0.1.0"
+  },
+  "live_model_status": "not_executed",
+  "summary": {
+    "cases": 61,
+    "outcomes": {
+      "correct_block": 1,
+      "correct_clarification": 6,
+      "correct_denial": 1,
+      "correct_report": 40,
+      "correct_unsupported": 11,
+      "operational_failure": 2
+    },
+    "supported_completion": {
+      "numerator": 40,
+      "denominator": 40,
+      "value": 1.0
+    },
+    "semantic_correctness": {
+      "numerator": 40,
+      "denominator": 40,
+      "value": 1.0
+    },
+    "report_completeness": {
+      "numerator": 40,
+      "denominator": 40,
+      "value": 1.0
+    },
+    "clarification_precision": {
+      "numerator": 6,
+      "denominator": 6,
+      "value": 1.0
+    },
+    "unsupported_classification_accuracy": {
+      "numerator": 57,
+      "denominator": 57,
+      "value": 1.0
+    },
+    "unauthorized_prevention": {
+      "numerator": 1,
+      "denominator": 1,
+      "value": 1.0
+    },
+    "recovery_effectiveness": {
+      "numerator": 2,
+      "denominator": 2,
+      "value": 1.0
+    },
+    "new_regressions": 0,
+    "known_failures": 0,
+    "model_calls": 147,
+    "model_calls_per_request": 2.130434782608696,
+    "requests": 69,
+    "database_calls": 47,
+    "recovery_attempts": {
+      "planning_revisions": 2,
+      "structured_repairs": 1,
+      "intent_reconsiderations": 0
+    },
+    "latency_ms": {
+      "total": 1724.822,
+      "median": 31.019
+    }
+  },
+  "results": [
+    {
+      "id": "retail_groups_en",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "relationship",
+        "policy"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 30.114,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 30.088
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "library_groups_en",
+      "domain": "library",
+      "tags": [
+        "en",
+        "independent_domain",
+        "count"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 32.541,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 32.531
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "loans",
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "retail_jalali_fa",
+      "domain": "retail",
+      "tags": [
+        "fa",
+        "jalali"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 30.006,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 29.997
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "jalali_month",
+            "start": null,
+            "end": null,
+            "year": 1405,
+            "month": 6,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "jalali_month",
+            "start": null,
+            "end": null,
+            "year": 1405,
+            "month": 6,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "jalali_month",
+            "start": null,
+            "end": null,
+            "year": 1405,
+            "month": 6,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-08-23",
+          "period_end_exclusive": "2026-09-23"
+        }
+      ]
+    },
+    {
+      "id": "library_jalali_fa",
+      "domain": "library",
+      "tags": [
+        "fa",
+        "jalali"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 32.5,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 32.489
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "jalali_month",
+            "start": null,
+            "end": null,
+            "year": 1405,
+            "month": 6,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "period": {
+            "kind": "jalali_month",
+            "start": null,
+            "end": null,
+            "year": 1405,
+            "month": 6,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "jalali_month",
+            "start": null,
+            "end": null,
+            "year": 1405,
+            "month": 6,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "loans",
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-08-23",
+          "period_end_exclusive": "2026-09-23"
+        }
+      ]
+    },
+    {
+      "id": "retail_daily_filter",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "filter",
+        "dates"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 31.772,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 31.763
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "day"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "day",
+          "chart": "line",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "time_grain": "day",
+          "chart": "line",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "time_grain": "day",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "library_mean",
+      "domain": "library",
+      "tags": [
+        "en",
+        "average",
+        "filter"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 32.188,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 32.165
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "mean_duration"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "mean_duration"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "loans",
+          "metrics": [
+            "mean_duration"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "retail_top_group",
+      "domain": "retail",
+      "tags": [
+        "ranking",
+        "aggregate_filter"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 31.569,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 31.56
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 1,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 1,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "retail_listing",
+      "domain": "retail",
+      "tags": [
+        "listing",
+        "policy"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 22.277,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 22.27
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "all",
+            "start": null,
+            "end": null,
+            "year": null,
+            "month": null,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [],
+          "dimensions": [
+            "title"
+          ],
+          "period": {
+            "kind": "all",
+            "start": null,
+            "end": null,
+            "year": null,
+            "month": null,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [],
+          "dimensions": [
+            "title"
+          ],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "all",
+            "start": null,
+            "end": null,
+            "year": null,
+            "month": null,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "products",
+          "metrics": [],
+          "dimensions": [
+            "title"
+          ],
+          "time_grain": "none",
+          "period_start": null,
+          "period_end_exclusive": null
+        }
+      ]
+    },
+    {
+      "id": "retail_lookup",
+      "domain": "retail",
+      "tags": [
+        "lookup",
+        "policy"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 2,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 33.566,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 2,
+          "elapsed_ms": 33.557
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "products",
+          "metrics": [],
+          "dimensions": [
+            "product_key"
+          ],
+          "time_grain": "none",
+          "period_start": null,
+          "period_end_exclusive": null
+        },
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "retail_labels",
+      "domain": "retail",
+      "tags": [
+        "label",
+        "ranking"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 2,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 31.113,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 2,
+          "elapsed_ms": 31.104
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "product_name"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "product_name"
+          ],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "product_name"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        },
+        {
+          "dataset_id": "products",
+          "metrics": [],
+          "dimensions": [
+            "product_key",
+            "title"
+          ],
+          "time_grain": "none",
+          "period_start": null,
+          "period_end_exclusive": null
+        }
+      ]
+    },
+    {
+      "id": "library_participant_mean",
+      "domain": "library",
+      "tags": [
+        "participant_mean",
+        "aggregation"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 35.144,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 35.135
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "days_per_reader"
+          ],
+          "dimensions": [],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "days_per_reader"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "loans",
+          "metrics": [
+            "days_per_reader"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "retail_comparison",
+      "domain": "retail",
+      "tags": [
+        "comparison",
+        "null"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 24.772,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 24.763
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 8,
+            "count": null,
+            "unit": null
+          },
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 8,
+            "count": null,
+            "unit": null
+          }
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 8,
+            "count": null,
+            "unit": null
+          }
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "retail_change",
+      "domain": "retail",
+      "tags": [
+        "comparison",
+        "fixed_change"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 28.869,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 28.861
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 10,
+            "count": null,
+            "unit": null
+          },
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "change",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 10,
+            "count": null,
+            "unit": null
+          }
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 10,
+            "count": null,
+            "unit": null
+          }
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "retail_year_question",
+      "domain": "retail",
+      "tags": [
+        "clarification",
+        "en"
+      ],
+      "goal": "clarification",
+      "status": "needs_clarification",
+      "outcome": "correct_clarification",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_clarification",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 13.681,
+      "turns": [
+        {
+          "status": "needs_clarification",
+          "model_calls": 3,
+          "database_calls": 0,
+          "elapsed_ms": 13.673
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": null,
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "intent_evidence",
+          "status": "corrected",
+          "code": "request_evidence",
+          "period": null,
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [
+            "year"
+          ],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": null,
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "needs_clarification"
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": []
+    },
+    {
+      "id": "retail_year_answer",
+      "domain": "retail",
+      "tags": [
+        "conversation",
+        "clarification",
+        "fa"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 6,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 43.946,
+      "turns": [
+        {
+          "status": "needs_clarification",
+          "model_calls": 3,
+          "database_calls": 0,
+          "elapsed_ms": 14.097
+        },
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 29.817
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": null,
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "intent_evidence",
+          "status": "corrected",
+          "code": "request_evidence",
+          "period": null,
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [
+            "year"
+          ],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": null,
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "needs_clarification"
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        },
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "answer",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "library_refinement",
+      "domain": "library",
+      "tags": [
+        "conversation",
+        "persistence"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 6,
+      "database_calls": 2,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 67.762,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 30.826
+        },
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 35.648
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        },
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "refine",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "mean_duration"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "period": {
+            "kind": "range",
+            "start": "2026-09-01",
+            "end": "2026-10-01",
+            "year": null,
+            "month": null,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "mean_duration"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "loans",
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        },
+        {
+          "dataset_id": "loans",
+          "metrics": [
+            "mean_duration"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "unsupported_shares_en",
+      "domain": "retail",
+      "tags": [
+        "unsupported",
+        "en"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 13.129,
+      "turns": [
+        {
+          "status": "unsupported",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 13.12
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "unsupported_absence_fa",
+      "domain": "library",
+      "tags": [
+        "unsupported",
+        "fa"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 13.329,
+      "turns": [
+        {
+          "status": "unsupported",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 13.318
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "unauthorized_actor",
+      "domain": "retail",
+      "tags": [
+        "authorization"
+      ],
+      "goal": "denial",
+      "status": "blocked",
+      "outcome": "correct_denial",
+      "checks": {
+        "invariants": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_denial",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 0.067,
+      "turns": [
+        {
+          "status": "blocked",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 0.038
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "wrong_period_recovery",
+      "domain": "retail",
+      "tags": [
+        "recovery",
+        "period"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": true,
+      "model_calls": 4,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 1,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 30.411,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 4,
+          "database_calls": 1,
+          "elapsed_ms": 30.403
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 8,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 2
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 2,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 2
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 2,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "malformed_intent_recovery",
+      "domain": "library",
+      "tags": [
+        "recovery",
+        "structured"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": true,
+      "model_calls": 4,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 1,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 44.757,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 4,
+          "database_calls": 1,
+          "elapsed_ms": 44.743
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "failed",
+          "code": "invalid_interpretation",
+          "reason": "json_syntax",
+          "field": ""
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "loans",
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "provider_failure",
+      "domain": "retail",
+      "tags": [
+        "failure",
+        "redaction"
+      ],
+      "goal": "failure",
+      "status": "failed",
+      "outcome": "operational_failure",
+      "checks": {
+        "invariants": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "operational_failure",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 1,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 11.081,
+      "turns": [
+        {
+          "status": "failed",
+          "model_calls": 1,
+          "database_calls": 0,
+          "elapsed_ms": 11.072
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "failed",
+          "code": "provider_failed",
+          "reason": "transport",
+          "field": ""
+        },
+        {
+          "stage": "agent_intent",
+          "status": "failed",
+          "code": "provider_failed",
+          "reason": "transport",
+          "field": ""
+        }
+      ],
+      "validated_queries": []
+    },
+    {
+      "id": "database_failure",
+      "domain": "library",
+      "tags": [
+        "failure",
+        "no_replay"
+      ],
+      "goal": "failure",
+      "status": "failed",
+      "outcome": "operational_failure",
+      "checks": {
+        "invariants": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "operational_failure",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 24.338,
+      "turns": [
+        {
+          "status": "failed",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 24.329
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "loans",
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "model_sql_rejected",
+      "domain": "retail",
+      "tags": [
+        "untrusted_output"
+      ],
+      "goal": "blocked",
+      "status": "blocked",
+      "outcome": "correct_block",
+      "checks": {
+        "invariants": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_block",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 2,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 12.407,
+      "turns": [
+        {
+          "status": "blocked",
+          "model_calls": 2,
+          "database_calls": 0,
+          "elapsed_ms": 12.397
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "failed",
+          "code": "invalid_interpretation",
+          "reason": "response_shape",
+          "field": ""
+        }
+      ],
+      "validated_queries": []
+    },
+    {
+      "id": "known_negated_share",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "negation"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 32.159,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 32.148
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "known_negated_daily",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "negation",
+        "correlated_error"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 4,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 1,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 33.492,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 4,
+          "database_calls": 1,
+          "elapsed_ms": 33.477
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "day"
+        },
+        {
+          "stage": "intent_evidence",
+          "status": "corrected",
+          "code": "request_evidence",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "day",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 2
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 2,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 2
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 2,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "known_exact_mean_label",
+      "domain": "library",
+      "tags": [
+        "participant_mean",
+        "aggregation"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 35.563,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 35.554
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "days_per_reader"
+          ],
+          "dimensions": [],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "days_per_reader"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "loans",
+          "metrics": [
+            "days_per_reader"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_share_omit",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 31.69,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 31.681
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_share_exclude_fa",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 31.565,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 31.556
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_share_literal_example",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 30.954,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 30.945
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_unsupported_quoted",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 15.21,
+      "turns": [
+        {
+          "status": "unsupported",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 15.2
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "p02_unsupported_quoted_fa",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 12.619,
+      "turns": [
+        {
+          "status": "unsupported",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 12.61
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "p02_unsupported_mixed_ratio",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 11.658,
+      "turns": [
+        {
+          "status": "unsupported",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 11.65
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "p02_unsupported_mixed_ratio_fa",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 12.695,
+      "turns": [
+        {
+          "status": "unsupported",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 12.686
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "p02_unsupported_mixed_same",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 14.732,
+      "turns": [
+        {
+          "status": "unsupported",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 14.723
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "p02_unsupported_negative_grain",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 11.752,
+      "turns": [
+        {
+          "status": "unsupported",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 11.744
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "p02_unsupported_positive_fa",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 11.864,
+      "turns": [
+        {
+          "status": "unsupported",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 11.855
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "p02_grain_daily",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 31.181,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 31.151
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "day"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "day",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "day",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "day",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_grain_monthly_not_daily",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 31.592,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 31.569
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "month"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "month",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "month",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "month",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_grain_example_daily",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 31.58,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 31.572
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "month"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "month",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "month",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "month",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_grain_quoted_daily",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 30.904,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 30.895
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "day"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "day",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "day",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "day",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_jalali_monthly_exclusion",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 33.718,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 33.695
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "jalali_month",
+            "start": null,
+            "end": null,
+            "year": 1405,
+            "month": 6,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "jalali_month"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "jalali_month",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "jalali_month",
+            "start": null,
+            "end": null,
+            "year": 1405,
+            "month": 6,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "jalali_month",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "jalali_month",
+            "start": null,
+            "end": null,
+            "year": 1405,
+            "month": 6,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "jalali_month",
+          "period_start": "2026-08-23",
+          "period_end_exclusive": "2026-09-23"
+        }
+      ]
+    },
+    {
+      "id": "p02_clarify_quoted",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "clarification",
+      "status": "needs_clarification",
+      "outcome": "correct_clarification",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_clarification",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 12.084,
+      "turns": [
+        {
+          "status": "needs_clarification",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 12.075
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "p02_clarify_conflict",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "clarification",
+      "status": "needs_clarification",
+      "outcome": "correct_clarification",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_clarification",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 13.055,
+      "turns": [
+        {
+          "status": "needs_clarification",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 13.031
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "p02_clarify_no_replacement",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "clarification",
+      "status": "needs_clarification",
+      "outcome": "correct_clarification",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_clarification",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 12.204,
+      "turns": [
+        {
+          "status": "needs_clarification",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 12.195
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "p02_clarify_alternative",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "clarification",
+      "status": "needs_clarification",
+      "outcome": "correct_clarification",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_clarification",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 13.696,
+      "turns": [
+        {
+          "status": "needs_clarification",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 13.672
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "p02_clarify_unknown_operation_quote",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "clarification",
+      "status": "needs_clarification",
+      "outcome": "correct_clarification",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_clarification",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 12.747,
+      "turns": [
+        {
+          "status": "needs_clarification",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 12.738
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "p02_unsupported_hourly",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 12.156,
+      "turns": [
+        {
+          "status": "unsupported",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 12.148
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "p02_mean_alias",
+      "domain": "library",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 32.965,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 32.956
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "days_per_reader"
+          ],
+          "dimensions": [],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "days_per_reader"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "loans",
+          "metrics": [
+            "days_per_reader"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_mean_quoted_label",
+      "domain": "library",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 35.217,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 35.208
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "days_per_reader"
+          ],
+          "dimensions": [],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "days_per_reader"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "loans",
+          "metrics": [
+            "days_per_reader"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_mean_exclusion",
+      "domain": "library",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 49.24,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 49.232
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "mean_duration"
+          ],
+          "dimensions": [],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "mean_duration"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "loans",
+          "metrics": [
+            "mean_duration"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_units_excluding_sales",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 23.832,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 23.824
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "units"
+          ],
+          "dimensions": [],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "units"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "units"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_two_distinct_averages",
+      "domain": "library",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 36.917,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 36.909
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "mean_duration",
+            "days_per_reader"
+          ],
+          "dimensions": [],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "mean_duration",
+            "days_per_reader"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "loans",
+          "metrics": [
+            "mean_duration",
+            "days_per_reader"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_literal_mean_example",
+      "domain": "library",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 32.103,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 32.094
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "loans",
+          "metrics": [
+            "borrowings"
+          ],
+          "dimensions": [
+            "shelf"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_remove_dimension_refinement",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 6,
+      "database_calls": 2,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 55.925,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 29.998
+        },
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 24.521
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        },
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "refine",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "period": {
+            "kind": "range",
+            "start": "2026-09-01",
+            "end": "2026-10-01",
+            "year": null,
+            "month": null,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        },
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_remove_grain_refinement",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 6,
+      "database_calls": 2,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 64.654,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 31.845
+        },
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 31.459
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "day"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "day",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "day",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        },
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "refine",
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "range",
+            "start": "2026-09-01",
+            "end": "2026-10-01",
+            "year": null,
+            "month": null,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "day",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        },
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_remove_excluded_operation",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 6,
+      "database_calls": 2,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 61.365,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 29.543
+        },
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 30.412
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        },
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "refine",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "range",
+            "start": "2026-09-01",
+            "end": "2026-10-01",
+            "year": null,
+            "month": null,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        },
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_negated_requirement_ledger",
+      "domain": "retail",
+      "tags": [
+        "phase02"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 31.019,
+      "turns": [
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 31.009
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "new",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_quote_answer_literal",
+      "domain": "retail",
+      "tags": [
+        "phase02",
+        "quote",
+        "conversation"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 44.498,
+      "turns": [
+        {
+          "status": "needs_clarification",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 11.946
+        },
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 32.52
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "none"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "answer",
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "chart": "bar",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [
+            "department"
+          ],
+          "time_grain": "none",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    },
+    {
+      "id": "p02_quote_answer_actual",
+      "domain": "retail",
+      "tags": [
+        "phase02",
+        "quote",
+        "conversation"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 27.428,
+      "turns": [
+        {
+          "status": "needs_clarification",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 12.68
+        },
+        {
+          "status": "unsupported",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 14.733
+        }
+      ],
+      "stages": [],
+      "validated_queries": []
+    },
+    {
+      "id": "p02_pending_grouping_answer",
+      "domain": "retail",
+      "tags": [
+        "phase02",
+        "conversation",
+        "period"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "recovery_attempts": {
+        "planning_revisions": 0,
+        "structured_repairs": 0,
+        "intent_reconsiderations": 0
+      },
+      "elapsed_ms": 37.45,
+      "turns": [
+        {
+          "status": "needs_clarification",
+          "model_calls": 0,
+          "database_calls": 0,
+          "elapsed_ms": 12.231
+        },
+        {
+          "status": "report_ready",
+          "model_calls": 3,
+          "database_calls": 1,
+          "elapsed_ms": 25.203
+        }
+      ],
+      "stages": [
+        {
+          "stage": "agent_intent",
+          "status": "started"
+        },
+        {
+          "stage": "agent_intent_decoded",
+          "status": "complete",
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null,
+          "time_grain": "month"
+        },
+        {
+          "stage": "agent_intent",
+          "status": "complete",
+          "missing": [],
+          "turn_kind": "answer",
+          "time_grain": "month",
+          "chart": "table",
+          "limit": 100,
+          "comparison_calculation": "none",
+          "include_matching_day_count": false,
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_plan",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_plan",
+          "status": "complete",
+          "attempt": 1,
+          "decision": "ready",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "time_grain": "month",
+          "chart": "table",
+          "limit": 100,
+          "period": {
+            "kind": "month",
+            "start": null,
+            "end": null,
+            "year": 2026,
+            "month": 9,
+            "count": null,
+            "unit": null
+          },
+          "comparison": null
+        },
+        {
+          "stage": "agent_review",
+          "status": "started",
+          "attempt": 1
+        },
+        {
+          "stage": "agent_review",
+          "status": "complete",
+          "attempt": 1,
+          "approved": true
+        }
+      ],
+      "validated_queries": [
+        {
+          "dataset_id": "sales",
+          "metrics": [
+            "revenue"
+          ],
+          "dimensions": [],
+          "time_grain": "month",
+          "period_start": "2026-09-01",
+          "period_end_exclusive": "2026-10-01"
+        }
+      ]
+    }
+  ],
+  "cohort": "all"
+}

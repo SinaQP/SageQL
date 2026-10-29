@@ -32,11 +32,11 @@ from sageql.sdk.provider import (
     _ORDERING_INSTRUCTIONS, _OrderingSelectionError, _CALENDAR_INSTRUCTIONS,
     _PERIOD_LIMIT_INSTRUCTIONS,
     _BUSINESS_INSTRUCTIONS,
-    _decode_object,
+    _decode_object, _transport_reason,
 )
 from sageql.sdk.evidence import (
     OPERATION_LABELS, UnsupportedRequirement, anchor_intent, evidence_feedback,
-    request_evidence, unsupported_message, words,
+    request_evidence, unsupported_message, evidence_question, requirement_state, RequestEvidence, canonical_fixed_periods,
 )
 
 
@@ -94,7 +94,11 @@ _PLANNER_INSTRUCTIONS = (
     "for ready use an empty question. Assistant prose uses business labels, "
     "never technical IDs. Never claim execution or knowledge of result rows. "
     "When feedback is supplied, reconsider the complete request and return a "
-    "revised decision; do not add capabilities or invent missing business facts."
+    "complete revised decision. structured_validation identifies a rejected "
+    "response: repair its structure, use distinct selected IDs and kind-specific "
+    "period fields, and preserve all effective intent constraints. Do not repeat "
+    "the same invalid field or treat validation feedback as a new business "
+    "request. Do not add capabilities or invent missing business facts."
 ) + CAPABILITY_INSTRUCTIONS + _ENTITY_LABEL_INSTRUCTIONS + _ORDERING_INSTRUCTIONS + _CALENDAR_INSTRUCTIONS + _PERIOD_LIMIT_INSTRUCTIONS + _BUSINESS_INSTRUCTIONS
 
 _REVIEWER_INSTRUCTIONS = (
@@ -153,7 +157,9 @@ _INTENT_INSTRUCTIONS = (
     "Set unsupported_reason only for an unregistered business operation/concept, "
     "with a useful business explanation; cross-dataset references are checked "
     "locally. chart and time_grain constrain explicit presentation choices; use "
-    "null when unspecified. Never return SQL, formulas, identities or results."
+    "null when unspecified. A named month or date range restricts the reporting "
+    "period; it does not request time grouping. A dated table without an explicit "
+    "time breakdown returns period totals. Never return SQL, formulas, identities or results."
     " unsupported_requirements is a COMPLETE ledger of requested operations that "
     "the registered reporting contract cannot provide. Each entry has an operation "
     "and a short EXACT quotation from the user's own words as evidence. Recognize "
@@ -262,8 +268,11 @@ def _payload(
     }
 
 
-def _content(payload: dict[str, Any]) -> str:
+def _content(payload: dict[str, Any], catalog: ReportingCatalog | None = None) -> str:
     try:
+        if catalog is not None:
+            from sageql.sdk.vocabulary import project_payload
+            payload = project_payload(payload, catalog)
         content = json.dumps(payload, ensure_ascii=False, allow_nan=False)
     except (ValueError, TypeError, RecursionError):
         raise SDKError("invalid_interpretation", "Report agent context is invalid.") from None
@@ -353,14 +362,17 @@ class AgentReportInterpreter:
         self, messages: tuple[Message, ...], current_spec: ReportSpec | None,
         catalog: ReportingCatalog, today: date,
     ) -> Interpretation:
-        _content(_payload(messages, current_spec, catalog, today))
-        evidence = request_evidence(messages, catalog)
+        _content(_payload(messages, current_spec, catalog, today), catalog)
+        evidence = request_evidence(messages, catalog, current_spec)
         self._observe("request_evidence", "complete", operations=list(evidence.operations),
                       period=json_value(evidence.period), comparison=json_value(evidence.comparison),
                       time_grain=evidence.time_grain, missing=evidence.missing)
         if evidence.operations:
             return Interpretation("unsupported", message=unsupported_message(
                 evidence.operations, getattr(self, "language", "fa")))
+        question = evidence_question(evidence, getattr(self, "language", "fa"), messages)
+        if question is not None:
+            return question
         if evidence.missing == "period":
             return Interpretation("needs_clarification", question=(
                 "لطفاً یک بازهٔ تاریخی معتبر در محدودهٔ تقویم پشتیبانی‌شده مشخص کنید."
@@ -400,7 +412,17 @@ class AgentReportInterpreter:
 
         structured_repairs = 0
 
-        def invoke(stage, call):
+        def repair_feedback(error):
+            # Only fixed validator vocabulary crosses this boundary. Custom
+            # backend errors and rejected response values cannot become prompts.
+            reasons = {'json_syntax', 'response_shape', 'specification', 'period_selection',
+                       'concept_reference', 'conditions', 'intent_constraints', 'review_shape'}
+            fields = {'period', 'comparison', 'metrics', 'dimensions', 'limit', 'order_by'}
+            reason = error.reason if error.reason in reasons else 'invalid_response'
+            field = ': ' + error.field if error.field in fields else ''
+            return ('structured_validation: ' + reason + field,)
+
+        def invoke(stage, call, repair=None):
             nonlocal structured_repairs
             try:
                 return call()
@@ -408,7 +430,12 @@ class AgentReportInterpreter:
                 self._observe(stage, "failed", code=error.code, reason=error.reason, field=error.field)
                 if (error.code != "invalid_interpretation" or not error.reason
                         or error.reason in {"response_size", "requirements"}
+                        or (stage == 'agent_intent' and evidence.confirmed_clarification_answer
+                            and evidence.missing == 'year' and evidence.clarification == 'period_detail'
+                            and error.reason == 'period_selection' and error.field == 'period')
                         or structured_repairs >= self._max_structured_repairs):
+                    # Preserve the original invalid-period diagnostic so the
+                    # existing known-year fallback below can ask its question.
                     raise
                 structured_repairs += 1
                 remaining()
@@ -417,7 +444,7 @@ class AgentReportInterpreter:
                 # Same bounded, authorized business context; no raw rejected
                 # output or exception text is supplied as repair feedback.
                 try:
-                    repaired = call()
+                    repaired = repair(error) if repair is not None else call()
                     self._observe("structured_repair", "complete", target_stage=stage,
                                   attempt=structured_repairs)
                     return repaired
@@ -436,6 +463,14 @@ class AgentReportInterpreter:
             from sageql.sdk.day_counts import matching_day_context
             value = matching_day_context(value, messages, current_spec)
             anchored = anchor_intent(value, evidence)
+            if evidence.plain_table and anchored.chart in {None, 'table'} and not anchored.ordering_specified:
+                # The extracted intent requested no sort. A plain fresh table
+                # must not acquire a ranking solely during planning. Explicit
+                # semantic sort selections and current-report sorts are kept.
+                anchored = replace(anchored, order_by=None, ordering_specified=True, descending=False)
+            if (evidence.plain_table and anchored.chart in {None, 'table'}
+                    and current_spec is None and anchored.limit is None):
+                anchored = replace(anchored, limit=100)
             if anchored != value:
                 self._observe("intent_evidence", "corrected", code="request_evidence",
                               period=json_value(anchored.period), comparison=json_value(anchored.comparison),
@@ -447,11 +482,12 @@ class AgentReportInterpreter:
         def unavailable_requirements(value):
             users = [item.content for item in messages if item.role == "user"]
             texts = users if value.turn_kind == "answer" else users[-1:]
-            if any(not any(words(item.evidence) in words(text) for text in texts)
-                   for item in value.unsupported_requirements):
-                raise SDKError("invalid_interpretation", "Requirement evidence is not in the user request.",
-                               stage="intent", reason="requirements")
-            operations = tuple(item.operation for item in value.unsupported_requirements)
+            states = [(item.operation, requirement_state(item, texts, catalog, evidence.quoted_role))
+                      for item in value.unsupported_requirements]
+            if any(state == "unresolved" for _, state in states):
+                return evidence_question(RequestEvidence(missing="grouping", clarification="quoted_requirement"),
+                                         getattr(self, "language", "fa"), messages)
+            operations = tuple(operation for operation, state in states if state == "positive")
             self._observe("requirements_check", "complete", operations=list(dict.fromkeys(operations)))
             if operations:
                 return Interpretation("unsupported", message=unsupported_message(
@@ -464,8 +500,11 @@ class AgentReportInterpreter:
         if callable(understand):
             try:
                 self._observe("agent_intent", "started")
+                reconsider = getattr(self._backend, 'reconsider', None)
                 intent = invoke("agent_intent", lambda: understand(
-                    messages, current_spec, catalog, today, timeout_seconds=remaining()))
+                    messages, current_spec, catalog, today, timeout_seconds=remaining()),
+                    repair=(lambda error: reconsider(messages, current_spec, catalog, today,
+                        feedback=repair_feedback(error), timeout_seconds=remaining())) if callable(reconsider) else None)
                 remaining()
                 check_intent(intent, catalog, today=today)
                 self._observe("agent_intent_decoded", "complete", period=json_value(intent.period),
@@ -482,6 +521,10 @@ class AgentReportInterpreter:
                 unsupported = unavailable_requirements(intent)
                 if unsupported is not None:
                     return unsupported
+                # Any active requirement is terminal above. The effective
+                # context must not tell the planner/reviewer that an excluded
+                # or literal occurrence is still an unavailable requirement.
+                intent = replace(intent, unsupported_requirements=())
                 if explicit_measure_missing(intent, messages, current_spec, catalog):
                     self._observe("business_check", "complete", code="explicit_measure_required")
                     return measure_question(catalog, getattr(self, "language", "fa"))
@@ -495,6 +538,14 @@ class AgentReportInterpreter:
             except SDKError as error:
                 self._observe("agent_intent", "failed", code=error.code, reason=error.reason, field=error.field)
                 remaining()
+                if (error.code == 'invalid_interpretation' and error.reason == 'period_selection'
+                        and error.field == 'period' and evidence.missing == 'year'
+                        and evidence.clarification == 'period_detail'):
+                    # A rejected partial model period supplies no valid dates.
+                    # Independent user evidence already establishes what is
+                    # missing; ask it locally without accepting/retrying output.
+                    return evidence_question(replace(evidence, clarification='year'),
+                        getattr(self, 'language', 'fa'), messages)
                 raise
             except Exception:
                 remaining()
@@ -506,11 +557,21 @@ class AgentReportInterpreter:
             try:
                 context = {"intent": intent} if intent is not None else {}
                 self._observe("agent_plan", "started", attempt=attempt + 1)
-                decision = invoke("agent_plan", lambda: self._backend.plan(
-                    messages, current_spec, catalog, today,
-                    feedback=feedback, timeout_seconds=remaining(), **context))
+                def checked_plan(notes):
+                    value = self._backend.plan(messages, current_spec, catalog, today,
+                        feedback=notes, timeout_seconds=remaining(), **context)
+                    _check_decision(value, catalog)
+                    return value
+                decision = invoke("agent_plan", lambda: checked_plan(feedback),
+                    repair=lambda error: checked_plan((*feedback, *repair_feedback(error))))
                 remaining()
                 _check_decision(decision, catalog)
+                if decision.status == 'ready':
+                    canonical = canonical_fixed_periods(evidence, decision.spec, today,
+                        messages=messages, catalog=catalog, current_spec=current_spec)
+                    if canonical != decision.spec:
+                        decision = replace(decision, spec=canonical)
+                        self._observe('specification_evidence', 'canonicalized', code='equivalent_fixed_period')
                 self._observe("agent_plan", "complete", attempt=attempt + 1, decision=decision.status,
                               **({"metrics": list(decision.spec.metric_ids),
                                   "dimensions": list(decision.spec.dimension_ids),
@@ -541,6 +602,7 @@ class AgentReportInterpreter:
                             self._observe("intent_reconsideration", "complete")
                             unsupported = unavailable_requirements(intent)
                             if unsupported is None:
+                                intent = replace(intent, unsupported_requirements=())
                                 unsupported = unavailable_intent(intent, catalog, getattr(self, "language", "fa"))
                             if unsupported is not None:
                                 return unsupported
@@ -563,7 +625,7 @@ class AgentReportInterpreter:
                         if attempt < self._max_revisions:
                             continue
                         break
-                    mismatch = evidence_feedback(evidence, decision.spec, today)
+                    mismatch = evidence_feedback(evidence, decision.spec, today, catalog)
                     if mismatch:
                         feedback = ("request_evidence: " + mismatch,)
                         self._observe("request_check", "failed", code=mismatch)
@@ -645,7 +707,7 @@ class _OpenAIReportAgentBackend(OpenAIReportInterpreter):
         })
         _check_schema_limits(schema)
         content = _content({**_payload(messages, current_spec, catalog, today),
-                            "consistency_feedback": list(feedback)})
+                            "consistency_feedback": list(feedback)}, catalog)
         try:
             response = self._client.chat.completions.create(
                 model=self._model,
@@ -656,11 +718,13 @@ class _OpenAIReportAgentBackend(OpenAIReportInterpreter):
                 max_completion_tokens=self._max_output_tokens, timeout=timeout_seconds,
             )
             raw = response.choices[0].message.content
-        except Exception:
+        except Exception as error:
             raise SDKError("provider_failed", "Report intent could not complete.", retryable=True,
-                           stage="intent", reason="transport") from None
+                           stage="intent", reason=_transport_reason(error)) from None
         try:
             result = _decode_object(raw, set(schema["properties"]), "intent")
+            from sageql.sdk.vocabulary import restore_response
+            result = restore_response(result, catalog, content)
             requirements = result["unsupported_requirements"]
             if (not isinstance(requirements, list) or any(
                     not isinstance(item, dict) or set(item) != {"operation", "evidence"}
@@ -720,7 +784,7 @@ class _OpenAIReportAgentBackend(OpenAIReportInterpreter):
             payload["intent"] = intent.to_dict()
         response_format = _format(catalog)
         _check_schema_limits(response_format["json_schema"]["schema"])
-        return self._request(_content(payload), response_format,
+        return self._request(_content(payload, catalog), response_format,
                              _PLANNER_INSTRUCTIONS + language_instructions(self.language),
                              timeout_seconds, catalog, current_spec)
 
@@ -734,7 +798,7 @@ class _OpenAIReportAgentBackend(OpenAIReportInterpreter):
         payload = {**_payload(messages, current_spec, catalog, today), "candidate": candidate}
         if intent is not None:
             payload["intent"] = intent.to_dict()
-        content = _content(payload)
+        content = _content(payload, catalog)
         response_format = {"type": "json_schema", "json_schema": {
             "name": "sageql_report_review", "strict": True,
             "schema": _record({"approved": {"type": "boolean"}, "feedback": {"type": "string"}}),
@@ -748,11 +812,13 @@ class _OpenAIReportAgentBackend(OpenAIReportInterpreter):
                 timeout=timeout_seconds,
             )
             raw = response.choices[0].message.content
-        except Exception:
+        except Exception as error:
             raise SDKError("provider_failed", "Report review could not complete.", retryable=True,
-                           stage="review", reason="transport") from None
+                           stage="review", reason=_transport_reason(error)) from None
         try:
             result = _decode_object(raw, {"approved", "feedback"}, "review")
+            from sageql.sdk.vocabulary import restore_response
+            result = restore_response(result, catalog, content)
             review = AgentReview(result["approved"], result["feedback"])
             _check_review(review)
             return review

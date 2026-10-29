@@ -26,3 +26,5 @@ packages = ["src/sageql"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+addopts = "--strict-markers"
+markers = ["sqlserver_integration: separately authorized native SQL Server tests; disabled unless --run-sqlserver-integration is supplied"]

@@ -1,0 +1,16 @@
+[
+  {
+    "cohort": "pilot",
+    "exit_code": 2,
+    "key_reads": 0,
+    "output_created": false,
+    "dispatched_requests": 0
+  },
+  {
+    "cohort": "assessment",
+    "exit_code": 2,
+    "key_reads": 0,
+    "output_created": false,
+    "dispatched_requests": 0
+  }
+]

@@ -1,0 +1,4221 @@
+{
+  "version": 1,
+  "exposure": "Authored and frozen before running the changed SDK. F/O development; A assessment. Scripted, not blind language evaluation.",
+  "cases": [
+    {
+      "id": "F01",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount in July 2026; Channel = Web",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [],
+            "filters": [
+              {
+                "filter_id": "channel_filter",
+                "operator": "eq",
+                "values": [
+                  "Web"
+                ]
+              }
+            ],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "billed"
+            ],
+            "types": [
+              "decimal"
+            ],
+            "rows": [
+              [
+                "580"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": [
+                {
+                  "filter_id": "channel_filter",
+                  "operator": "eq",
+                  "values": [
+                    "Web"
+                  ]
+                }
+              ]
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "fault": "filter_omission"
+        }
+      ]
+    },
+    {
+      "id": "F02",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount in July 2026; Channel equals \"Web\"",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [],
+            "filters": [
+              {
+                "filter_id": "channel_filter",
+                "operator": "eq",
+                "values": [
+                  "Web"
+                ]
+              }
+            ],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "billed"
+            ],
+            "types": [
+              "decimal"
+            ],
+            "rows": [
+              [
+                "580"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": [
+                {
+                  "filter_id": "channel_filter",
+                  "operator": "eq",
+                  "values": [
+                    "Web"
+                  ]
+                }
+              ]
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": []
+        }
+      ]
+    },
+    {
+      "id": "F03",
+      "domain": "retail",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Net sales in September 2026; Department = Books",
+          "spec": {
+            "dataset_id": "sales",
+            "metric_ids": [
+              "revenue"
+            ],
+            "dimension_ids": [],
+            "filters": [
+              {
+                "filter_id": "department_filter",
+                "operator": "eq",
+                "values": [
+                  "Books"
+                ]
+              }
+            ],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 9
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "revenue"
+            ],
+            "types": [
+              "decimal"
+            ],
+            "rows": [
+              [
+                "70"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-09-01",
+              "2026-10-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "revenue"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": [
+                {
+                  "filter_id": "department_filter",
+                  "operator": "eq",
+                  "values": [
+                    "Books"
+                  ]
+                }
+              ]
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 9
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "fault": "filter_omission"
+        }
+      ]
+    },
+    {
+      "id": "F04",
+      "domain": "library",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Borrowings in September 2026; Shelf = Science",
+          "spec": {
+            "dataset_id": "loans",
+            "metric_ids": [
+              "borrowings"
+            ],
+            "dimension_ids": [],
+            "filters": [
+              {
+                "filter_id": "shelf_filter",
+                "operator": "eq",
+                "values": [
+                  "Science"
+                ]
+              }
+            ],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 9
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "borrowings"
+            ],
+            "types": [
+              "integer"
+            ],
+            "rows": [
+              [
+                3
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-09-01",
+              "2026-10-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "borrowings"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": [
+                {
+                  "filter_id": "shelf_filter",
+                  "operator": "eq",
+                  "values": [
+                    "Science"
+                  ]
+                }
+              ]
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 9
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "fault": "filter_omission"
+        }
+      ]
+    },
+    {
+      "id": "F05",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount for Web only in July 2026",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [],
+            "filters": [
+              {
+                "filter_id": "channel_filter",
+                "operator": "eq",
+                "values": [
+                  "Web"
+                ]
+              }
+            ],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "clarification",
+            "question_contains": "filter"
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": [
+                {
+                  "filter_id": "channel_filter",
+                  "operator": "eq",
+                  "values": [
+                    "Web"
+                  ]
+                }
+              ]
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "missing": [
+            "filter_value"
+          ],
+          "question": "Which filter and value should I use?"
+        },
+        {
+          "request": "Use Channel = Web",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [],
+            "filters": [
+              {
+                "filter_id": "channel_filter",
+                "operator": "eq",
+                "values": [
+                  "Web"
+                ]
+              }
+            ],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "billed"
+            ],
+            "types": [
+              "decimal"
+            ],
+            "rows": [
+              [
+                "580"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": [
+                {
+                  "filter_id": "channel_filter",
+                  "operator": "eq",
+                  "values": [
+                    "Web"
+                  ]
+                }
+              ]
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "turn_kind": "answer"
+        }
+      ]
+    },
+    {
+      "id": "F06",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount in July 2026; Channel =",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [],
+            "filters": [
+              {
+                "filter_id": "channel_filter",
+                "operator": "eq",
+                "values": [
+                  "Web"
+                ]
+              }
+            ],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "clarification",
+            "question_contains": "filter"
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": [
+                {
+                  "filter_id": "channel_filter",
+                  "operator": "eq",
+                  "values": [
+                    "Web"
+                  ]
+                }
+              ]
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "missing": [
+            "filter_value"
+          ],
+          "question": "Which filter and value should I use?"
+        }
+      ]
+    },
+    {
+      "id": "F07",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount in July 2026; Channel = Web",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [],
+            "filters": [
+              {
+                "filter_id": "channel_filter",
+                "operator": "eq",
+                "values": [
+                  "Web"
+                ]
+              }
+            ],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "billed"
+            ],
+            "types": [
+              "decimal"
+            ],
+            "rows": [
+              [
+                "580"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": [
+                {
+                  "filter_id": "channel_filter",
+                  "operator": "eq",
+                  "values": [
+                    "Web"
+                  ]
+                }
+              ]
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": []
+        },
+        {
+          "request": "Change the metric to Completed jobs; keep the filters",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "jobs_count"
+            ],
+            "dimension_ids": [],
+            "filters": [
+              {
+                "filter_id": "channel_filter",
+                "operator": "eq",
+                "values": [
+                  "Web"
+                ]
+              }
+            ],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "jobs_count"
+            ],
+            "types": [
+              "integer"
+            ],
+            "rows": [
+              [
+                4
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "jobs_count"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": [
+                {
+                  "filter_id": "channel_filter",
+                  "operator": "eq",
+                  "values": [
+                    "Web"
+                  ]
+                }
+              ]
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "turn_kind": "refine",
+          "fault": "filter_omission"
+        },
+        {
+          "request": "Remove Channel filter",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "jobs_count"
+            ],
+            "dimension_ids": [],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "jobs_count"
+            ],
+            "types": [
+              "integer"
+            ],
+            "rows": [
+              [
+                6
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "jobs_count"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "turn_kind": "refine",
+          "restart": true
+        }
+      ]
+    },
+    {
+      "id": "F08",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount in July 2026; Channel = Web",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [],
+            "filters": [
+              {
+                "filter_id": "channel_filter",
+                "operator": "eq",
+                "values": [
+                  "Web"
+                ]
+              }
+            ],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "billed"
+            ],
+            "types": [
+              "decimal"
+            ],
+            "rows": [
+              [
+                "580"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": [
+                {
+                  "filter_id": "channel_filter",
+                  "operator": "eq",
+                  "values": [
+                    "Web"
+                  ]
+                }
+              ]
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": []
+        },
+        {
+          "request": "Replace Channel with Phone",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [],
+            "filters": [
+              {
+                "filter_id": "channel_filter",
+                "operator": "eq",
+                "values": [
+                  "Phone"
+                ]
+              }
+            ],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "billed"
+            ],
+            "types": [
+              "decimal"
+            ],
+            "rows": [
+              [
+                null
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": [
+                {
+                  "filter_id": "channel_filter",
+                  "operator": "eq",
+                  "values": [
+                    "Phone"
+                  ]
+                }
+              ]
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "turn_kind": "refine"
+        }
+      ]
+    },
+    {
+      "id": "F09",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount in July 2026; Channel = Web",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [],
+            "filters": [
+              {
+                "filter_id": "channel_filter",
+                "operator": "eq",
+                "values": [
+                  "Web"
+                ]
+              }
+            ],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "blocked",
+            "error_code": "intent_mismatch"
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": [
+                {
+                  "filter_id": "channel_filter",
+                  "operator": "eq",
+                  "values": [
+                    "Web"
+                  ]
+                }
+              ]
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "fault": "custom_filter_omission"
+        }
+      ]
+    },
+    {
+      "id": "F10",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount in July 2026; Channel = Web",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [],
+            "filters": [
+              {
+                "filter_id": "channel_filter",
+                "operator": "eq",
+                "values": [
+                  "Web"
+                ]
+              }
+            ],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "blocked",
+            "error_code": "intent_mismatch"
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": [
+                {
+                  "filter_id": "channel_filter",
+                  "operator": "eq",
+                  "values": [
+                    "Web"
+                  ]
+                }
+              ]
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "fault": "persistent_filter_omission"
+        }
+      ]
+    },
+    {
+      "id": "O01",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount by Service in July 2026; highest Billed amount first",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [
+              "service"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "billed",
+            "descending": true,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "service",
+              "billed"
+            ],
+            "types": [
+              "text",
+              "decimal"
+            ],
+            "rows": [
+              [
+                "Install",
+                "500"
+              ],
+              [
+                "Repair",
+                "300"
+              ],
+              [
+                "Tune",
+                "60"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "service"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "billed"
+            },
+            {
+              "field": "descending",
+              "equals": true
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "fault": "order_omission"
+        }
+      ]
+    },
+    {
+      "id": "O02",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount by Service in July 2026; lowest Billed amount first",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [
+              "service"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "billed",
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "service",
+              "billed"
+            ],
+            "types": [
+              "text",
+              "decimal"
+            ],
+            "rows": [
+              [
+                "Tune",
+                "60"
+              ],
+              [
+                "Repair",
+                "300"
+              ],
+              [
+                "Install",
+                "500"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "service"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "billed"
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "fault": "order_omission"
+        }
+      ]
+    },
+    {
+      "id": "O03",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount by Service in July 2026; largest Billed amount first",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [
+              "service"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "billed",
+            "descending": true,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "service",
+              "billed"
+            ],
+            "types": [
+              "text",
+              "decimal"
+            ],
+            "rows": [
+              [
+                "Install",
+                "500"
+              ],
+              [
+                "Repair",
+                "300"
+              ],
+              [
+                "Tune",
+                "60"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "service"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "billed"
+            },
+            {
+              "field": "descending",
+              "equals": true
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "fault": "order_omission"
+        }
+      ]
+    },
+    {
+      "id": "O04",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount by Service in July 2026; smallest Billed amount first",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [
+              "service"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "billed",
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "service",
+              "billed"
+            ],
+            "types": [
+              "text",
+              "decimal"
+            ],
+            "rows": [
+              [
+                "Tune",
+                "60"
+              ],
+              [
+                "Repair",
+                "300"
+              ],
+              [
+                "Install",
+                "500"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "service"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "billed"
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "fault": "order_omission"
+        }
+      ]
+    },
+    {
+      "id": "O05",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount by Service in July 2026; top 2 by Billed amount",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [
+              "service"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "billed",
+            "descending": true,
+            "limit": 2,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "service",
+              "billed"
+            ],
+            "types": [
+              "text",
+              "decimal"
+            ],
+            "rows": [
+              [
+                "Install",
+                "500"
+              ],
+              [
+                "Repair",
+                "300"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": true,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "service"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "billed"
+            },
+            {
+              "field": "descending",
+              "equals": true
+            },
+            {
+              "field": "limit",
+              "equals": 2
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "fault": "order_omission"
+        }
+      ]
+    },
+    {
+      "id": "O06",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount by Service in July 2026; bottom 2 by Billed amount",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [
+              "service"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "billed",
+            "descending": false,
+            "limit": 2,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "service",
+              "billed"
+            ],
+            "types": [
+              "text",
+              "decimal"
+            ],
+            "rows": [
+              [
+                "Tune",
+                "60"
+              ],
+              [
+                "Repair",
+                "300"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": true,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "service"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "billed"
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 2
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": []
+        }
+      ]
+    },
+    {
+      "id": "O07",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount by Service in July 2026; sort by Service ascending",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [
+              "service"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "service",
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "service",
+              "billed"
+            ],
+            "types": [
+              "text",
+              "decimal"
+            ],
+            "rows": [
+              [
+                "Install",
+                "500"
+              ],
+              [
+                "Repair",
+                "300"
+              ],
+              [
+                "Tune",
+                "60"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "service"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "service"
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": []
+        }
+      ]
+    },
+    {
+      "id": "O08",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount and Completed jobs by Service in July 2026; highest first",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed",
+              "jobs_count"
+            ],
+            "dimension_ids": [
+              "service"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "billed",
+            "descending": true,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "clarification",
+            "question_contains": "order"
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed",
+                "jobs_count"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "service"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "billed"
+            },
+            {
+              "field": "descending",
+              "equals": true
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "missing": [
+            "ordering"
+          ],
+          "question": "Which order should I use?"
+        }
+      ]
+    },
+    {
+      "id": "O09",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount by Service in July 2026; sort Billed amount ascending and descending",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [
+              "service"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "billed",
+            "descending": true,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "clarification",
+            "question_contains": "order"
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "service"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "billed"
+            },
+            {
+              "field": "descending",
+              "equals": true
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "missing": [
+            "ordering"
+          ],
+          "question": "Which order should I use?"
+        }
+      ]
+    },
+    {
+      "id": "O10",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount by Service in July 2026; highest first",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [
+              "service"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "billed",
+            "descending": true,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "service",
+              "billed"
+            ],
+            "types": [
+              "text",
+              "decimal"
+            ],
+            "rows": [
+              [
+                "Install",
+                "500"
+              ],
+              [
+                "Repair",
+                "300"
+              ],
+              [
+                "Tune",
+                "60"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "service"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "billed"
+            },
+            {
+              "field": "descending",
+              "equals": true
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": []
+        },
+        {
+          "request": "Reverse the ordering",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [
+              "service"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "billed",
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "service",
+              "billed"
+            ],
+            "types": [
+              "text",
+              "decimal"
+            ],
+            "rows": [
+              [
+                "Tune",
+                "60"
+              ],
+              [
+                "Repair",
+                "300"
+              ],
+              [
+                "Install",
+                "500"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "service"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "billed"
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "turn_kind": "refine",
+          "restart": true
+        },
+        {
+          "request": "Keep the same ordering, but change the period to June 2026",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [
+              "service"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 6
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "billed",
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "service",
+              "billed"
+            ],
+            "types": [
+              "text",
+              "decimal"
+            ],
+            "rows": [
+              [
+                "Repair",
+                "100"
+              ],
+              [
+                "Install",
+                "400"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-06-01",
+              "2026-07-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "service"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 6
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "billed"
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "turn_kind": "refine"
+        },
+        {
+          "request": "Remove the ranking",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [
+              "service"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 6
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "service",
+              "billed"
+            ],
+            "types": [
+              "text",
+              "decimal"
+            ],
+            "rows": [
+              [
+                "Install",
+                "400"
+              ],
+              [
+                "Repair",
+                "100"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-06-01",
+              "2026-07-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "service"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 6
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "turn_kind": "refine"
+        }
+      ]
+    },
+    {
+      "id": "O11",
+      "domain": "workshop",
+      "cohort": "phase04_development",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount by Service in July 2026; highest first",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [
+              "service"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "billed",
+            "descending": true,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "blocked",
+            "error_code": "intent_mismatch"
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "service"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "billed"
+            },
+            {
+              "field": "descending",
+              "equals": true
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "fault": "custom_order_omission"
+        }
+      ]
+    },
+    {
+      "id": "A01",
+      "domain": "retail",
+      "cohort": "phase04_assessment",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Net sales by Department in September 2026; highest Net sales first",
+          "spec": {
+            "dataset_id": "sales",
+            "metric_ids": [
+              "revenue"
+            ],
+            "dimension_ids": [
+              "department"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 9
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "revenue",
+            "descending": true,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "department",
+              "revenue"
+            ],
+            "types": [
+              "text",
+              "decimal"
+            ],
+            "rows": [
+              [
+                "Books",
+                "70"
+              ],
+              [
+                "Garden",
+                "45"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-09-01",
+              "2026-10-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "revenue"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "department"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 9
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "revenue"
+            },
+            {
+              "field": "descending",
+              "equals": true
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": []
+        }
+      ]
+    },
+    {
+      "id": "A02",
+      "domain": "library",
+      "cohort": "phase04_assessment",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Borrowings by Shelf in September 2026; lowest Borrowings first",
+          "spec": {
+            "dataset_id": "loans",
+            "metric_ids": [
+              "borrowings"
+            ],
+            "dimension_ids": [
+              "shelf"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 9
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "borrowings",
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "shelf",
+              "borrowings"
+            ],
+            "types": [
+              "text",
+              "integer"
+            ],
+            "rows": [
+              [
+                null,
+                1
+              ],
+              [
+                "History",
+                1
+              ],
+              [
+                "Science",
+                3
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-09-01",
+              "2026-10-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "borrowings"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "shelf"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 9
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "borrowings"
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": []
+        }
+      ]
+    },
+    {
+      "id": "A03",
+      "domain": "workshop",
+      "cohort": "phase04_assessment",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount in July 2026; title \"Channel = Web; highest first\"",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "billed"
+            ],
+            "types": [
+              "decimal"
+            ],
+            "rows": [
+              [
+                "860"
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": []
+        }
+      ]
+    },
+    {
+      "id": "A04",
+      "domain": "workshop",
+      "cohort": "phase04_assessment",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount in July 2026; Channel = \"highest daily\"",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [],
+            "filters": [
+              {
+                "filter_id": "channel_filter",
+                "operator": "eq",
+                "values": [
+                  "highest daily"
+                ]
+              }
+            ],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": null,
+            "descending": false,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "report",
+            "fields": [
+              "billed"
+            ],
+            "types": [
+              "decimal"
+            ],
+            "rows": [
+              [
+                null
+              ]
+            ],
+            "chart": "table",
+            "visualization": {
+              "kind": "table"
+            },
+            "truncated": false,
+            "bounds": [
+              "2026-07-01",
+              "2026-08-01"
+            ]
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": []
+            },
+            {
+              "field": "filters",
+              "equals": [
+                {
+                  "filter_id": "channel_filter",
+                  "operator": "eq",
+                  "values": [
+                    "highest daily"
+                  ]
+                }
+              ]
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": null
+            },
+            {
+              "field": "descending",
+              "equals": false
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": []
+        }
+      ]
+    },
+    {
+      "id": "A05",
+      "domain": "workshop",
+      "cohort": "phase04_assessment",
+      "tags": [
+        "phase04"
+      ],
+      "actor": "trusted synthetic host actor; fixed policies",
+      "initial_state": "new persistent session",
+      "turns": [
+        {
+          "request": "Billed amount by Service in July 2026; do not use ascending ordering",
+          "spec": {
+            "dataset_id": "jobs",
+            "metric_ids": [
+              "billed"
+            ],
+            "dimension_ids": [
+              "service"
+            ],
+            "filters": [],
+            "aggregate_filters": [],
+            "period": {
+              "kind": "month",
+              "year": 2026,
+              "month": 7
+            },
+            "chart": "table",
+            "time_grain": "none",
+            "order_by": "billed",
+            "descending": true,
+            "limit": 100,
+            "comparison": null,
+            "comparison_calculation": "none",
+            "include_matching_day_count": false
+          },
+          "expect": {
+            "kind": "clarification",
+            "question_contains": "order"
+          },
+          "requirements": [
+            {
+              "field": "metric_ids",
+              "equals": [
+                "billed"
+              ]
+            },
+            {
+              "field": "dimension_ids",
+              "equals": [
+                "service"
+              ]
+            },
+            {
+              "field": "filters",
+              "equals": []
+            },
+            {
+              "field": "aggregate_filters",
+              "equals": []
+            },
+            {
+              "field": "period",
+              "equals": {
+                "kind": "month",
+                "year": 2026,
+                "month": 7
+              }
+            },
+            {
+              "field": "chart",
+              "equals": "table"
+            },
+            {
+              "field": "time_grain",
+              "equals": "none"
+            },
+            {
+              "field": "order_by",
+              "equals": "billed"
+            },
+            {
+              "field": "descending",
+              "equals": true
+            },
+            {
+              "field": "limit",
+              "equals": 100
+            },
+            {
+              "field": "comparison",
+              "equals": null
+            },
+            {
+              "field": "comparison_calculation",
+              "equals": "none"
+            },
+            {
+              "field": "include_matching_day_count",
+              "equals": false
+            }
+          ],
+          "exclusions": [],
+          "missing": [
+            "ordering"
+          ],
+          "question": "Which order should I use?"
+        }
+      ]
+    }
+  ]
+}

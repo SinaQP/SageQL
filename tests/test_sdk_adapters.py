@@ -551,6 +551,7 @@ def test_sqlite_vm_budget_stops_expensive_aggregate(sqlite_file):
     assert failure.value.code == "query_work_limit"
 
 
+@pytest.mark.sqlserver_integration
 def test_opt_in_sql_server_synthetic_fixture_is_readonly_and_scoped():
     """Opt-in integration; the host seeds this test fixture before running it.
 

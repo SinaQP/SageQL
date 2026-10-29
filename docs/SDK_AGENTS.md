@@ -1,5 +1,85 @@
 # Bounded agent planning for the embedded SDK
 
+## Final Phase 14 evidence invariants
+
+The private request-evidence projection distinguishes unspecified groups from a
+known empty complete projection. A fresh explicit table total with one registered
+metric owner and no positive/ambiguous grouping or ranking request retains that
+projection through known owner/year questions. Explicit new grouping replaces it;
+current grouped reports and host defaults outside this scope retain their roles.
+Predicate values/registered labels remain data. Effective Intent and every final
+provider specification must satisfy the projection before reads.
+
+Named-month role/date relations bind before interval parsing in either word order.
+A role-assignment connector cannot become a date-range connector. Conflicts,
+unbound operands and missing years require clarification; all supplied years must
+be accounted for. Existing Gregorian/Jalali operations, real month ranges, negation
+and literal boundaries remain. This bounded recognizer is not a general parser.
+
+[Phase 14's final decision](PHASE14_ENGINEERING.md) is **Outcome C** after actual V6
+failure. R02 completed live on df46; N04 failed and R04 accepted extra grouping.
+Final a226 guards have offline verification only. No new stage, public API, SQL,
+policy, model or recovery budget changed. Reviewer agreement cannot replace
+independent semantic validation or complete-conversation live assessment.
+
+[Phase 09](PHASE09_ENGINEERING.md) repairs deterministic clarification priority,
+criterion answers, replacements, quoted roles and conversational filter corrections.
+Internal pending evidence retains independent requirements and constrains every
+provider's final spec. No extra model stage or persistent schema is introduced.
+The offline harness separately corrects author metadata `refinement` to the public
+`refine` enum; actual provider decoding remains strict. Live behavior is unmeasured.
+
+[Clarification continuation](SDK_CLARIFICATION_CONTINUATION.md) resolves a known
+pending slot from current permitted concepts while retaining the original user
+requirements. Tested English/Persian wrappers, exact quoted values, negative
+choices, ambiguity and explicit resets use local evidence. A rejected owner is
+not an output-group exclusion. Every provider's final specification must satisfy
+the reconstructed constraints before reads. [Phase 07 measurements](PHASE07_ENGINEERING.md)
+are offline; live-model generalization remains unverified.
+
+[Phase 06 evaluation readiness](../evaluations/PHASE06.md) measures standard
+transport protocol behavior separately from scripted semantic enforcement. The
+transport rejects fabricated/altered reserved references and references in reviewer
+feedback, including when no vocabulary is visible. Issued references still need
+correct current ownership and semantic validation. Canonical scalar responses
+remain subject to ordinary checks. No topology or prompt rewrite is implied.
+
+Optional [host-owned value vocabulary](SDK_VALUE_VOCABULARY.md) supplies local
+categorical semantics. Grounded predicates constrain every provider's final spec;
+omissions/wrong values are repaired within existing bounds or blocked before reads.
+Standard transports use opaque references for registered canonical predicate values
+in intent, planning, review and current context; no value/alias inventory is sent.
+The user's own question remains user text. See [Phase 05](PHASE05_ENGINEERING.md).
+
+Phase 04 adds [provider-neutral filter and ordering grounding](PHASE04_ENGINEERING.md).
+Explicit predicates over permitted filter labels carry typed literal values;
+registered ordering targets, directions and counted limits constrain both intent
+and final specifications. Bounded refinement cues preserve/replace/remove existing
+controls. Literal values retain their exact source spelling and never act as
+analytical instructions. Missing owners/values, conflicting conditions and
+ambiguous sort targets clarify before reads. No value discovery query or mandatory
+enumeration is added. In particular, a value-only restriction cannot acquire its
+filter identity from a model proposal. The unchanged D03 host needs clarification.
+Two-method backends, the legacy interpreter and custom providers remain subject to
+the same engine gate; review approval cannot waive these requirements.
+
+Phase 03 additionally grounds explicit registered grouping and bounded replacement
+instructions, and preserves an explicitly retained current typed filter in every
+provider's final gate. This does not prove arbitrary new filter-value or ordering
+interpretations; the [Phase 03 report](PHASE03_ENGINEERING.md) records reproducible
+remaining limits and separate scripted/live evaluation status.
+
+The [Phase 02 semantic-evidence contract](PHASE02_ENGINEERING.md) distinguishes
+positive, excluded, literal and unresolved occurrences using bounded shared en/fa
+scope rules. Explicit exclusions constrain both normalized intent and every
+provider's final ready specification. Unclear replacements/conflicts clarify;
+ordinary source filters and output groupings have separate removal semantics.
+Exact permitted labels/specific aliases select their registered metric without
+requiring unrelated averaging words. Ambiguous labels remain clarification.
+Excluded/literal unavailable-ledger entries do not enter effective planning
+context; actual unavailable requests remain terminal. These checks are bounded
+language evidence, not a general natural-language correctness proof.
+
 The [Phase 3 reliability contract](REPORTING_RELIABILITY_PHASE3.md) adds bounded
 request evidence, a typed unavailable-requirement ledger, one optional structured
 repair allowance and one reconsideration of repeatedly conflicting intent.
@@ -422,7 +502,65 @@ interpretation-only checks with the configured model after the redundant-axis
 correction. No report SQL ran during those model checks. Details and the failed
 pre-correction attempt are recorded in [ROADMAP.md](ROADMAP.md).
 
-The agent tests use fake transports/backends and synthetic local fixtures. Run:
+Fresh dated table requests use period totals unless the user explicitly requests
+a time breakdown. A named month supplies date bounds, not a monthly grouping.
+Scoped local evidence anchors Intent and gates final specifications independently
+of Reviewer approval. Existing time grouping is preserved for refinements; explicit
+daily/monthly breakdowns and quoted/negated presentation phrases keep their roles.
+A fresh plain-table Intent with unspecified sorting is constrained to null sort
+and ascending direction before planning. Explicit semantic sorts remain supported.
+A rejected partial model period can become a local year question when independent
+user evidence already establishes that missing detail. No provider retry is added.
+Affirmative year replies retain the known pending month and registered “for each”
+grouping. The engine asks for report details when a year-only message has no report
+context, including after a failed request; existing refinements and numeric business
+labels remain supported. See [the Phase 14 evidence](PHASE14_ENGINEERING.md).
+Pending filter-owner answers may repeat the same pending literal with an explicit
+affirmative choice. Negative/question/ambiguous choices do not bind an owner.
+When local evidence confirms resolution of a pending slot, its answer role takes
+precedence over a model's new-request tag; explicit new-report resets retain their
+role. This preserves the earlier explicit measure during owner/year continuation.
+For a confirmed answer with a known remaining missing year, an invalid model
+period reaches the existing year-question fallback before structured repair can
+mask that diagnostic. Valid Intent retains normal Planner/Reviewer sequencing;
+empty output or transport errors do not gain this fallback.
+A fresh dated table explicitly requesting whole-period totals with no grouping
+or ranking cue cannot acquire an output dimension from a filter owner. This is
+anchored locally and enforced again for custom providers. Explicit groups,
+existing grouped reports, quoted values and negated wording retain their roles.
+Fixed month/year periods may be canonicalized from a model range only when both
+resolve to exactly the same dates and bounded user evidence proves that fixed
+selection. Provider session context still freezes Gregorian periods to ranges.
+Later relative or ambiguous date instructions prevent recovery of an older fixed
+selection; explicit user ranges remain ranges. This does not accept changed dates
+or relax final evidence, authorization or SQL checks.
+Two validated named months with explicit affirmative `is/as the base` and
+`is/as the comparison/reference` roles are anchored by role, not mention order.
+Negative/title/predicate text supplies no role, missing years still require
+clarification and duplicate roles are ambiguous. This adds no formula or calendar
+operation. Plain-table defaults can be retained while an owner/year is pending;
+confirmed owner continuations enforce their unsorted table requirement before
+publication. Explicit sorting, current ranked reports and historical host-defined
+defaults outside that continuation retain their existing behavior.
+Unquoted terminal Persian copulas are grammar only around a whole, uniquely
+registered value alias; quoted/free-form text and full registered phrases retain
+their exact value. The prompts describe kind-specific period fields, unique IDs
+and default output limits; strict decoding still rejects malformed model output.
+The observed failure and limited live comparison are recorded in
+[Phase 13](PHASE13_ENGINEERING.md).
+
+The agent tests use fake transports/backends and synthetic local fixtures.
+
+Opted-in structured repair now sends only fixed validation feedback for Intent
+and Planner failures; the single shared allowance and default zero remain.
+A fresh plain table carries its known default output limit into effective Intent.
+Affirmative comparisons to the current total retain its base period; missing
+current context requires clarification. Transport diagnostics use fixed categories
+from already-loaded SDK exception types, without importing optional clients,
+echoing exceptions or retrying calls. See the latest Phase 14 evidence for the
+offline/live distinction and exact approval requirements.
+
+Run:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest tests/test_sdk_intent.py tests/test_sdk_agents.py tests/test_sdk_engine.py tests/test_sdk_provider.py tests/test_sdk_jalali_provider.py tests/test_sdk_lookups.py tests/test_sdk_sessions.py tests/test_rahtal_sdk.py tests/test_sdk_web.py -q

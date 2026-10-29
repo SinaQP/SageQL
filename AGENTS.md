@@ -2,6 +2,19 @@
 
 Before changing code, read [agent-rules/Agent.md](agent-rules/Agent.md). Follow its product contract, working rules, and verification workflow.
 
+Automated tests and evaluations are [SQLite-first](docs/SQLITE_FIRST_TESTING.md):
+reuse disposable synthetic hosts, independent references and existing WAL probes.
+Never use production databases or read Rahtal `.env` files for testing. Keep SQL
+Server compiler/adapter contracts offline; native tests require an explicit
+`--run-sqlserver-integration` command flag plus separately approved synthetic scope.
+
+Opt-in report read consistency is scoped in [docs/SDK_READ_CONSISTENCY.md](docs/SDK_READ_CONSISTENCY.md).
+Compatibility mode retains separate executions. Snapshot mode shares one lease
+across lookup/main/label reads and completes cleanup before publication; SQL
+Server requires a host-prepared manual-commit SNAPSHOT factory. Never enable
+database options, adopt application transactions or silently downgrade consistency.
+Real SQL Server verification remains separately gated by explicit synthetic-target approval.
+
 Fixed local absolute/percentage changes across two ungrouped aggregate periods
 are scoped in [docs/SDK_COMPARISON_CHANGES.md](docs/SDK_COMPARISON_CHANGES.md).
 Models select this typed operation; formulas, grouped alignment and result

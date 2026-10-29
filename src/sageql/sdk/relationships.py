@@ -139,7 +139,8 @@ def _expand(catalog: ReportingCatalog) -> ReportingCatalog:
                               for item in relation.dimensions)
             source_filters = {item.id: item for item in source.filters}
             filters.extend(FilterDefinition(item.id, item.label, _column(relation, item.id),
-                                            source_filters[item.source_filter_id].operators)
+                                            source_filters[item.source_filter_id].operators,
+                                            value_vocabulary=source_filters[item.source_filter_id].value_vocabulary)
                            for item in relation.filters)
         expanded.append(replace(target, columns=tuple(columns), dimensions=tuple(dimensions),
                                 filters=tuple(filters), related_columns=tuple(virtual)))

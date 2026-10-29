@@ -1,5 +1,631 @@
 # SageQL roadmap
 
+## Phase 14 final decision — Outcome C: reliability blocked (2026-10-28)
+
+Authorized V6 actually ran 20 AvalAI gpt-5-nano calls on exact df46/c4d1 and closed
+at R04's wrong accepted grouping. Keep scores separate: N04 0/3 reports, R02 1/1
+with a complete conversation, R03/R04 3/4 attempted (3/6 planned), with R03 complete
+and R04's last two turns unexecuted. No unauthorized read was observed. N04's
+bounded revision failed, so comparison reversal was not demonstrated live.
+
+Final a226 SDK evidence distinguishes a known empty total projection from an
+unspecified subset and binds explicit period roles before range connectors. These
+fixes are offline-only; no further live call or recycled allowance occurred.
+All 2,421 tests/13 native skips, historical semantic gates and 14 SQLite schedules
+pass on Windows 3.10/3.12 and Ubuntu 3.12. Scripted N06 remains incomplete. Earlier
+intermediate year-refinement failure logs are retained. See [the final report](PHASE14_ENGINEERING.md)
+and [V8 evidence](../evaluations/phase14/verification.v8.json).
+
+N06, A01–A12, N05's denial and R04's remaining turns lack live coverage; historical
+N01/N02/N03/R01 successes do not verify the new source. No production-readiness or
+Phase 15 acceptance follows. Next: select a stronger comparison model and review
+an explicit source-bound paired development assessment on the fixed SDK, then a
+separately authorized broader assessment if justified. No model switch or new live
+scope is authorized or prepared by this conclusion. Preserve current architecture,
+security and frozen evidence; no commit/push/deploy.
+
+## Phase 14 authorized V5 — specific gains, replacement safety stop (2026-10-28)
+
+Exact c7a1/c4d1 ran 29 calls: N02/N04 completed 4/5 reports and 1/2 conversations;
+separately R01/R02 completed 2/3 reports and 1/2 conversations. N02's confirmed-year
+fallback was exercised live and its full conversation completed. N04 recovered
+from a repeated extra-grouping plan and completed the first comparison, but its
+explicit reversal was blocked by stale Intent roles. R02 accepted an unrequested
+sort, triggering the frozen stop even though rows matched. R03/R04's six turns
+were unexecuted. No broader quality or Phase 14 completion claim is supported.
+
+Offline df46/c4d1 anchors explicit base/reference month roles and preserves plain
+table defaults through confirmed owner/year clarification. A broader initial
+constraint broke 14 legacy tests and clean smoke; those failures are preserved
+and the final rule retains host-defined defaults outside this continuation.
+Exact captured replay reproduces all 29 responses; corrected replay requires
+unavailable new model responses and is not live success. See
+[the report](PHASE14_ENGINEERING.md) and additive V7 evidence.
+
+Disabled `dist/phase14/completion/approval-scope.v6.json` separates N04 and now-
+development R02 from live-unexecuted R03/R04. It needs its own exact approval;
+V5 is closed and its allowance cannot be reused. Model, token caps, recovery
+budgets and SQL/authorization architecture remain unchanged. No production
+access, native SQL Server execution, commit, push, deploy or Phase 15.
+
+Final df46 verification passes 2,391 tests / 13 native skips, all semantic gates
+and 14 SQLite schedules on Windows Python 3.10/3.12 and Ubuntu Python 3.12.
+Clean core imports/examples pass. A first Windows 3.12 loopback HTTP abort is
+preserved; isolated and fresh full gates pass, with cause unresolved.
+
+## Historical Phase 14 V3 verification (2026-10-28)
+
+Exact ccc6/c4d1 V3 ran 17 calls / 9 turns, then stopped on N04 turn 1's accepted
+extra Channel grouping. Completion was 4/6 attempted reports; one of two fully
+executed conversations succeeded, plus partial N04. N03 completed all three
+reports and directly exercised equal-range-to-month canonicalization twice.
+N02 still failed its year continuation after malformed Intent and an empty
+8,192-token repair. R01–R04 and N04's comparison turns were unexecuted; 15/24
+planned turns received no score. The report-shape failure is retained even though
+the filtered amount was 280. V3 is closed; no allowance is reusable.
+
+Final c7a1/c4d1 changes preserve the original invalid-period diagnostic for a
+confirmed pending-year fallback and forbid extra grouping on explicit fresh
+whole-period totals. Valid model clarification sequencing and explicit grouping
+remain compatible. Historical replay reproduces all 17 outputs; corrected replay
+is offline-only and does not fabricate a corrected Planner. Full release evidence,
+retained intermediate failure and new focused regressions are in
+[the report](PHASE14_ENGINEERING.md) and additive V6 evidence. No current-source
+live improvement is claimed. Phase 14's overall reliability objective is unmet.
+
+Disabled final `dist/phase14/completion/approval-scope.v5.json` proposes N02/N04
+then R01–R04 with separate scores, exact c7a1/c4d1 and fresh outputs. V4 remains
+as a superseded compatibility-fix draft. Another dispatch needs its own exact
+authorization. No production access, native SQL Server execution, publication,
+commit, push, deploy or Phase 15.
+
+Final verification passes 2,374 tests / 13 native skips, every semantic gate and
+all 14 SQLite schedules on Windows Python 3.10/3.12 and Ubuntu Python 3.12.
+Clean installation and package evidence remain separate from real model quality.
+
+## Historical Phase 14 V2 verification (2026-10-28)
+
+The explicitly approved 8e3c/c4d1 V2 scope ran 20 real calls / 10 turns, then
+stopped at N03 turn 2. Complete frozen-contract completion was 4/6 attempted
+report goals. Five published reports had correct numerical rows and bounds; one
+failed the typed `month` versus equal-bounds `range` contract. The frozen result
+and stop are preserved. N01 completed; N02 lost pending-answer context. One of two
+fully executed conversations succeeded, plus one partial N03. N04 and replacements
+were not dispatched; 17/27 planned turns remain unexecuted. No live results from
+different SDK sources are pooled.
+
+Offline corrections confirm pending-answer roles and canonicalize exactly equal
+ranges only to user-evidenced fixed periods. Provider session context still freezes
+Gregorian periods to ranges. Final SDK ccc6dae1/c4d1 passes 2,360 tests / 13 native
+skips, every semantic gate and all 14 SQLite schedules on Windows Python 3.10/3.12
+and Ubuntu Python 3.12. Exact historical replay preserves all 20 responses and
+outcomes; corrected-source replay is explicitly counterfactual. No corrected-source
+live calls occurred. V5 evidence and the current [report](PHASE14_ENGINEERING.md)
+record intermediate failures, actual $0.02323205 estimated usage and limitations.
+
+V2 is closed. Disabled `dist/phase14/completion/approval-scope.v3.json` proposes
+N02–N04 then R01–R04 with separate scores, ccc6/c4d1 and fresh outputs; the earlier
+allowance is not reusable. Preparation does not authorize dispatch. N06 remains
+scripted-incomplete and live-unexecuted; A01–A12 remain live-unexecuted. No
+production, commit, push, deploy or Phase 15.
+
+## Historical Phase 14 completion preparation (2026-10-28)
+
+Audit the preserved 28-call attempt at the actual failing boundaries. Keep strict
+decoding and default recovery settings; make the existing opt-in structured repair
+receive bounded validation feedback, transfer known output defaults to Planner,
+and correct demonstrated current-period comparison anchoring. Distinguish agent
+exhaustion from transport failures without exposing raw exceptions. Reuse frozen
+corpora, SQLite fixtures and independent oracles. Run all release gates and prepare
+one disabled, exact source/evaluator-bound targeted verification packet. No new
+model dispatch, credential access, production access, Phase 15 or publication is
+authorized by this preparation task.
+
+Final source `8e3c0356…` and evaluator `c4d1db5c…` have complete offline evidence:
+2,346 tests / 13 native skips, all semantic gates and 14 SQLite schedules on each
+of Windows Python 3.10/3.12 and Ubuntu Python 3.12. Default scripted N improves to
+12/13 reports and 5/6 conversations; N06 remains incomplete and live-unexecuted.
+The separate targeted one-repair contracts pass N01–N04 10/10 reports and R01–R04
+9/9. V4 evidence preserves intermediate failures and the original 28-call results.
+Disabled `dist/phase14/completion/approval-scope.v2.json` proposes N01–N04 then
+R01–R04, 160 requests / 45 minutes / $8 estimates. New exact approval is required
+under the user's continuation §10; no new model request or credential read occurred.
+
+## Phase 14 corrected-source continuation — partial live evidence (2026-10-28)
+
+The separately authorized exact `d1f48054…` source ran N01 followed by N02–N05.
+Request 28 failed without usage and closed the batch through the existing
+transport/accounting guard: 15 turns, 1/11 supported reports complete, no wrong
+accepted report, 25 remaining turns unexecuted including every legacy A case.
+N01 asked for a year and retained Units/Department/September after reopening,
+but malformed Planner output prevented completion. Later owner/vocabulary,
+period-structure and unnecessary-clarification failures remain visible. Reviewer
+approved one wrong clarification; no wrong ready report was published.
+
+Captured-response replay reproduces the baseline with no network. Subsequent
+offline fixes bind an affirmative filter-owner answer repeated with its pending
+literal and recognize a terminal Persian copula only around a whole registered
+alias. Prompt guidance clarifies existing period/unique-ID/default-limit rules;
+strict decoding, policies and read boundaries remain intact. New exact source
+`c60b35c5…` has no live verification. All older scopes/corpora/results are preserved.
+Four separately frozen replacement cases remain live-ineligible; their scripted
+success is not live generalization. Estimated recorded usage costs $0.03642790;
+with the failed-call reservation the closed ledger is $0.04102815, billing unknown.
+See [the current report](PHASE14_ENGINEERING.md) and additive Phase 14 V3 evidence
+for exact denominators and final offline release results. No Phase 15 or deployment.
+Final release gates passed 2,323 tests / 13 native skips on Windows Python 3.10,
+Windows Python 3.12 and Ubuntu WSL2 Python 3.12, with 14/14 SQLite consistency
+schedules and all previous semantic gates in each runtime. The clean core-only
+wheel smoke passed. Scripted N01–N06 remains incomplete at 11/13 reports and
+4/6 conversations (N04/N06), separate from the measured live failures.
+
+## Phase 14 live assessment — safety-stopped, offline repair verified (2026-10-27)
+
+**Partial live baseline measured; full assessment incomplete.** The user approved
+the exact 18-trajectory / 40-turn scope. N01 turn 1 failed instead of asking for
+a missing year. Its reopened year reply then became an annual revenue report,
+approved by Reviewer, instead of September Units by Department. The existing
+safety hook saved this wrong attempt and stopped the batch after four calls;
+N01 turn 3, N02–N06 and all A01–A12 remain live-unexecuted.
+
+Actual AvalAI `gpt-5-nano` usage: 16,658 input / 8,702 completion tokens, estimated
+$0.00431370, billed cost unverified. No production access or Rahtal `.env` read.
+Baseline, scope, questions/answers and every response are preserved. N01 is now
+development-exposed. The old approval cannot authorize corrected-source execution.
+
+Targeted offline corrections ask for a missing year after the observed invalid
+partial period, preserve affirmative year answers and “for each” grouping, and
+prevent context-free years from executing invented reports across providers.
+Exact captured-output replay changes wrong publication into zero-read rejection;
+no successful model repair is fabricated. Corrected-source live comparison and
+broader reliability remain unmeasured; a separate scope is required.
+
+Post-fix verification: **2,295 passed / 13 native skips** on Windows Python
+3.10/3.12 and Ubuntu WSL2 Python 3.12, with all existing semantic gates and fourteen
+SQLite consistency schedules passing. The clean core wheel smoke also passes.
+
+See [the Phase 14 report](PHASE14_ENGINEERING.md),
+[procedure](../evaluations/PHASE14.md) and
+[historical readiness evidence](../evaluations/phase14/verification.v1.json) and
+[live/repair evidence](../evaluations/phase14/verification.v2.json).
+Existing scripted legacy/new contracts remain 12/12 and 2/6 trajectories; supported
+incompletions are retained. Phase 15 has not begun; no commit, push or deployment.
+
+## Phase 13 real-model SQLite pilot — measured and corrected (2026-10-27)
+
+The user explicitly authorized exploratory accounting and bounded engineering
+comparisons, superseding the earlier $0.25/accounting condition. The existing
+runner now has an explicit exploratory option; strict mode remains default.
+Ordinary pytest/CI/evaluations remain offline. No production database or Rahtal
+`.env` was read. Earlier disabled packets and
+[the zero-dispatch v1 record](../evaluations/phase13/verification.v1.json) are preserved.
+
+Actual AvalAI `gpt-5-nano` exposed two failures: invented time grouping and Planner
+ranking after Intent marked sorting unspecified. Reviewer approved both. Scoped
+evidence/Intent fixes reject these paths before execution; exact captured-response
+comparisons reproduce that change without fabricated model responses. A broader
+intermediate ordering rule failed compatibility checks and was narrowed; those
+failures remain recorded, with no changed answer keys or examples.
+
+Final source completes **P01/P02 2/2 and 26/26 requirements**, with zero wrong
+accepted specs and six calls. All four source-versioned attempts remain separate:
+22 calls, 88,788 input / 43,466 completion tokens, estimated $0.02182580 at published
+rates; account charges remain unverified. No accuracy score is pooled across runs.
+
+Final offline verification: **2,250 passes / 13 native skips** on Windows Python
+3.10/3.12 and Ubuntu WSL2 Python 3.12; fourteen SQLite consistency schedules and
+existing semantic gates pass with historical D02/D03 preserved. Fresh core wheel
+imports/examples and archive checks are documented in
+[the Phase 13 report](PHASE13_ENGINEERING.md) and
+[versioned evidence](../evaluations/phase13/verification.v2.json).
+
+This is an exposed technical pilot. Genuine multi-turn clarification, opaque
+references, unfamiliar language and broader Reviewer quality remain live-unmeasured.
+A01–A12 was not enabled; no model switch, Phase 14, commit, push or deployment.
+
+## SQLite-first automated testing (2026-10-27)
+
+The [testing workflow](SQLITE_FIRST_TESTING.md) reuses the existing synthetic
+retail/library/workshop builders, independent reference calculations, evaluation
+cohorts and controlled SQLite WAL schedules. Ordinary pytest now guards external
+connections and private environment files; native SQL Server tests additionally
+require `--run-sqlserver-integration` in the actual command and their original
+separate approval. Ambient opt-ins and `PYTEST_ADDOPTS` cannot activate native work.
+
+The audit reproduced the default native activation gap using synthetic unused
+settings, before any driver/credential access. Focused regressions cover both
+native paths, explicit approval retention, inherited pytest options, guard dispatch
+and isolated reusable SQLite fixtures. No SDK adapter/production connection,
+public API, dependency or business semantics changed. Native ODBC/type/collation/
+isolation/cleanup, production capacity and live-model quality remain separately
+unverified. Phase 01–12 evidence and native test bodies are preserved. See the
+[new measurements](../evaluations/testing/sqlite-first.v1.json); no production
+configuration, live database, model endpoint, commit or push is used for this task.
+
+## Phase 12 native SQL Server verification — blocked (2026-10-27)
+
+**Level A: Native verification remains blocked.** After initially excluding the
+live Rahtal target, the user explicitly authorized a limited production read-only
+assessment. The existing `.env` was read locally and left unchanged. One secure,
+short-timeout connection attempt failed with SQLSTATE 08001 before any SQL ran.
+No retry, relaxed certificate validation, business-source read or write occurred.
+The existing Phase 11 suite is retained: its thirteen approval checks pass,
+missing/disabled approval blocks before credentials/driver/network, and all twelve
+native cases skip. The starting full suite reproduces 2,201 passes / 13 skips.
+
+The [Phase 12 report](PHASE12_ENGINEERING.md) and
+[current results](../evaluations/phase12/verification.v2.json) preserve the
+[earlier blocked record](../evaluations/phase12/verification.v1.json) and distinguish native
+gaps from offline regressions. No SDK/test-framework change is justified by absent
+native observations. Documentation and release readiness retain blocked native
+types/isolation/cancellation/cleanup and unverified pooling/workload/live models.
+
+Next dependencies: resolve the connection failure securely, verify independent
+read-only access before source reads, and separately approve an isolated synthetic
+target for the full native suite. Phase 12 is not fully complete; Phase 13 has not
+started. Fixture writes, concurrency/stress/cancellation experiments and automatic
+configuration/permission changes remain prohibited on production. No commit or publication.
+
+## Phase 11 report read consistency (2026-10-27)
+
+Implemented the [additive consistency contract](SDK_READ_CONSISTENCY.md) and
+[scoped architecture/evidence](PHASE11_ENGINEERING.md). A deterministic SQLite
+schedule first reproduces mixed committed states. Host-selected snapshot mode
+now keeps lookup, main SQL and all label batches on one supported transaction,
+with cleanup before publication and current policy checks outside the snapshot.
+Compatibility execution remains available and is explicitly labeled in new
+provenance. Strong mode cannot replay a compatibility receipt or silently fall
+back. No arbitrary SQL/formula/relationship or database option is introduced.
+
+Actual installed Python 3.10 execution exposed the new scope's unsupported
+`set_authorizer(None)` use. A focused failing regression precedes a callable
+metadata/cleanup repair; read-only file mode and business-query allowlists remain.
+Final 3.10.22 Windows, 3.12.0 development and 3.12.3 Ubuntu WSL2 suites each pass
+2,201 tests; 13 real SQL Server checks are explicitly skipped. Fourteen controlled
+SQLite schedules pass their contracts, including intentional compatibility skew
+and safe failure cases. Historical Phase03 D02/D03, original/corrected Phase08
+scripts and all Phase01–10 evidence remain preserved.
+
+SQL Server fake-driver lifecycle checks pass. The separately gated
+[synthetic suite](PHASE11_SQLSERVER_TESTING.md) is prepared but has no approved
+target/operations and has not run. Real SQL Server execution remains unverified;
+SQLite and mocks do not certify native isolation/cancellation/cleanup or pooling.
+Hosted CI and live-model generalization remain unexecuted. No production DB,
+external model, commit, push or publication occurred.
+
+Phase 12 recommendation (not started): authorize an isolated synthetic SQL Server
+target and run the existing suite with actual driver/version/cleanup evidence;
+verify pooling/reset separately. A separately authorized real-model baseline is
+still valuable. Do not repeat fixture/approval preparation or start Phase 12
+without a new request.
+
+## Phase 10 runtime compatibility and release engineering (2026-10-27)
+
+Completed the [scoped compatibility work](PHASE10_ENGINEERING.md), with a
+[versioned machine-readable matrix](../evaluations/compatibility/phase10.v2.json)
+and [repeatable installation/release gates](SDK_RELEASE.md). Actual Windows
+CPython 3.10.22 through the measured 3.15.2 releases pass the original full
+2,119-test baseline; Python 3.10 uses exact core floors sqlglot 26.0.0 / dotenv
+1.2.0. Ubuntu WSL2 3.12.3 passes the baseline and new release-tool tests.
+Wheel/sdist/editable, core-only isolation, optional lower/current imports and
+minimum build tools are measured. SDK source, public API and dependency ranges
+are unchanged. Phase 06 explicitly selects all 45 cases; historical Phase 03
+D02/D03 and original/corrected Phase 08 script evidence remain intact.
+
+Public PyPI SDK resolution encountered concrete timeout/DNS failures; measured
+installs use hashed cached wheels and identified upstream tag builds, never
+copied installed dependencies. This remains a release follow-up. New GitHub
+Actions gates are pinned and pass local actionlint/command checks; hosted runs
+are unexecuted. Finite patch-version and WSL coverage do not certify all future
+runtimes, native Linux deployments or every optional native-wheel combination.
+
+Phase 11 recommendation (not started): separately scope and authorize synthetic
+SQL Server runtime and multi-read snapshot consistency verification. Real SQL
+Server execution remains unverified. A live-model baseline still requires its
+separate explicit authorization; no additional approval/corpus preparation phase
+is needed. No production database operation, live-model call, commit or push.
+
+## Phase 09 semantic continuation (2026-10-26)
+
+Completed the [scoped deterministic repairs](PHASE09_ENGINEERING.md) with an
+[explicit contract](PHASE09_SEMANTIC_DESIGN.md) and
+[versioned evaluation](../evaluations/PHASE09.md). Owner/year, measure/grain and
+related-source grouping requirements retain distinct roles. Criterion answers,
+metric/group replacements, explicit direction plus top-N, plural quoted examples
+and terminal filter corrections now preserve the intended report.
+
+A11's unissued-reference rejection was correct for a wrongly grounded literal;
+fixing local modifier parsing resolves it without weakening opaque validation.
+Separately, original A04/A06 mock metadata emitted invalid `refinement`; script
+v2 converts only author metadata to valid `refine`. Actual provider decoding stays
+strict. Original questions/specs/answers/scorer and every first result remain.
+
+Same valid-script Phase08 comparison: **8/14 → 14/14 trajectories**, **10/16 →
+16/16 reports**. Historical observed original script remains 8/14 and 8/16; final
+SDK against that untouched script is **12/14 and 12/16**, still rejecting its
+invalid enums. These are separate cells, not one claimed unchanged experiment.
+New Phase09 v2: **1/13 → 13/13**, **7/18 → 18/18 reports**, development7/7,
+replacement assessment6/6. R01's exposed first failure was promoted and R07 frozen
+before its targeted correction. No blind/live generalization claim.
+
+Also closed reproduced custom-provider wrong-report paths for changed dates,
+invented retained filters, extra selected metrics and unconfirmed question answers.
+All final measured cohorts have zero wrong accepted specs/unauthorized reads.
+**2,119 tests pass / one optional SQL Server skip**; original Phase06 45/45 and
+36/36 reports, Phase07 27/27 and 24/24, strict/holdout/Phase04/05 remain passing.
+Original D02/D03 remain visible. First local I/O interruptions and controlled
+non-reexecuting resume evidence remain; their root cause is unverified.
+
+No public API/session schema, runtime dependency, model stage, production DB,
+permission or compiler expansion. Existing disabled live packets remain unchanged
+and stale for the modified source. No external model call or commit/push.
+
+Phase10 recommendation (not started): when live authorization remains unavailable,
+verify actual minimum-Python/dependency/installed-wheel compatibility against the
+declared >=3.10 contract. Require full offline tests/imports/examples across the
+supported bounds without private-data/network side effects. A separately approved
+real-model baseline can use reviewed current source/exposure; it needs no duplicate
+preparation phase. Avoid model/prompt/framework changes without measured evidence.
+
+## Phase 08 real-model preflight (2026-10-26)
+
+**Completion level A only: preflight ready, external execution awaiting explicit
+authorization.** [Report](PHASE08_ENGINEERING.md),
+[selection/approval guide](../evaluations/PHASE08.md). Reused Phase 06 transport,
+scorer, journals, exact approval and budget controls. Frozen focused selection:
+14 trajectories / 23 turns / 16 report goals across three existing domains;
+two pilot cases precede twelve assessment cases. No SDK runtime change, external
+model request, production query or new dependency. No empirical accuracy/cost/
+latency or reviewer-effectiveness claim.
+
+Disabled packets bind AvalAI `https://api.avalai.ir/v1`, `gpt-5-nano`, exact ordered
+selection/hash/source/directory and all ceilings. Pilot: 12 calls / 300 s / $0.25;
+assessment: 120 calls / 1,800 s / $1.00, separately reviewed. Both reject before
+key access. Human authorization and pricing/accounting review remain prerequisites;
+public rates do not prove input/framing/reasoning/fees guarantees for the route.
+
+Existing regressions pass: 2,048 tests / one optional SQL Server skip, Phase06
+45/45 and 36/36 reports, Phase07 27/27 and 24/24 reports. Original D02/D03 stay
+visible and unchanged. New offline contract review exposes six incomplete
+trajectories (8/14 complete, 8/16 reports), including zero-model-call local
+clarification/context failures. These are not real-model defects or success rates.
+V1 oracle duplicated comparison composition; v2 corrects only that answer key,
+preserving questions, goals, versions and first failures. No production tuning.
+
+Backlog: confirmed P2 local wrong-detail/preempted clarification for A03/A04,
+stalled criterion answer A05, replacement A06 and quoted role A10; A11's scripted/
+local interaction needs diagnosis. No confirmed real-model defect exists without
+live evidence. Unsupported share-of-total remains outside the registered scope.
+Provider usage/pricing guarantees, runtime Python3.10/SQL Server and multi-read
+snapshots remain unverified assumptions, not measured regressions.
+
+Phase09 recommendation (not started): if live approval remains unavailable,
+repair the demonstrated deterministic clarification/context failures with captured
+before-source evidence, promoted regressions/replacements, complete independent
+reports and zero wrong accepts/unauthorized reads. This is product work rather
+than another preparation phase. Finish Phase08's unchanged pilot/baseline if
+authorized before choosing agent or prompt optimizations.
+
+## Phase 07 clarification continuation (2026-10-26)
+
+**Offline complete; live-model generalization unverified.** The
+[engineering report](PHASE07_ENGINEERING.md),
+[scoped contract](SDK_CLARIFICATION_CONTINUATION.md) and
+[evaluation guide](../evaluations/PHASE07.md) record the verified L26 repair.
+An ownerless fallback previously swallowed the original measure/group/date;
+contextual answer parsing then rejected natural positive choices. Both causes
+are repaired with current registered evidence, preserving other constraints.
+
+Also fixed demonstrated wrong-report paths involving negative wrappers, reset
+questions, sort label collisions, owner revocation/reinterpretation, stale custom
+controls after reset and unsupported clauses lost during value completion.
+No new analytics, permission, model stage, dependency or persistent schema.
+
+Identical original Phase 06 v4: **44/45 → 45/45 trajectories**, **35/36 → 36/36
+reports**; original protocol 14/14 and multi-turn 5/5. New frozen v2: **10/27 →
+27/27 trajectories**, **8/24 → 24/24 reports**, assessment 13/13, development
+14/14, zero wrong accepted specifications or unauthorized reads. L26 and exposed
+Persian A07 are development; A01/A14 are independent library replacements.
+Original v1 and first failures remain; A13's clarification annotation correction
+does not alter report goals or numerical answers. Original D02/D03 remain visible
+and unfulfilled under unchanged contracts. Older strict/holdout/Phase04/05 pass.
+
+Verification: **2,038 tests pass / one optional SQL Server skip**; both stores,
+reopen/replay/current vocabulary, custom-provider gates, examples, browser and
+offline package checks. Prior work and measurement bytes remain preserved;
+no commit or push. Unknown paraphrases and unregistered meanings can still need
+clarification; live language/model reliability remains unmeasured.
+
+Recommended Phase 08 (not started): separately authorized synthetic live-agent
+evaluation with fresh exposure-tracked cases and exact budgets. Measure complete
+reports, wrong accepts, isolation, stage faults/recovery, calls, latency/cost and
+every failed first attempt before choosing model or prompt changes. Require zero
+incorrect accepted reports/unauthorized reads. Approval is a separate dependency;
+if unavailable, scope the existing runtime/SQL Server matrix independently.
+
+## Phase 06 live-agent evaluation readiness (2026-10-26)
+
+**Offline readiness complete; live-model reliability remains unverified.**
+The [engineering report](PHASE06_ENGINEERING.md), [design](PHASE06_EVALUATION_DESIGN.md)
+and [executable guide](../evaluations/PHASE06.md) describe fresh frozen synthetic
+assessment/development/protocol cohorts, independent result scoring, durable
+first-attempt/restart records, exact approval and separate request/input/output/
+total/time/USD budgets. No live authorization or external model/production call.
+
+Fixed a reproduced incorrect-report path: fabricated/altered reserved value
+references could become ordinary text predicates under correlated model output.
+The decoder now rejects invalid reserved references, including changed leading
+underscores/separators/case, and references in reviewer feedback. Current issuance,
+ownership and final semantic/access checks still apply. No new analytics, prompt/
+topology rewrite, dependency, permission or SDK/session API change.
+
+Measured same-corpus before/after: 41/45 to **44/45 trajectories**, unchanged
+**35/36 required reports**, one to **zero wrong accepted specifications**. New
+protocol cohort 14/14; development 5/5; assessment 25/26 trajectories and 29/30
+reports. L26's owner-answer paraphrase still stalls safely and remains a failed
+report goal, not completion credit. Original D02/D03 remain incomplete; old 61
+strict and Phase 04/05 cohorts still pass. Scripted results are not model accuracy.
+
+Verification: **1,956 tests pass / one optional SQL Server skip**, 119 new tests,
+96 vocabulary tests, examples/browser/dependency/compilation/package/installed-wheel
+checks pass. Earlier source/evidence is preserved. Transient legacy CLI failures,
+first diagnostic mistakes and unknown causes remain recorded; final entrypoint
+runs have their expected exits. Source and evaluator hashes bind measurements.
+
+Highest-value Phase 07 proposal: scoped clarification-continuation reliability
+for the new confirmed completeness gap; promote exposed L26 and freeze a fresh
+replacement before targeting it. Require correct metric/date/group/filter retention,
+ambiguity, reopen/replay and final gates without host-meaning guesses. Keep a
+separately authorized synthetic live baseline ready; actual model understanding,
+reviewer utility/cost, Python 3.10 runtime, production SQL Server and multi-read
+snapshot behavior remain unverified. No Phase 07 implementation or commit/push.
+
+## Phase 05 optional host-owned value vocabulary (2026-10-25)
+
+Implemented the [optional per-filter contract](SDK_VALUE_VOCABULARY.md): typed
+canonical values, bounded aliases, ambiguity, current permission projection,
+relationship-source inheritance and provider-neutral evidence enforcement.
+Standard transports protect canonical predicate values with local references;
+no alias/value inventory or dynamic database enumeration is introduced. Free-form
+typed filters and default empty-vocabulary fingerprints remain compatible.
+
+[Phase 05 report](PHASE05_ENGINEERING.md): 1,837 tests pass/one opt-in skip;
+new frozen v2 has 37/37 trajectories, 36/36 required reports, zero wrong accepted
+specifications. One exposed assessment was promoted with a replacement; original
+versions and every earlier corpus/baseline/freeze remain. Exact source arithmetic,
+model/adapter calls, local matching overhead and privacy checks are documented.
+
+The original D03 is still unfulfilled with its unchanged metadata and frozen goal.
+The distinct workshop-values-v1 contract supplies Web -> Channel and completes
+the same wording with 580. This resolves the optional registration capability,
+not the absent business knowledge of an unchanged host. D02 remains safely blocked;
+Phase 04 ordering remains correct. Existing Phase 03/04 completion is 40/42 and
+26/26 trajectories respectively, with no wrong accepted specifications.
+
+Remaining priorities: authorized synthetic live evaluation of vocabulary/reference
+handling and refinement (unverified, high product impact); Python 3.10/live SQL
+Server matrix (unverified); bounded large-vocabulary cold latency (measured, no
+production SLA); multi-read snapshots (separate design). Static registration cannot
+replace missing host semantics or force a nonconforming provider to complete.
+Phase 06 is recommended, not started. No live call, commit or push.
+
+## Phase 04 provider-neutral filter and ordering grounding (2026-10-25)
+
+Outcome: enforce independently grounded categorical predicates, sort targets,
+directions and counted limits through effective intent, bounded planning and the
+final gate for every provider, before any data read. Preserve registered policies,
+parameterized compilation, existing public/session contracts and earlier artifacts.
+See [the engineering report](PHASE04_ENGINEERING.md) and
+[reproducible evaluation guide](../evaluations/PHASE04.md).
+
+Non-goals: general language parsing, database value discovery, mandatory enumerated
+filter vocabularies, new joins/formulas, secondary ordering, storage migrations,
+live model/database calls and Phase 05 implementation.
+
+Verified status: P3-06/P02 resolves through a local rejection and bounded repair.
+P3-05/D03 can no longer publish the incorrect unfiltered report, but its original
+one-turn completion remains **unfulfilled**. The unchanged host has three free-form
+text filters and no registered evidence linking the value to its owner. It asks
+for the filter identity; the new two-turn continuation then returns the correct
+580. No hard-coded value mapping or query is used to invent that association.
+D02 remains blocked, with zero reads. Phase 03 improves 39/42 to 40/42 complete
+supported turns/trajectories, with zero wrong accepted specifications. The frozen
+26-case Phase 04 cohort separately tests explicit predicates, ambiguity, ordering,
+repair and persistent refinements. This is scripted offline evidence.
+
+| Priority/evidence | Current status and next action |
+| --- | --- |
+| P1 P3-06/P02, wrong accepted sort | Resolved and verified: explicit target/direction/limit evidence; wrong candidates rejected before review/execution. |
+| P1 P3-05/D03, omitted categorical restriction | Incorrect success prevented. Original one-turn report is still incomplete; clarify the missing business owner. Consider an optional host-owned value/alias contract only under a separately reviewed scope. |
+| Safe residual D02 | Persistent custom provider still refuses to conform to explicit grouping; do not count its block as report completion. |
+| P2 P4-01, analytical words/Unicode inside literal values | Fixed: source-indexed normalization preserves exact parameters while masking their instructional role. Focused data/predicate tests and both dialects verify this. |
+| P2 P4-02, stale refinement controls | Fixed for bounded keep/change/replace/reverse/remove instructions. Reconstruct pending controls from user history; do not migrate sessions. Unrecognized reference language remains a limitation. |
+| Unverified live generalization and runtime matrix | Offline scripted tests cannot establish these. Existing reviewed synthetic live procedure remains opt-in; Python 3.10 runtime and real SQL Server are unverified. |
+
+Phase 05 recommendation: request-to-report completeness and an optional,
+privacy-reviewed host value-to-concept vocabulary contract, followed by explicitly
+authorized live synthetic evaluation. Targets: keep wrong accepted specs at zero;
+resolve D03's owner without core domain inference or mandatory global enumerations;
+measure first-attempt supported completion and excess clarification separately.
+This recommendation follows the remaining measured semantic gap; snapshot
+consistency, scalability and orchestration changes have weaker evidence in this
+run. No Phase 05 work or commit is authorized or started.
+
+Verification: 1,741 offline tests pass with one optional SQL Server skip; the
+106 focused filter/order tests, examples, browser regressions, dependency/compile
+checks, wheel/sdist builds and isolated installed-wheel smoke pass. Python 3.10
+syntax passes; its runtime and live SQL Server/model behavior remain unverified.
+
+Suggested commit message:
+`fix: ground categorical filters and ordering across report providers`
+
+## Phase 03 completeness and held-out evaluation (2026-10-24)
+
+Offline evaluation complete; live-model generalization unverified. The
+[engineering report](PHASE03_ENGINEERING.md) and [evaluation guide](../evaluations/PHASE03.md)
+record independent source arithmetic, freezes/corrections/exposure, separate
+cohort results and remaining findings. Phase 01/02 archives are preserved;
+the original 61 cases remain unchanged and pass strict evaluation.
+
+Resolved and tested: P3-01 grouping omission (agent repair/custom-provider pre-read
+block), P3-02 excluded `leave out` operation, P3-03 replacement retaining the old
+measure, P3-04 explicitly retained typed filter lost during refinement. V2 has
+30 assessment, six development and six pipeline trajectories; H12/H25 were promoted
+after exposure, with two replacements. Comparable supported turns improve 35/42
+to 39/42; multi-turn correctness improves 6/8 to 8/8.
+
+| Priority/evidence | Impact/root cause | Proposed work/tests/complexity |
+| --- | --- | --- |
+| P1 confirmed P3-05: D03 accepts 860 instead of Web-only 580 under correlated faults | New categorical values lack independent filter grounding; natural frequency unknown | Scope typed value/filter grounding; collision, quote, exclusion and permission tests across hosts. Medium/high. |
+| P1 confirmed P3-06: P02 approves ascending instead of requested descending | Ordering can remain absent from extracted constraints; controlled frequency only | Scope typed metric/direction evidence, multiple-metric ambiguity and refinement tests. Medium. |
+| Safe residual D02: persistent custom-provider error | Final gate prevents reads; cannot fulfill requested report | Host returns a conforming spec; preserve safety test, no automatic DB retry. Low. |
+| Unverified live generalization | Scripted selections do not measure language understanding | Authorized synthetic trials with request/token/time/USD caps and first-attempt records. Evaluation work. |
+
+Phase 04 recommendation: reviewed provider-neutral filter/ordering requirement
+grounding and complete-report tests. Do not hard-code answers or broaden analytics
+to clear these failing experiments. Snapshot consistency, runtime matrix and long
+context work retain separate status. No Phase 04 implementation or commit.
+
+## Phase 02 semantic evidence and registered vocabulary (2026-10-24)
+
+Resolved P01-02 (negated grain executing daily reports), P01-01 (negated/literal
+share terms incorrectly unsupported), and P01-03 (exact registered participant
+mean requiring an extra generic word). Original requests/expected data remain
+unchanged; all three now pass normally, with no xfails or evaluation waivers.
+
+Implemented bounded shared phrase scope, quote roles, registered-vocabulary
+matching and explicit exclusions; enforce them in intent normalization and every
+provider's final gate. Contradictory/missing selections clarify. Registered filter
+removal differs from grouping removal. Raw grouping over the registered report
+date cannot bypass a daily exclusion. Known pending semantic questions preserve
+user evidence across restart/answers, including subsequent year clarification.
+False unavailable-ledger entries are removed from effective planner context;
+active unavailable requirements remain terminal. No SQL/analytics/auth expansion.
+
+The [Phase 02 report](PHASE02_ENGINEERING.md) records reproduction, corrective
+design, all verification and residual limits. The expanded 61-case corpus passes
+strict evaluation; original-cohort completion is 20/20 and additions are scored
+separately. Original Phase 01 snapshots are retained in `evaluations/baselines/`.
+Additional regressions found during this phase (pending-date loss, generic-mean
+exclusions, filter/group role confusion, raw-date grouping and effective ledger
+consistency) are fixed and tested, rather than deferred as unfinished Phase 02.
+
+Phase 03 recommendation: independently grounded held-out request-to-report
+completeness evaluation, with explicitly opted-in live synthetic trials and a
+reviewed typed pending-evidence/version contract if the evidence warrants it.
+Snapshot consistency and Python/dependency matrix work retain their separate
+backlog status. Phase 03 has not started. No commit was created.
+
+## Phase 01 engineering audit and evaluation foundation (2026-10-24)
+
+Outcome: establish a verified architecture/baseline and an independent, repeatable
+report evaluation gate. Scope and results are in [the engineering report](PHASE01_ENGINEERING.md)
+and [evaluation instructions](../evaluations/README.md). Keep production reporting
+behavior and security boundaries unchanged. New analytics, parser changes,
+framework migrations and live service calls are excluded. Confirmed defects have
+strict expected-failure regressions and an evidence-ranked follow-up backlog;
+Phase 02 is recommended, not started. No commit was created.
+
 ## Application-independent reporting (2026-10-15)
 
 Outcome: integrate independent business applications through host configuration,

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import nullcontext
 from dataclasses import fields, is_dataclass, replace
 from datetime import date, datetime, timezone
 from decimal import Decimal
@@ -53,7 +54,9 @@ def _typed(value: Any) -> Any:
     if isinstance(value, date):
         return {"$date": value.isoformat()}
     if is_dataclass(value) and not isinstance(value, type):
-        return {item.name: _typed(getattr(value, item.name)) for item in fields(value)}
+        # Preserve old fingerprints for hosts not using the additive vocabulary.
+        return {item.name: _typed(getattr(value, item.name)) for item in fields(value)
+                if item.name != "value_vocabulary" or getattr(value, item.name)}
     if isinstance(value, dict):
         return {key: _typed(item) for key, item in value.items()}
     if isinstance(value, (list, tuple)):
@@ -123,12 +126,14 @@ class SageQL:
         provider: ReportProvider, policy: ReportPolicy,
         sessions: SessionStore | None = None, clock: Callable[[], date] | None = None,
         limits: ExecutionLimits | None = None, execution: str = "disabled",
-        language: str = "fa",
+        language: str = "fa", read_consistency: str = "compatibility",
     ) -> None:
         self.language = validate_language(language)
         validate_catalog(catalog)
         if execution not in {"disabled", "validated"}:
             raise ValueError("execution must be disabled or validated")
+        if read_consistency not in ("compatibility", "snapshot"):
+            raise ValueError("read_consistency must be compatibility or snapshot")
         if not callable(policy) or not callable(getattr(provider, "interpret", None)):
             raise ValueError("policy and report provider are required")
         if not callable(getattr(database, "execute", None)):
@@ -148,6 +153,7 @@ class SageQL:
         self._clock = clock or (lambda: datetime.now(timezone.utc).date())
         self.limits = limits if limits is not None else ExecutionLimits()
         self.execution = execution
+        self.read_consistency = read_consistency
 
     def _scope(self, actor: ActorContext) -> AccessScope:
         if not isinstance(actor, ActorContext):
@@ -192,6 +198,10 @@ class SageQL:
         if (saved is None or saved["scope_key"] != _digest(scope)
                 or saved["catalog_key"] != _digest(self.catalog)):
             raise SDKError("access_denied", "Report is unavailable under the current access rules.")
+        if (self.read_consistency == "snapshot"
+                and saved["artifact"]["provenance"].get("read_consistency") != "snapshot"):
+            from sageql.sdk.consistency import unavailable
+            raise unavailable()
         spec = ReportSpec.from_dict(_untyped(saved["spec"]))
         dataset = next((item for item in self.catalog.datasets if item.id == spec.dataset_id), None)
         access = next((item for item in scope.datasets if item.dataset_id == spec.dataset_id), None)
@@ -206,6 +216,8 @@ class SageQL:
         )
         text = (str(error) if error.code == "unsupported" and error.stage == "semantic_validation"
                 and error.reason == "requirements" else error_text(error.code, str(error), self.language))
+        if error.reason == "consistency_unavailable" and self.language == "fa":
+            text = "این گزارش با تضمین سازگاری دادهٔ درخواستی در دسترس نیست. با میزبان برنامه تماس بگیرید."
         return Reply(session_id, revision, status, text,
                      error={"code": error.code, "retryable": error.retryable,
                             **({"stage": error.stage} if error.stage else {}),
@@ -235,7 +247,9 @@ class SageQL:
             visible = permitted_catalog(self.catalog, scope)
             scope_key = _digest(scope)
             fingerprint = _digest({"message": message, "revision": expected_revision,
-                                   "catalog": _digest(self.catalog)})
+                                   "catalog": _digest(self.catalog),
+                                   **({"read_consistency": self.read_consistency}
+                                      if self.read_consistency != "compatibility" else {})})
             claim = self.sessions.claim(session_id, (actor.subject, actor.tenant_id), request_id,
                                         fingerprint, scope_key, expected_revision,
                                         self.limits.request_timeout_seconds + 5)
@@ -293,6 +307,12 @@ class SageQL:
                 except SDKError:
                     current = None
             history = tuple(Message(**item) for item in state["messages"])
+            from sageql.sdk.phrases import new_report_requested
+            if new_report_requested(message):
+                current, history = None, ()
+                state['current_spec'] = None
+                state['pending_origin'] = state['pending_question'] = state['pending_clarification_key'] = None
+                state['pending_clarification_keys'] = []
             # Retain structured current spec for refinements; history remains bounded.
             retain = max(0, self.limits.max_history_messages - 1)
             messages = (*(history[-retain:] if retain else ()), Message("user", message.strip()))
@@ -300,7 +320,23 @@ class SageQL:
             if origin and not any(item.role == "user" and item.content == origin for item in messages[:-1]):
                 messages = (Message("user", origin), *messages[-(self.limits.max_history_messages - 1):])
             try:
-                decision = self.provider.interpret(messages, current, visible, today)
+                from sageql.sdk.evidence import year_answer
+                from sageql.sdk.phrases import concept_evidence
+                supplied_year = year_answer(message)
+                has_context = current is not None or bool(origin and year_answer(origin) is None)
+                numeric_concept = (supplied_year is not None and any(
+                    concept_evidence(supplied_year, visible, kind).positive for kind in ('metrics', 'dimensions')))
+                if supplied_year is not None and not has_context and not numeric_concept:
+                    # A year alone cannot authorize a model-selected default
+                    # report, including after a failed request rolled back its
+                    # history. All providers share this before-read boundary.
+                    decision = Interpretation('needs_clarification', question=(
+                        'برای این سال چه گزارشی می‌خواهید؟ لطفاً معیار و تفکیک مورد نظر را مشخص کنید.'
+                        if self.language == 'fa' else
+                        'Which report do you want for that year? Please specify the measure and grouping.'),
+                        clarification_key='request', continues_clarification=bool(state.get('pending_question')))
+                else:
+                    decision = self.provider.interpret(messages, current, visible, today)
             except SDKError:
                 raise
             except Exception:
@@ -311,26 +347,22 @@ class SageQL:
                 raise SDKError("access_denied", "Report access changed during this request.")
             if not isinstance(decision, Interpretation):
                 raise SDKError("invalid_interpretation", "Provider returned an invalid interpretation.")
-            prepared = None
+            prepared = artifact = None
             if decision.status == "ready":
                 if not isinstance(decision.spec, ReportSpec) or decision.question:
                     raise SDKError("invalid_interpretation", "Provider returned an invalid report specification.")
+                from sageql.sdk.evidence import final_evidence_check, canonical_fixed_periods, request_evidence
+                decision = replace(decision, spec=canonical_fixed_periods(
+                    request_evidence(messages, visible, current), decision.spec, today,
+                    messages=messages, catalog=visible, current_spec=current))
                 prepared, lookup = prepare_request(self.catalog, decision.spec, scope, today)
-                from sageql.sdk.evidence import final_evidence_check
-                final_evidence_check(messages, visible, decision.spec, today, self.language)
+                final_evidence_check(messages, visible, decision.spec, today, self.language, current)
                 if self.execution != "validated":
                     raise SDKError("execution_disabled", "The developer has not enabled report execution.")
-                if lookup is not None:
-                    def check_lookup_access() -> None:
-                        active()
-                        if _digest(self._scope(actor)) != scope_key:
-                            raise SDKError("access_denied", "Report access changed during this request.")
-                    prepared, question = resolve_request(
-                        prepared, lookup, self.database, self.limits,
-                        cancel=cancelled, check_access=check_lookup_access, language=self.language,
-                    )
-                    if question:
-                        decision = Interpretation("needs_clarification", question=question)
+                prepared, artifact, question = self._read_report(
+                    session_id, revision + 1, prepared, lookup, scope, scope_key, actor, cancelled, active)
+                if question:
+                    decision = Interpretation("needs_clarification", question=question)
             if decision.status == "needs_clarification":
                 if (decision.spec is not None or not isinstance(decision.question, str)
                         or not decision.question.strip() or len(decision.question) > 4_000):
@@ -372,29 +404,14 @@ class SageQL:
                 state["pending_clarification_key"] = None
                 state["pending_clarification_keys"] = []
             elif decision.status == "ready":
-                if not isinstance(decision.spec, ReportSpec) or decision.question or prepared is None:
+                if (not isinstance(decision.spec, ReportSpec) or decision.question
+                        or prepared is None or artifact is None):
                     raise SDKError("invalid_interpretation", "Provider returned an invalid report specification.")
                 spec = decision.spec
                 active()
-                # Re-evaluate immediately before executing, including changes that
-                # occurred during a remote model request.
+                # Recheck after read cleanup, before accepting publication state.
                 if _digest(self._scope(actor)) != scope_key:
                     raise SDKError("access_denied", "Report access changed during this request.")
-                result = self.database.execute(prepared, self.limits, cancel=cancelled)
-                active()
-                if _digest(self._scope(actor)) != scope_key:
-                    raise SDKError("access_denied", "Report access changed during this request.")
-                artifact = self._make_report(session_id, revision + 1, prepared, result, scope)
-
-                def check_label_access() -> None:
-                    active()
-                    if _digest(self._scope(actor)) != scope_key:
-                        raise SDKError("access_denied", "Report access changed during this request.")
-
-                artifact = resolve_labels(
-                    self.catalog, prepared, artifact, scope, self.database, self.limits,
-                    cancel=cancelled, check_access=check_label_access, language=self.language,
-                )
                 if prepared.spec.filters != spec.filters:
                     # Name/qualifier inputs belong in the public report context.
                     # The resolved identity stays out of provider specifications.
@@ -462,6 +479,46 @@ class SageQL:
             return self._error(session_id, revision, SDKError(
                 "storage_failed", "Session storage is unavailable.", retryable=True))
         return reply
+
+    def _read_report(self, session_id, revision, prepared, lookup, scope, scope_key,
+                     actor, cancelled, active):
+        """Complete all contributing reads and scope cleanup before publication."""
+        def check_access():
+            active()
+            if _digest(self._scope(actor)) != scope_key:
+                raise SDKError("access_denied", "Report access changed during this request.")
+
+        check_access()
+        if self.read_consistency == "snapshot":
+            factory = getattr(self.database, "read_scope", None)
+            if not callable(factory):
+                from sageql.sdk.consistency import unavailable
+                raise unavailable()
+            context = factory(self.limits, cancel=cancelled)
+        else:
+            context = nullcontext(self.database)
+        artifact, question = None, ""
+        with context as database:
+            if not callable(getattr(database, "execute", None)):
+                from sageql.sdk.consistency import unavailable
+                raise unavailable()
+            if lookup is not None:
+                prepared, question = resolve_request(
+                    prepared, lookup, database, self.limits, cancel=cancelled,
+                    check_access=check_access, language=self.language)
+            if not question:
+                check_access()
+                result = database.execute(prepared, self.limits, cancel=cancelled)
+                check_access()
+                artifact = self._make_report(session_id, revision, prepared, result, scope)
+                artifact = resolve_labels(
+                    self.catalog, prepared, artifact, scope, database, self.limits,
+                    cancel=cancelled, check_access=check_access, language=self.language)
+        # A data snapshot never freezes the host's current authorization.
+        check_access()
+        if artifact is not None:
+            artifact = replace(artifact, provenance={**artifact.provenance, "read_consistency": self.read_consistency})
+        return prepared, artifact, question
 
     def _make_report(self, session_id, revision, prepared, result, scope) -> ReportArtifact:
         spec, dataset = prepared.spec, prepared.dataset

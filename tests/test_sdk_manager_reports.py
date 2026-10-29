@@ -427,7 +427,7 @@ def test_registered_hour_criterion_can_rank_and_observer_excludes_prose_values()
     result = provider.interpret((Message("user", "بیشترین مجموع ساعت در ماه قبل"),), None,
                                 permitted_catalog(rahtal_reporting_catalog(), scope()), TODAY)
     assert result.spec == ranked
-    assert [e[0] for e in events] == ["request_evidence", "agent_intent", "agent_intent_decoded",
+    assert [e[0] for e in events] == ["request_evidence", "agent_intent", "agent_intent_decoded", "intent_evidence",
         "agent_intent", "requirements_check", "agent_plan", "agent_plan", "agent_review", "agent_review"]
     assert "بیشترین" not in json.dumps(events) and "question" not in json.dumps(events)
 

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "authorized": false,
+  "synthetic_only": true,
+  "authorization_id": "REQUIRES_EXPLICIT_HUMAN_APPROVAL",
+  "server": "synthetic-host.example.invalid",
+  "database": "SageQL_Phase11_Disposable",
+  "driver": "ODBC Driver 18 for SQL Server",
+  "authentication": "sql",
+  "schema": "dbo",
+  "fixture_policy": "create_drop",
+  "tables": {},
+  "allowed_operations": ["select", "create_fixture", "insert_fixture", "update_fixture", "delete_fixture", "drop_fixture"],
+  "network_exposure": "REVIEW_PRIVATE_SYNTHETIC_TARGET_ONLY",
+  "cleanup_policy": "drop_created_fixtures",
+  "connect_timeout_seconds": 5,
+  "query_timeout_seconds": 3,
+  "max_seconds": 120
+}

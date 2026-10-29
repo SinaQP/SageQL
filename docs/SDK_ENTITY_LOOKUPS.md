@@ -47,7 +47,9 @@ row/time/work/concurrency/cancellation limits and disposable connections.
 Each query is a separate bounded SELECT on one registered source. Access is
 checked before and after each read and again around final execution. Identity
 is a report filter, never authentication or an expansion of target access.
-This is not a cross-source snapshot transaction; names can change between reads.
+Compatibility mode has no shared snapshot and names can change between reads.
+The additive [snapshot mode](SDK_READ_CONSISTENCY.md) covers lookup, report and
+label reads on one supported transaction; it does not add distributed joins.
 
 The lookup selects DISTINCT identity values with a two-candidate limit.
 Duplicate profiles for one identity cannot multiply activity aggregates. Zero

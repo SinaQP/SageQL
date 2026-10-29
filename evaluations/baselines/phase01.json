@@ -1,0 +1,932 @@
+{
+  "schema_version": 1,
+  "mode": "scripted_offline",
+  "corpus_sha256": "7dbbad24b359e57bcc52b862e599490725d7122aaa5de0f5349e87ef4f99cc43",
+  "package_source_sha256": "9b5e90d70a3e17f843a0252fb2da0a05824fdee1c130116e0a25ef018f53abdf",
+  "evaluator_sha256": "2dcdf963dccebd6ba5ed76cf18422c8cc7bc258028dd57062d5b6e53cc51616d",
+  "host_fixture_sha256": "c776c3f014c1e510a785ad8b8ab8d63600f682a29477e6da137c2b7898eff816",
+  "environment": {
+    "python": "3.12.0",
+    "sqlglot": "30.19.0",
+    "sageql": "0.1.0"
+  },
+  "live_model_status": "not_executed",
+  "summary": {
+    "cases": 27,
+    "outcomes": {
+      "correct_block": 1,
+      "correct_clarification": 1,
+      "correct_denial": 1,
+      "correct_report": 17,
+      "correct_unsupported": 2,
+      "incorrect_rejection": 2,
+      "operational_failure": 2,
+      "semantic_error": 1
+    },
+    "supported_completion": {
+      "numerator": 17,
+      "denominator": 20,
+      "value": 0.85
+    },
+    "semantic_correctness": {
+      "numerator": 17,
+      "denominator": 18,
+      "value": 0.9444444444444444
+    },
+    "report_completeness": {
+      "numerator": 17,
+      "denominator": 20,
+      "value": 0.85
+    },
+    "clarification_precision": {
+      "numerator": 1,
+      "denominator": 2,
+      "value": 0.5
+    },
+    "unsupported_classification_accuracy": {
+      "numerator": 22,
+      "denominator": 23,
+      "value": 0.9565217391304348
+    },
+    "unauthorized_prevention": {
+      "numerator": 1,
+      "denominator": 1,
+      "value": 1.0
+    },
+    "recovery_effectiveness": {
+      "numerator": 2,
+      "denominator": 2,
+      "value": 1.0
+    },
+    "new_regressions": 0,
+    "known_failures": 3,
+    "model_calls": 72,
+    "model_calls_per_request": 2.4827586206896552,
+    "requests": 29,
+    "database_calls": 22,
+    "latency_ms": {
+      "total": 705.08,
+      "median": 26.882
+    }
+  },
+  "measured_date": "2026-10-24",
+  "starting_git_revision": "b74c109",
+  "results": [
+    {
+      "id": "retail_groups_en",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "relationship",
+        "policy"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "elapsed_ms": 49.434
+    },
+    {
+      "id": "library_groups_en",
+      "domain": "library",
+      "tags": [
+        "en",
+        "independent_domain",
+        "count"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "elapsed_ms": 28.436
+    },
+    {
+      "id": "retail_jalali_fa",
+      "domain": "retail",
+      "tags": [
+        "fa",
+        "jalali"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "elapsed_ms": 26.655
+    },
+    {
+      "id": "library_jalali_fa",
+      "domain": "library",
+      "tags": [
+        "fa",
+        "jalali"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "elapsed_ms": 29.653
+    },
+    {
+      "id": "retail_daily_filter",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "filter",
+        "dates"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "elapsed_ms": 28.25
+    },
+    {
+      "id": "library_mean",
+      "domain": "library",
+      "tags": [
+        "en",
+        "average",
+        "filter"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "elapsed_ms": 31.707
+    },
+    {
+      "id": "retail_top_group",
+      "domain": "retail",
+      "tags": [
+        "ranking",
+        "aggregate_filter"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "elapsed_ms": 29.636
+    },
+    {
+      "id": "retail_listing",
+      "domain": "retail",
+      "tags": [
+        "listing",
+        "policy"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "elapsed_ms": 23.165
+    },
+    {
+      "id": "retail_lookup",
+      "domain": "retail",
+      "tags": [
+        "lookup",
+        "policy"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 2,
+      "elapsed_ms": 30.518
+    },
+    {
+      "id": "retail_labels",
+      "domain": "retail",
+      "tags": [
+        "label",
+        "ranking"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 2,
+      "elapsed_ms": 32.526
+    },
+    {
+      "id": "library_participant_mean",
+      "domain": "library",
+      "tags": [
+        "participant_mean",
+        "aggregation"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "elapsed_ms": 33.32
+    },
+    {
+      "id": "retail_comparison",
+      "domain": "retail",
+      "tags": [
+        "comparison",
+        "null"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "elapsed_ms": 23.916
+    },
+    {
+      "id": "retail_change",
+      "domain": "retail",
+      "tags": [
+        "comparison",
+        "fixed_change"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "elapsed_ms": 26.882
+    },
+    {
+      "id": "retail_year_question",
+      "domain": "retail",
+      "tags": [
+        "clarification",
+        "en"
+      ],
+      "goal": "clarification",
+      "status": "needs_clarification",
+      "outcome": "correct_clarification",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_clarification",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 0,
+      "elapsed_ms": 15.56
+    },
+    {
+      "id": "retail_year_answer",
+      "domain": "retail",
+      "tags": [
+        "conversation",
+        "clarification",
+        "fa"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 6,
+      "database_calls": 1,
+      "elapsed_ms": 53.87
+    },
+    {
+      "id": "library_refinement",
+      "domain": "library",
+      "tags": [
+        "conversation",
+        "persistence"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 6,
+      "database_calls": 2,
+      "elapsed_ms": 68.492
+    },
+    {
+      "id": "unsupported_shares_en",
+      "domain": "retail",
+      "tags": [
+        "unsupported",
+        "en"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "elapsed_ms": 11.987
+    },
+    {
+      "id": "unsupported_absence_fa",
+      "domain": "library",
+      "tags": [
+        "unsupported",
+        "fa"
+      ],
+      "goal": "unsupported",
+      "status": "unsupported",
+      "outcome": "correct_unsupported",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_unsupported",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "elapsed_ms": 10.855
+    },
+    {
+      "id": "unauthorized_actor",
+      "domain": "retail",
+      "tags": [
+        "authorization"
+      ],
+      "goal": "denial",
+      "status": "blocked",
+      "outcome": "correct_denial",
+      "checks": {
+        "invariants": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_denial",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "elapsed_ms": 0.039
+    },
+    {
+      "id": "wrong_period_recovery",
+      "domain": "retail",
+      "tags": [
+        "recovery",
+        "period"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": true,
+      "model_calls": 4,
+      "database_calls": 1,
+      "elapsed_ms": 30.901
+    },
+    {
+      "id": "malformed_intent_recovery",
+      "domain": "library",
+      "tags": [
+        "recovery",
+        "structured"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "correct_report",
+      "checks": {
+        "invariants": true,
+        "specification": true,
+        "fields": true,
+        "types": true,
+        "rows": true,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_report",
+      "meets_baseline": true,
+      "recovery_expected": true,
+      "model_calls": 4,
+      "database_calls": 1,
+      "elapsed_ms": 32.317
+    },
+    {
+      "id": "provider_failure",
+      "domain": "retail",
+      "tags": [
+        "failure",
+        "redaction"
+      ],
+      "goal": "failure",
+      "status": "failed",
+      "outcome": "operational_failure",
+      "checks": {
+        "invariants": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "operational_failure",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 1,
+      "database_calls": 0,
+      "elapsed_ms": 10.001
+    },
+    {
+      "id": "database_failure",
+      "domain": "library",
+      "tags": [
+        "failure",
+        "no_replay"
+      ],
+      "goal": "failure",
+      "status": "failed",
+      "outcome": "operational_failure",
+      "checks": {
+        "invariants": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "operational_failure",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "elapsed_ms": 18.123
+    },
+    {
+      "id": "model_sql_rejected",
+      "domain": "retail",
+      "tags": [
+        "untrusted_output"
+      ],
+      "goal": "blocked",
+      "status": "blocked",
+      "outcome": "correct_block",
+      "checks": {
+        "invariants": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": null,
+      "baseline_outcome": "correct_block",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 2,
+      "database_calls": 0,
+      "elapsed_ms": 10.016
+    },
+    {
+      "id": "known_negated_share",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "negation"
+      ],
+      "goal": "report",
+      "status": "unsupported",
+      "outcome": "incorrect_rejection",
+      "checks": {
+        "invariants": true,
+        "explanation": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": "P01-01",
+      "baseline_outcome": "incorrect_rejection",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 0,
+      "database_calls": 0,
+      "elapsed_ms": 10.539
+    },
+    {
+      "id": "known_negated_daily",
+      "domain": "retail",
+      "tags": [
+        "en",
+        "negation",
+        "correlated_error"
+      ],
+      "goal": "report",
+      "status": "report_ready",
+      "outcome": "semantic_error",
+      "checks": {
+        "invariants": true,
+        "specification": false,
+        "fields": false,
+        "types": false,
+        "rows": false,
+        "truncation": true,
+        "presentation": true,
+        "axes": true,
+        "response": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": "P01-02",
+      "baseline_outcome": "semantic_error",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 3,
+      "database_calls": 1,
+      "elapsed_ms": 26.654
+    },
+    {
+      "id": "known_exact_mean_label",
+      "domain": "library",
+      "tags": [
+        "participant_mean",
+        "aggregation"
+      ],
+      "goal": "report",
+      "status": "needs_clarification",
+      "outcome": "incorrect_rejection",
+      "checks": {
+        "invariants": true,
+        "clarification": true,
+        "receipt": true,
+        "persisted": true,
+        "source_unchanged": true,
+        "payload_isolation": true
+      },
+      "known_issue": "P01-03",
+      "baseline_outcome": "incorrect_rejection",
+      "meets_baseline": true,
+      "recovery_expected": false,
+      "model_calls": 1,
+      "database_calls": 0,
+      "elapsed_ms": 11.628
+    }
+  ],
+  "verification": {
+    "initial_tests": {
+      "passed": 1381,
+      "skipped": 1,
+      "failed": 0,
+      "seconds": 30.01
+    },
+    "final_tests": {
+      "passed": 1430,
+      "skipped": 1,
+      "xfailed": 3,
+      "failed": 0,
+      "seconds": 32.46
+    },
+    "focused_tests": {
+      "passed": 49,
+      "xfailed": 3
+    },
+    "historical_inventory": {
+      "recorded_pass": 6,
+      "recorded_unsupported": 4,
+      "live_executed": false,
+      "numeric_correctness_reexecuted": false
+    },
+    "wheel_and_sdist": "passed",
+    "fresh_wheel_smoke": "passed with reused local runtime dependencies and blocked sockets",
+    "browser": "passed"
+  }
+}

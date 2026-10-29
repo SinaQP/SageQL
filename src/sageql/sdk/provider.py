@@ -12,6 +12,7 @@ from datetime import date
 import json
 import math
 import re
+import sys
 import time
 from typing import Any
 
@@ -58,6 +59,13 @@ _ORDERING_INSTRUCTIONS = (
     "grouping rather than adding a dimension merely to enable sorting."
 )
 _PERIOD_LIMIT_INSTRUCTIONS = (
+    " Period objects use only fields for their selected kind. For month or "
+    "jalali_month use integer year/month and null start/end/count/unit; a month "
+    "period never has unit month. For year or jalali_year only year is set. "
+    "Each selected metric/dimension ID occurs once, including after combining "
+    "a current report with an answer. A single aggregate total does not itself "
+    "request limit 1. Keep the default row limit 100 unless the user explicitly "
+    "requests a row/group count; preserve an existing explicit limit on refinements. "
     " For a rolling last N days/weeks/months/quarters/years through today, use "
     "period kind rolling, count N, unit day/week/month/quarter/year; start/end/year/month "
     "stay null. The host computes date bounds. Do not calculate dates or substitute "
@@ -447,6 +455,32 @@ def _reject_constant(value: str) -> None:
     raise ValueError("non-finite JSON number")
 
 
+def _transport_reason(error: Exception) -> str:
+    """Fixed categories only: never exception messages, URLs, bodies or headers."""
+    # A real OpenAI client has already loaded its SDK. Error classification
+    # must not initialize an optional SDK on an unrelated injected failure.
+    sdk = sys.modules.get('openai')
+    if sdk is None:
+        return 'transport'
+    timeout = getattr(sdk, 'APITimeoutError', None)
+    connection = getattr(sdk, 'APIConnectionError', None)
+    status_error = getattr(sdk, 'APIStatusError', None)
+    if isinstance(timeout, type) and isinstance(error, timeout):
+        return 'transport_timeout'
+    if isinstance(connection, type) and isinstance(error, connection):
+        return 'transport_connection'
+    if isinstance(status_error, type) and isinstance(error, status_error):
+        status = error.status_code
+        if type(status) is int:
+            if status == 429:
+                return 'transport_rate_limit'
+            if 500 <= status <= 599:
+                return 'transport_server'
+            if 400 <= status <= 499:
+                return 'transport_client'
+    return 'transport'
+
+
 def _decode_object(raw: Any, keys: set[str], stage: str) -> dict[str, Any]:
     """Strict decoding with fixed diagnostic reasons, never rejected content."""
     reason = "response_size"
@@ -678,7 +712,8 @@ class OpenAIReportInterpreter:
         }
         # A serialized whole-request bound ensures metadata is never silently
         # truncated and earlier clarification context cannot be discarded.
-        content = json.dumps(payload, ensure_ascii=False, allow_nan=False)
+        from sageql.sdk.vocabulary import project_payload
+        content = json.dumps(project_payload(payload, catalog), ensure_ascii=False, allow_nan=False)
         if len(content.encode("utf-8")) > 96_000:
             raise SDKError("provider_input_limit", "Report request exceeds provider limits.")
         response_format = _format(catalog)
@@ -716,11 +751,13 @@ class OpenAIReportInterpreter:
                 timeout=timeout_seconds,
             )
             raw = response.choices[0].message.content
-        except Exception:
+        except Exception as error:
             raise SDKError("provider_failed", "Report interpretation could not complete.",
-                           retryable=True, stage="planning", reason="transport") from None
+                           retryable=True, stage="planning", reason=_transport_reason(error)) from None
         try:
             result = _decode_object(raw, {"status", "spec", "question", "message"}, "planning")
+            from sageql.sdk.vocabulary import restore_response
+            result = restore_response(result, catalog, content)
             status, question, message = result["status"], result["question"], result["message"]
             if (status not in ("ready", "needs_clarification", "unsupported")
                     or not isinstance(question, str) or not isinstance(message, str)
