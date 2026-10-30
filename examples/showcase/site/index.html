@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SageQL Showcase</title>
+  <meta name="description" content="Recorded examples of SageQL, an embedded chat reporting SDK where the language model never writes SQL.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="#">SageQL</a>
+    <nav>
+      <a href="#examples">Examples</a>
+      <a href="#how">How it works</a>
+      <a href="#results">Results</a>
+      <a href="https://github.com/SinaQP/SageQL">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Embedded chat reporting for Python backends</p>
+      <h1>Ask for a report in plain language.<br>The model never writes the SQL.</h1>
+      <p class="lede">SageQL turns a Persian or English request into a typed report specification,
+        checks it against what the host registered and what the user may see, then writes a
+        parameterized, read-only query itself. Below are real runs, stage by stage.</p>
+      <div class="hero-actions">
+        <button class="install" type="button" data-copy="pip install sageql">
+          <code>pip install sageql</code><span class="copy-label">Copy</span>
+        </button>
+        <a class="button" href="https://github.com/SinaQP/SageQL">Source on GitHub</a>
+        <a class="button ghost" href="https://pypi.org/project/sageql/">PyPI</a>
+      </div>
+    </section>
+
+    <section id="how" class="how">
+      <h2>How a request becomes a report</h2>
+      <ol class="flow">
+        <li class="model"><span class="who">Model</span><strong>Extract intent</strong>
+          <span>Picks registered measures, groupings, period and filters by ID, or asks a question.</span></li>
+        <li><span class="who">SageQL</span><strong>Validate</strong>
+          <span>Every ID must be registered and allowed for this user. Anything else is rejected.</span></li>
+        <li><span class="who">SageQL</span><strong>Resolve</strong>
+          <span>Dates, Solar Hijri months and product names are resolved locally.</span></li>
+        <li><span class="who">SageQL</span><strong>Compile</strong>
+          <span>Writes the SQL with the user's row policy and bound parameters.</span></li>
+        <li><span class="who">SageQL</span><strong>Execute</strong>
+          <span>Read-only, with row, time and work limits. Rows never go back to the model.</span></li>
+      </ol>
+    </section>
+
+    <section id="examples" class="examples">
+      <div class="section-head">
+        <h2>Examples</h2>
+        <p id="provenance" class="muted"></p>
+      </div>
+      <div class="filters" role="tablist" aria-label="Filter examples">
+        <button type="button" class="chip active" data-filter="all">All</button>
+        <button type="button" class="chip" data-filter="conversation">Conversations</button>
+        <button type="button" class="chip" data-filter="persian">Persian</button>
+        <button type="button" class="chip" data-filter="boundaries">Boundaries</button>
+        <button type="button" class="chip" data-filter="attacks">Attacks</button>
+      </div>
+      <div class="explorer">
+        <ul id="example-list" class="example-list"></ul>
+        <article id="detail" class="detail" aria-live="polite"></article>
+      </div>
+    </section>
+
+    <section id="results" class="results">
+      <h2>Measured results</h2>
+      <p class="muted">Frozen synthetic multi-turn conversations, 27 scored reports, low reasoning effort.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Setup</th><th>Correct reports</th><th>Model calls / 40 turns</th><th>Median turn</th></tr></thead>
+          <tbody>
+            <tr><td><code>gpt-5-nano</code> for every stage</td><td>8/27</td><td>76</td><td>8–21 s</td></tr>
+            <tr><td><code>gpt-5-mini</code> intent, nano planner and reviewer</td><td>15/27</td><td>87</td><td>16–21 s</td></tr>
+            <tr class="best"><td><code>gpt-5-mini</code> intent, locally compiled spec, no reviewer</td><td>22/27</td><td>34</td><td>~7 s</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted">Compiling a complete intent locally, instead of asking a second model to plan
+        it, removed more than half the calls. The deterministic side is covered by about 2,200
+        offline tests in CI on Linux and Windows, Python 3.10–3.15.
+        <a href="https://github.com/SinaQP/SageQL/blob/main/docs/MODEL_COMPARISON_NANO_MINI.md">Full comparison</a>.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>All data on this page is invented. <span id="footer-version"></span></p>
+    <p><a href="https://github.com/SinaQP/SageQL/tree/main/examples/showcase">How these examples are built</a> ·
+      MIT licensed · Sina Qasempour</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

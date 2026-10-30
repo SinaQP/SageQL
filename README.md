@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/SinaQP/SageQL/actions/workflows/compatibility.yml/badge.svg)](https://github.com/SinaQP/SageQL/actions/workflows/compatibility.yml)
 [![PyPI](https://img.shields.io/pypi/v/sageql.svg)](https://pypi.org/project/sageql/)
+[![Showcase](https://img.shields.io/badge/showcase-recorded%20examples-1f6f5c.svg)](https://sinaqp.github.io/SageQL/)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/SinaQP/SageQL/blob/main/LICENSE)
 
@@ -14,6 +15,9 @@ report specification, checks it against the host's registered catalog and the
 user's access policy, and compiles a parameterized, read-only `SELECT` itself. The
 host gets back a typed table or chart payload. Persian is the default language;
 English is fully supported.
+
+**[See it work →](https://sinaqp.github.io/SageQL/)** Recorded example conversations, each
+showing what the model received and returned, the SQL SageQL wrote and the result.
 
 ## Why models never write SQL
 
