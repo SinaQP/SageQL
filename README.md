@@ -1,6 +1,7 @@
 # SageQL
 
 [![CI](https://github.com/SinaQP/SageQL/actions/workflows/compatibility.yml/badge.svg)](https://github.com/SinaQP/SageQL/actions/workflows/compatibility.yml)
+[![PyPI](https://img.shields.io/pypi/v/sageql.svg)](https://pypi.org/project/sageql/)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/SinaQP/SageQL/blob/main/LICENSE)
 
