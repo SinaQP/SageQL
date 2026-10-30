@@ -1,0 +1,149 @@
+{
+ "source": "live",
+ "recorded_at": "2026-10-30",
+ "planner_model": "gpt-5-nano",
+ "examples": {
+  "clarify-then-refine": [
+   {
+    "stage": "intent",
+    "model": "gpt-5-mini",
+    "output": "{\"metrics\":[{\"dataset_id\":\"sales\",\"concept_id\":\"revenue\"}],\"dimensions\":[],\"missing\":[\"period\",\"year\"],\"turn_kind\":\"new\",\"unsupported_reason\":\"\" ,\"chart\":null,\"time_grain\":\"day\",\"unsupported_requirements\":[],\"period\":null,\"comparison\":null,\"comparison_specified\":false,\"comparison_calculation\":null,\"include_matching_day_count\":null,\"filters\":[],\"aggregate_filters\":[],\"order_by\":null,\"ordering_specified\":false,\"descending\":null,\"limit\":null}",
+    "usage": {
+     "input": 4516,
+     "output": 376
+    }
+   },
+   {
+    "stage": "planner",
+    "model": "gpt-5-nano",
+    "output": "{\"status\":\"needs_clarification\",\"spec\":null,\"question\":\"Which September do you want? Please specify the year for the September period (for example: September 2026). Also confirm you want daily net sales (time_grain = day) within that September.\" ,\"message\":\"\"}",
+    "usage": {
+     "input": 4609,
+     "output": 269
+    }
+   },
+   {
+    "stage": "intent",
+    "model": "gpt-5-mini",
+    "output": "{\"metrics\":[{\"dataset_id\":\"sales\",\"concept_id\":\"revenue\"}],\"dimensions\":[],\"missing\":[],\"turn_kind\":\"new\",\"unsupported_reason\":\"\" ,\"chart\":null,\"time_grain\":\"day\",\"unsupported_requirements\":[],\"period\":{\"kind\":\"month\",\"start\":null,\"end\":null,\"year\":2026,\"month\":9,\"count\":null,\"unit\":null},\"comparison\":null,\"comparison_specified\":false,\"comparison_calculation\":null,\"include_matching_day_count\":null,\"filters\":[],\"aggregate_filters\":[],\"order_by\":null,\"ordering_specified\":false,\"descending\":null,\"limit\":null}",
+    "usage": {
+     "input": 4578,
+     "output": 335
+    }
+   },
+   {
+    "stage": "intent",
+    "model": "gpt-5-mini",
+    "output": "{\n  \"metrics\": [\n    {\n      \"dataset_id\": \"sales\",\n      \"concept_id\": \"revenue\"\n    }\n  ],\n  \"dimensions\": [],\n  \"missing\": [],\n  \"turn_kind\": \"refine\",\n  \"unsupported_reason\": \"\",\n  \"chart\": \"table\",\n  \"time_grain\": \"day\",\n  \"unsupported_requirements\": [],\n  \"period\": {\n    \"kind\": \"range\",\n    \"start\": \"2026-09-01\",\n    \"end\": \"2026-10-01\",\n    \"year\": null,\n    \"month\": null,\n    \"count\": null,\n    \"unit\": null\n  },\n  \"comparison\": null,\n  \"comparison_specified\": false,\n  \"comparison_calculation\": \"none\",\n  \"include_matching_day_count\": false,\n  \"filters\": [\n    {\n      \"filter_id\": \"department_filter\",\n      \"operator\": \"eq\",\n      \"values\": [\n        \"Books\"\n      ]\n    }\n  ],\n  \"aggregate_filters\": [],\n  \"order_by\": null,\n  \"ordering_specified\": true,\n  \"descending\": false,\n  \"limit\": 100\n}",
+    "usage": {
+     "input": 4761,
+     "output": 516
+    }
+   }
+  ],
+  "jalali-departments": [
+   {
+    "stage": "intent",
+    "model": "gpt-5-mini",
+    "output": "{\"metrics\":[{\"dataset_id\":\"sales\",\"concept_id\":\"revenue\"}],\"dimensions\":[{\"dataset_id\":\"sales\",\"concept_id\":\"department\"}],\"missing\":[],\"turn_kind\":\"new\",\"unsupported_reason\":\"\" ,\"chart\":\"bar\",\"time_grain\":\"none\",\"unsupported_requirements\":[],\"period\":{\"kind\":\"jalali_month\",\"start\":null,\"end\":null,\"year\":1405,\"month\":6,\"count\":null,\"unit\":null},\"comparison\":null,\"comparison_specified\":false,\"comparison_calculation\":null,\"include_matching_day_count\":null,\"filters\":[],\"aggregate_filters\":[],\"order_by\":null,\"ordering_specified\":false,\"descending\":null,\"limit\":null}",
+    "usage": {
+     "input": 4586,
+     "output": 348
+    }
+   }
+  ],
+  "top-products-saved": [
+   {
+    "stage": "intent",
+    "model": "gpt-5-mini",
+    "output": "{\"metrics\":[{\"dataset_id\":\"sales\",\"concept_id\":\"units\"}],\"dimensions\":[{\"dataset_id\":\"sales\",\"concept_id\":\"product\"}],\"missing\":[],\"turn_kind\":\"new\",\"unsupported_reason\":\"\" ,\"chart\":null,\"time_grain\":null,\"unsupported_requirements\":[],\"period\":{\"kind\":\"last_month\",\"start\":null,\"end\":null,\"year\":null,\"month\":null,\"count\":null,\"unit\":null},\"comparison\":null,\"comparison_specified\":false,\"comparison_calculation\":null,\"include_matching_day_count\":null,\"filters\":[],\"aggregate_filters\":[],\"order_by\":\"units\",\"ordering_specified\":true,\"descending\":true,\"limit\":3}",
+    "usage": {
+     "input": 4520,
+     "output": 281
+    }
+   }
+  ],
+  "period-comparison": [
+   {
+    "stage": "intent",
+    "model": "gpt-5-mini",
+    "output": "{\n  \"metrics\": [\n    {\n      \"dataset_id\": \"sales\",\n      \"concept_id\": \"revenue\"\n    }\n  ],\n  \"dimensions\": [],\n  \"missing\": [],\n  \"turn_kind\": \"new\",\n  \"unsupported_reason\": \"\",\n  \"chart\": null,\n  \"time_grain\": \"none\",\n  \"unsupported_requirements\": [],\n  \"period\": {\n    \"kind\": \"month\",\n    \"start\": null,\n    \"end\": null,\n    \"year\": 2026,\n    \"month\": 9,\n    \"count\": null,\n    \"unit\": null\n  },\n  \"comparison\": {\n    \"kind\": \"month\",\n    \"start\": null,\n    \"end\": null,\n    \"year\": 2026,\n    \"month\": 8,\n    \"count\": null,\n    \"unit\": null\n  },\n  \"comparison_specified\": true,\n  \"comparison_calculation\": \"change\",\n  \"include_matching_day_count\": null,\n  \"filters\": [],\n  \"aggregate_filters\": [],\n  \"order_by\": null,\n  \"ordering_specified\": false,\n  \"descending\": null,\n  \"limit\": null\n}",
+    "usage": {
+     "input": 4527,
+     "output": 454
+    }
+   }
+  ],
+  "name-lookup": [
+   {
+    "stage": "intent",
+    "model": "gpt-5-mini",
+    "output": "{\"metrics\":[{\"dataset_id\":\"sales\",\"concept_id\":\"units\"}],\"dimensions\":[],\"missing\":[],\"turn_kind\":\"new\",\"unsupported_reason\":\"\" ,\"chart\":null,\"time_grain\":\"month\",\"unsupported_requirements\":[],\"period\":{\"kind\":\"range\",\"start\":\"2026-07-01\",\"end\":\"2026-09-30\",\"year\":null,\"month\":null,\"count\":null,\"unit\":null},\"comparison\":null,\"comparison_specified\":false,\"comparison_calculation\":null,\"include_matching_day_count\":null,\"filters\":[{\"filter_id\":\"named_product\",\"operator\":\"eq\",\"values\":[\"The Little Prince\"]}],\"aggregate_filters\":[],\"order_by\":null,\"ordering_specified\":false,\"descending\":null,\"limit\":null}",
+    "usage": {
+     "input": 4530,
+     "output": 489
+    }
+   }
+  ],
+  "persian-trend": [
+   {
+    "stage": "intent",
+    "model": "gpt-5-mini",
+    "output": "{\"metrics\":[{\"dataset_id\":\"sales\",\"concept_id\":\"revenue\"}],\"dimensions\":[],\"missing\":[],\"turn_kind\":\"new\",\"unsupported_reason\":\"\" ,\"chart\":\"line\",\"time_grain\":\"jalali_month\",\"unsupported_requirements\":[],\"period\":{\"kind\":\"jalali_rolling\",\"start\":null,\"end\":null,\"year\":null,\"month\":null,\"count\":3,\"unit\":\"month\"},\"comparison\":null,\"comparison_specified\":false,\"comparison_calculation\":null,\"include_matching_day_count\":false,\"filters\":[],\"aggregate_filters\":[],\"order_by\":null,\"ordering_specified\":false,\"descending\":null,\"limit\":null}",
+    "usage": {
+     "input": 4576,
+     "output": 468
+    }
+   }
+  ],
+  "unsupported-profit": [
+   {
+    "stage": "intent",
+    "model": "gpt-5-mini",
+    "output": "{\n  \"metrics\": [],\n  \"dimensions\": [],\n  \"missing\": [\n    \"measure\"\n  ],\n  \"turn_kind\": \"new\",\n  \"unsupported_reason\": \"The requested business metric 'profit margin' requires cost or profit data (cost of goods sold or profit) which are not available in the provided datasets. The catalog only contains sales metrics (revenue, units, orders) and no cost/profit measures.\",\n  \"chart\": null,\n  \"time_grain\": \"none\",\n  \"unsupported_requirements\": [\n    {\n      \"operation\": \"formula\",\n      \"evidence\": \"profit margin\"\n    }\n  ],\n  \"period\": {\n    \"kind\": \"month\",\n    \"start\": null,\n    \"end\": null,\n    \"year\": 2026,\n    \"month\": 9,\n    \"count\": null,\n    \"unit\": null\n  },\n  \"comparison\": null,\n  \"comparison_specified\": false,\n  \"comparison_calculation\": null,\n  \"include_matching_day_count\": null,\n  \"filters\": [],\n  \"aggregate_filters\": null,\n  \"order_by\": null,\n  \"ordering_specified\": false,\n  \"descending\": null,\n  \"limit\": null\n}",
+    "usage": {
+     "input": 4521,
+     "output": 591
+    }
+   }
+  ],
+  "prompt-injection-store": [
+   {
+    "stage": "intent",
+    "model": "gpt-5-mini",
+    "output": "{\"metrics\":[{\"dataset_id\":\"sales\",\"concept_id\":\"revenue\"}],\"dimensions\":[],\"missing\":[],\"turn_kind\":\"new\",\"unsupported_reason\":\"فیلتر یا بعد 'فروشگاه' فقط در دیتاست products موجود است و دیتاست sales مستقیماً قابلیت فیلتر بر اساس store را ندارد؛ ترکیب میان دیتاست‌ها خودکار امکان‌پذیر نیست.\",\"chart\":null,\"time_grain\":\"none\",\"unsupported_requirements\":[{\"operation\":\"other\",\"evidence\":\"فروشگاه جنوب\"}],\"period\":{\"kind\":\"jalali_month\",\"start\":null,\"end\":null,\"year\":1405,\"month\":6,\"count\":null,\"unit\":null},\"comparison\":null,\"comparison_specified\":false,\"comparison_calculation\":null,\"include_matching_day_count\":null,\"filters\":[{\"filter_id\":\"product_key_filter\",\"operator\":\"is_null\",\"values\":[]}],\"aggregate_filters\":null,\"order_by\":null,\"ordering_specified\":false,\"descending\":null,\"limit\":null}",
+    "usage": {
+     "input": 4590,
+     "output": 542
+    }
+   }
+  ],
+  "sql-in-message": [
+   {
+    "stage": "intent",
+    "model": "gpt-5-mini",
+    "output": "{\n  \"metrics\": [\n    {\n      \"dataset_id\": \"sales\",\n      \"concept_id\": \"revenue\"\n    }\n  ],\n  \"dimensions\": [],\n  \"missing\": [],\n  \"turn_kind\": \"new\",\n  \"unsupported_reason\": \"\",\n  \"chart\": null,\n  \"time_grain\": \"none\",\n  \"unsupported_requirements\": [],\n  \"period\": {\n    \"kind\": \"month\",\n    \"start\": null,\n    \"end\": null,\n    \"year\": 2026,\n    \"month\": 9,\n    \"count\": null,\n    \"unit\": null\n  },\n  \"comparison\": null,\n  \"comparison_specified\": false,\n  \"comparison_calculation\": null,\n  \"include_matching_day_count\": null,\n  \"filters\": [],\n  \"aggregate_filters\": [],\n  \"order_by\": null,\n  \"ordering_specified\": false,\n  \"descending\": null,\n  \"limit\": null\n}",
+    "usage": {
+     "input": 4526,
+     "output": 406
+    }
+   }
+  ],
+  "simulated-unregistered-column": [
+   {
+    "stage": "intent",
+    "model": "scripted",
+    "output": "{\"metrics\": [{\"dataset_id\": \"sales\", \"concept_id\": \"cost_price\"}], \"dimensions\": [], \"missing\": [], \"turn_kind\": \"new\", \"unsupported_reason\": \"\", \"chart\": \"kpi\", \"time_grain\": null, \"period\": {\"kind\": \"month\", \"start\": null, \"end\": null, \"year\": 2026, \"month\": 9, \"count\": null, \"unit\": null}, \"comparison\": null, \"comparison_specified\": true, \"filters\": null, \"aggregate_filters\": null, \"order_by\": null, \"ordering_specified\": true, \"descending\": null, \"limit\": null, \"comparison_calculation\": null, \"include_matching_day_count\": null, \"unsupported_requirements\": []}",
+    "usage": null
+   }
+  ],
+  "simulated-injected-value": [
+   {
+    "stage": "intent",
+    "model": "scripted",
+    "output": "{\"metrics\": [{\"dataset_id\": \"sales\", \"concept_id\": \"revenue\"}], \"dimensions\": [], \"missing\": [], \"turn_kind\": \"new\", \"unsupported_reason\": \"\", \"chart\": \"kpi\", \"time_grain\": null, \"period\": {\"kind\": \"month\", \"start\": null, \"end\": null, \"year\": 2026, \"month\": 9, \"count\": null, \"unit\": null}, \"comparison\": null, \"comparison_specified\": true, \"filters\": [{\"filter_id\": \"department_filter\", \"operator\": \"eq\", \"values\": [\"Books' OR '1'='1\"]}], \"aggregate_filters\": null, \"order_by\": null, \"ordering_specified\": true, \"descending\": null, \"limit\": null, \"comparison_calculation\": null, \"include_matching_day_count\": null, \"unsupported_requirements\": []}",
+    "usage": null
+   }
+  ]
+ }
+}
