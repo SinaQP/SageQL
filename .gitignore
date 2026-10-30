@@ -7,3 +7,4 @@ dist/
 .env
 sageql_rahtal/reports/
 sageql_rahtal/local_config.py
+.claude/
