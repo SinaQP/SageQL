@@ -40,5 +40,7 @@ Cheaper, faster and more accurate report understanding, plus saved reports.
 - Historical phase reports, procedures and versioned evidence (kept in git history).
 
 ### Known limits
+- Released without the manual Rahtal real-data check; live checks cover the
+  synthetic legacy cohort (21/21 turns correct).
 - Native SQL Server behavior unverified; local workspace token instead of user login.
 - No share-of-total, absence or per-group top-N operations; saved reports are personal.
