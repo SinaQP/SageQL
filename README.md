@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/SinaQP/SageQL/actions/workflows/compatibility.yml/badge.svg)](https://github.com/SinaQP/SageQL/actions/workflows/compatibility.yml)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/SinaQP/SageQL/blob/main/LICENSE)
 
 **Chat-driven reporting you can embed in a backend, where the language model never
 writes SQL.**
@@ -47,7 +47,7 @@ flowchart LR
 ## Results
 
 Measured on frozen synthetic multi-turn conversations (27 scored reports, low
-reasoning effort; [full comparison](docs/MODEL_COMPARISON_NANO_MINI.md)):
+reasoning effort; [full comparison](https://github.com/SinaQP/SageQL/blob/main/docs/MODEL_COMPARISON_NANO_MINI.md)):
 
 | Setup | Correct reports | Model calls / 40 turns | Median turn |
 |---|---:|---:|---:|
@@ -59,8 +59,15 @@ Compiling a complete intent into the report spec locally, instead of asking a
 second model to plan it, removed more than half the model calls and roughly
 tripled accuracy over the nano baseline. Remaining failures are intent
 extraction mistakes (a lost filter, a wrong period or limit); see the
-[roadmap](docs/ROADMAP.md) for the next steps. The deterministic side is covered
+[roadmap](https://github.com/SinaQP/SageQL/blob/main/docs/ROADMAP.md) for the next steps. The deterministic side is covered
 by about 2,200 offline tests that run in CI on Linux and Windows, Python 3.10–3.15.
+
+## Install
+
+```bash
+pip install sageql                  # core: SQLite adapter, compiler, sessions
+pip install "sageql[openai,odbc]"   # OpenAI-compatible agents and SQL Server
+```
 
 ## Quickstart (offline, no API key)
 
@@ -79,7 +86,7 @@ network calls. In the web demo, ask «ساعات فعالیت روزانه در 
 ## Embedding it
 
 The host registers what may be reported on and who may see what; SageQL does the
-rest. A condensed version of [examples/sdk_demo.py](examples/sdk_demo.py):
+rest. A condensed version of [examples/sdk_demo.py](https://github.com/SinaQP/SageQL/blob/main/examples/sdk_demo.py):
 
 ```python
 from sageql import Column, SageQL, Table
@@ -115,13 +122,13 @@ calls. SQL Server is the production target; SQLite is the offline reference.
 
 ## Documentation
 
-- [Embedding guide](docs/SDK.md) and [architecture](docs/ARCHITECTURE.md)
-- [Agents and model settings](docs/SDK_AGENTS.md), [reliability](docs/SDK_RELIABILITY.md)
-- [SQL Server execution](docs/SDK_SQL_SERVER.md), [read consistency](docs/SDK_READ_CONSISTENCY.md)
-- [Relationships](docs/SDK_RELATIONSHIPS.md), [entity lookups](docs/SDK_ENTITY_LOOKUPS.md),
-  [Jalali months](docs/SDK_JALALI_MONTHS.md), [saved reports](docs/SDK_SAVED_REPORTS.md)
-- [Full capability list](docs/CAPABILITIES.md), [testing](docs/SQLITE_FIRST_TESTING.md),
-  [evaluations](evaluations/README.md), [roadmap](docs/ROADMAP.md)
+- [Embedding guide](https://github.com/SinaQP/SageQL/blob/main/docs/SDK.md) and [architecture](https://github.com/SinaQP/SageQL/blob/main/docs/ARCHITECTURE.md)
+- [Agents and model settings](https://github.com/SinaQP/SageQL/blob/main/docs/SDK_AGENTS.md), [reliability](https://github.com/SinaQP/SageQL/blob/main/docs/SDK_RELIABILITY.md)
+- [SQL Server execution](https://github.com/SinaQP/SageQL/blob/main/docs/SDK_SQL_SERVER.md), [read consistency](https://github.com/SinaQP/SageQL/blob/main/docs/SDK_READ_CONSISTENCY.md)
+- [Relationships](https://github.com/SinaQP/SageQL/blob/main/docs/SDK_RELATIONSHIPS.md), [entity lookups](https://github.com/SinaQP/SageQL/blob/main/docs/SDK_ENTITY_LOOKUPS.md),
+  [Jalali months](https://github.com/SinaQP/SageQL/blob/main/docs/SDK_JALALI_MONTHS.md), [saved reports](https://github.com/SinaQP/SageQL/blob/main/docs/SDK_SAVED_REPORTS.md)
+- [Full capability list](https://github.com/SinaQP/SageQL/blob/main/docs/CAPABILITIES.md), [testing](https://github.com/SinaQP/SageQL/blob/main/docs/SQLITE_FIRST_TESTING.md),
+  [evaluations](https://github.com/SinaQP/SageQL/blob/main/evaluations/README.md), [roadmap](https://github.com/SinaQP/SageQL/blob/main/docs/ROADMAP.md)
 
 **Out of scope by design:** model-written SQL, model-selected joins, arbitrary
 formulas, database writes. Production authentication belongs to the host.
@@ -143,11 +150,11 @@ python -m venv .venv
 .\.venv\Scripts\python.exe examples/web/server.py --demo
 ```
 
-Open `http://127.0.0.1:8765`, ask «ساعات فعالیت روزانه در سپتامبر», answer «۲۰۲۶», then request «به تفکیک کارمند نمایش بده». English versions of these requests also work. This uses synthetic data and a deterministic interpreter without credentials or remote calls. The [frontend guide](examples/web/README.md) also covers SQL Server mode. The first SDK slice queries one registered table/view per dataset; reviewed reporting views can contain business joins. Model-selected joins, arbitrary formulas, timestamp conversion, calendars beyond the explicit Jalali month extension and production authentication are outside this slice. The scripted offline demo does not interpret Persian month names; the configured model host supports the extension.
+Open `http://127.0.0.1:8765`, ask «ساعات فعالیت روزانه در سپتامبر», answer «۲۰۲۶», then request «به تفکیک کارمند نمایش بده». English versions of these requests also work. This uses synthetic data and a deterministic interpreter without credentials or remote calls. The [frontend guide](https://github.com/SinaQP/SageQL/blob/main/examples/web/README.md) also covers SQL Server mode. The first SDK slice queries one registered table/view per dataset; reviewed reporting views can contain business joins. Model-selected joins, arbitrary formulas, timestamp conversion, calendars beyond the explicit Jalali month extension and production authentication are outside this slice. The scripted offline demo does not interpret Persian month names; the configured model host supports the extension.
 
 Registered dimension-only reports can list employee names without adding an aggregate. The sections below document the earlier staged workflow. Its experimental model-written SQL API is separate from the SDK engine.
 
-The [application integration guide](docs/APPLICATION_INDEPENDENCE.md) documents
+The [application integration guide](https://github.com/SinaQP/SageQL/blob/main/docs/APPLICATION_INDEPENDENCE.md) documents
 the reviewed boundaries and executable retail/library fixtures. Each host supplies
 its own schema, business definitions, relationships and authenticated policies.
 The same SDK produces sales totals, borrowing counts and loan-duration reports;
@@ -157,12 +164,12 @@ same bounded lookup contract. The offline examples use scripted providers.
 Rahtal also resolves a supplied employee full name before filtering daily
 activity reports. The host registers this lookup explicitly; users do not need
 an employee ID. Duplicate names ask for job position, and each policy-bound read
-still queries one source without joins. See the [lookup scope](docs/SDK_ENTITY_LOOKUPS.md).
+still queries one source without joins. See the [lookup scope](https://github.com/SinaQP/SageQL/blob/main/docs/SDK_ENTITY_LOOKUPS.md).
 
 Grouped activity reports and employee rankings can also display full names using
 a host-registered `EntityLabelDimension`. The SDK ranks identities first, then
 fetches names locally under profile policies; duplicate profiles cannot multiply
-hours and names never enter model context. See the [display-label scope](docs/SDK_ENTITY_LABELS.md).
+hours and names never enter model context. See the [display-label scope](https://github.com/SinaQP/SageQL/blob/main/docs/SDK_ENTITY_LABELS.md).
 
 ## Inspect planning, SQL, validation, and execution without an API key
 
@@ -174,7 +181,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe main.py --plan-demo
 ```
 
-The output lists operations, `PASS` and `REVIEW` checks, generated SQLite SQL and parameters, then two result rows. This mode uses the synthetic schema and fixed proposal in [main.py](main.py). It creates a temporary database, executes through the same read-only path as the public API, and removes the file afterward. It needs no model or credentials. Run `.\.venv\Scripts\python.exe -m pytest -q` to check valid and rejected plans.
+The output lists operations, `PASS` and `REVIEW` checks, generated SQLite SQL and parameters, then two result rows. This mode uses the synthetic schema and fixed proposal in [main.py](https://github.com/SinaQP/SageQL/blob/main/main.py). It creates a temporary database, executes through the same read-only path as the public API, and removes the file afterward. It needs no model or credentials. Run `.\.venv\Scripts\python.exe -m pytest -q` to check valid and rejected plans.
 
 ## Run from `main.py`
 
@@ -188,7 +195,7 @@ notepad .env
 .\.venv\Scripts\python.exe main.py --example
 ```
 
-Put your API key in the `LLM_API_KEY` field of `.env`. The example contains the AvalAI Base URL and `gpt-5-nano` model. `main.py --example` runs `EXAMPLE_QUESTION` through the public API using the inline `EXAMPLE_SCHEMA` dictionary, then prints the plan, generated SQLite SQL, and validation. Edit those two values in [main.py](main.py) to try your own case. The fixed example binds calendar year 2025 as `2025-01-01` through the exclusive end `2026-01-01`. It does not execute because no real database file is supplied. `.env` is ignored by Git, and existing shell environment variables take precedence over the file. The OpenAI extra is unnecessary for offline tests or a custom provider.
+Put your API key in the `LLM_API_KEY` field of `.env`. The example contains the AvalAI Base URL and `gpt-5-nano` model. `main.py --example` runs `EXAMPLE_QUESTION` through the public API using the inline `EXAMPLE_SCHEMA` dictionary, then prints the plan, generated SQLite SQL, and validation. Edit those two values in [main.py](https://github.com/SinaQP/SageQL/blob/main/main.py) to try your own case. The fixed example binds calendar year 2025 as `2025-01-01` through the exclusive end `2026-01-01`. It does not execute because no real database file is supplied. `.env` is ignored by Git, and existing shell environment variables take precedence over the file. The OpenAI extra is unnecessary for offline tests or a custom provider.
 
 ## Start a report conversation
 
@@ -232,7 +239,7 @@ The sample catalog uses the `sales` schema name, so the command maps that name t
 
 ### Schema catalog format
 
-See [schema.example.json](schema.example.json) for a runnable synthetic example. The top-level `tables` array is required. Each table needs a `name` and nonempty `columns` array. `schema`, `kind` (`TABLE` or `VIEW`), and `description` are optional. Each column needs a `name`; `data_type`, `nullable`, and `description` are optional. An omitted data type is recorded as `unknown`. `relations` and `definitions` are optional:
+See [schema.example.json](https://github.com/SinaQP/SageQL/blob/main/schema.example.json) for a runnable synthetic example. The top-level `tables` array is required. Each table needs a `name` and nonempty `columns` array. `schema`, `kind` (`TABLE` or `VIEW`), and `description` are optional. Each column needs a `name`; `data_type`, `nullable`, and `description` are optional. An omitted data type is recorded as `unknown`. `relations` and `definitions` are optional:
 
 ```json
 {
@@ -361,7 +368,7 @@ print("Validation:", prepared.validation.checks_passed, prepared.validation.revi
 
 ## Development
 
-Read [`agent-rules/Agent.md`](agent-rules/Agent.md) for the AI development workflow and [`docs/ROADMAP.md`](docs/ROADMAP.md) for the implementation slices.
+Read [`agent-rules/Agent.md`](https://github.com/SinaQP/SageQL/blob/main/agent-rules/Agent.md) for the AI development workflow and [`docs/ROADMAP.md`](https://github.com/SinaQP/SageQL/blob/main/docs/ROADMAP.md) for the implementation slices.
 
 ```powershell
 python -m pip install -e ".[dev]"
@@ -371,5 +378,5 @@ python -m build
 
 Live model comparisons are separately approved runs of the shared evaluation
 runner; see `python -m evaluations.model_comparison --help` and
-[the latest results](docs/MODEL_COMPARISON_NANO_MINI.md). Ordinary tests and
+[the latest results](https://github.com/SinaQP/SageQL/blob/main/docs/MODEL_COMPARISON_NANO_MINI.md). Ordinary tests and
 offline runs make no external model calls.

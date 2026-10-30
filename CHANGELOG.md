@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.2.1 — 2026-10-30
+
+First release published to PyPI (`pip install sageql`). No SDK behavior changes.
 
 ### Fixed
 - CI: frozen evaluation inputs are hashed with LF-normalized line endings
@@ -10,7 +12,11 @@
 ### Changed
 - README rewritten around the design, measured results and an offline
   quickstart; the long feature description moved to `docs/CAPABILITIES.md`.
-- Package metadata: author, keywords, classifiers and project URLs.
+- Package metadata: author, keywords, classifiers and project URLs. README links
+  are absolute so they work on PyPI.
+
+### Added
+- Tag-triggered PyPI release workflow using trusted publishing (no stored token).
 
 ### Removed
 - The private Rahtal host (`sageql_rahtal/`), its dedicated tests and manual test

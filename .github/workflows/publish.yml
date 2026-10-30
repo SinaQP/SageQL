@@ -1,0 +1,56 @@
+name: Publish to PyPI
+
+# Runs when a version tag is pushed. PyPI trusts this workflow through OIDC
+# (trusted publishing), so no API token is stored in the repository.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Tag matches the package version
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
+          test "v$version" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME does not match version $version"; exit 1; }
+      - run: python -m pip --isolated install --index-url https://pypi.org/simple 'build>=1,<2' 'twine>=7,<8'
+      - run: python -m build --outdir dist/packages
+        env:
+          SOURCE_DATE_EPOCH: '1735689600'
+      - run: >-
+          python tools/release_check.py archives --source .
+          --wheel dist/packages/sageql-*-py3-none-any.whl
+          --sdist dist/packages/sageql-*.tar.gz
+          --output dist/inventory.json
+      - run: python -m twine check --strict dist/packages/*
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: distributions
+          path: dist/packages/*
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: pypi
+      url: https://pypi.org/project/sageql/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: distributions
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
