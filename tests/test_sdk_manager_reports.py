@@ -21,7 +21,9 @@ from sageql.sdk.provider import _metadata
 from sageql.sdk.semantics import permitted_catalog, resolve_period, validate_catalog
 from sageql.sdk.periods import relative_period_evidence
 from sageql.sdk.business import measure_question
-from sageql_rahtal.sdk import rahtal_reporting_catalog
+# The private Rahtal host supplies this catalog; it is not published.
+pytest.importorskip("sageql_rahtal")
+from sageql_rahtal.sdk import rahtal_reporting_catalog  # noqa: E402
 
 
 TODAY = date(2026, 10, 11)

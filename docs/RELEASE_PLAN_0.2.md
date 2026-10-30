@@ -36,7 +36,7 @@ Pass: 4 of 5 turns correct, no wrong accepted report, no rate-limit errors.
 
 **Skipped for 0.2.0 at the user's decision**; planned before the next release.
 
-Follow [RAHTAL_MANUAL_TEST.md](RAHTAL_MANUAL_TEST.md): 20 questions plus saving
+Follow the private Rahtal manual test guide: 20 questions plus saving
 one report and re-running it. Send back the score sheet (question number + what
 was wrong).
 

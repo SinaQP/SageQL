@@ -20,7 +20,9 @@ from sageql.sdk.adapters import compile_report
 from sageql.sdk.comparisons import calculate_change, comparison_evidence_context
 from sageql.sdk.lookups import prepare_request
 from sageql.sdk.provider import _check_spec, _format
-from sageql_rahtal.sdk import rahtal_reporting_catalog
+# The private Rahtal host supplies this catalog; it is not published.
+pytest.importorskip("sageql_rahtal")
+from sageql_rahtal.sdk import rahtal_reporting_catalog  # noqa: E402
 from sageql import Message
 
 

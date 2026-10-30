@@ -239,7 +239,7 @@ def test_demo_does_not_load_host_env_file(tmp_path):
 
 @pytest.fixture
 def simulated_rahtal_startup(tmp_path, monkeypatch):
-    from sageql_rahtal import sdk
+    sdk = pytest.importorskip("sageql_rahtal.sdk")
 
     root = tmp_path / "reference"
     private_state = root / ".venv" / "rahtal-web"

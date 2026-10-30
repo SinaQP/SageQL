@@ -132,7 +132,7 @@ def archives(args):
     prefix = "sageql-" + meta["Version"] + "/"
     source_roots = {".env.example", ".github", ".gitignore", "AGENTS.md", "CHANGELOG.md", "LICENSE",
                     "README.md", "agent-rules", "docs", "evaluations", "examples",
-                    "main.py", "pyproject.toml", "sageql_rahtal", "schema.example.json",
+                    "main.py", "pyproject.toml", "schema.example.json",
                     "src", "tests", "tools", "PKG-INFO"}
     assert all(n.startswith(prefix) and PurePosixPath(n).parts[1] in source_roots for n in sdist), "Unexpected source archive root"
     expected = {"sageql/" + p.relative_to(args.source / "src/sageql").as_posix(): p.read_bytes()

@@ -21,7 +21,9 @@ from sageql.sdk.models import ReportArtifact, ReportField
 from sageql.sdk.adapters import compile_report
 from sageql.sdk.comparisons import comparison_evidence_context
 from sageql.sdk.lookups import prepare_request
-from sageql_rahtal.sdk import rahtal_reporting_catalog
+# The private Rahtal host supplies this catalog; it is not published.
+pytest.importorskip("sageql_rahtal")
+from sageql_rahtal.sdk import rahtal_reporting_catalog  # noqa: E402
 
 
 ACTOR = ActorContext("synthetic-reader")

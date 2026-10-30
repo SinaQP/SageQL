@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import platform
 
+from evaluations.frozen import file_digest
 from evaluations.phase06_runtime import Budget, Journal, atomic_json, run_lock, validate_approval
 from evaluations.phase06_transport import ObservedClient, mock_client
 from evaluations.trajectories import run_trajectory, summarize_trajectories, fraction
@@ -28,7 +29,7 @@ def assess_outcome(expected, reply, **options):
 def load_cases(cohort='all', case_ids=None):
     freeze = json.loads((ROOT / 'freeze.v4.json').read_text(encoding='utf-8'))
     for name, expected in freeze['files'].items():
-        if sha256((ROOT.parents[1] / name).read_bytes()).hexdigest() != expected:
+        if file_digest(ROOT.parents[1] / name) != expected:
             raise ValueError('Frozen Phase 06 inputs changed; preserve and version corrections')
     cases = json.loads((ROOT / 'cases.v4.json').read_text(encoding='utf-8'))['cases']
     if len({c['id'] for c in cases}) != len(cases):

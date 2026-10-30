@@ -526,7 +526,10 @@ def main(argv: list[str] | None = None) -> int:
             elif args.rahtal:
                 root = Path(__file__).resolve().parents[2]
                 sys.path.insert(0, str(root))
-                from sageql_rahtal.sdk import create_rahtal_engine
+                try:
+                    from sageql_rahtal.sdk import create_rahtal_engine
+                except ImportError:
+                    raise SystemExit("--rahtal needs the private sageql_rahtal package, which is not published")
                 private_state = root / ".venv" / "rahtal-web"
                 private_state.mkdir(parents=True, exist_ok=True)
                 from sageql.sdk import SQLiteSavedReportStore, SQLiteSessionStore

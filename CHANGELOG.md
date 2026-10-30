@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- CI: frozen evaluation inputs are hashed with LF-normalized line endings
+  (`evaluations/frozen.py`), so the offline gate passes on any checkout; package
+  jobs no longer hard-code the `0.1.0` archive names.
+
+### Changed
+- README rewritten around the design, measured results and an offline
+  quickstart; the long feature description moved to `docs/CAPABILITIES.md`.
+- Package metadata: author, keywords, classifiers and project URLs.
+
+### Removed
+- The private Rahtal host (`sageql_rahtal/`), its dedicated tests and manual test
+  guide are no longer published or packaged. Tests that use its catalog skip
+  when it is absent.
+
 ## 0.2.0 — 2026-10-30
 
 Cheaper, faster and more accurate report understanding, plus saved reports.
@@ -20,7 +37,7 @@ Cheaper, faster and more accurate report understanding, plus saved reports.
 - **Report interpretation**: each report lists the filters, conditions, sort and
   row limit it applied (`provenance["interpretation"]`), shown on the web page.
 - **Rahtal test panel and guide**: 20 example questions with expected outcomes
-  and read-only SQL cross-checks (`docs/RAHTAL_MANUAL_TEST.md`).
+  and read-only SQL cross-checks (private guide).
 - **Live evaluation levels** (`smoke`, `standard`, `full`) with hard spending caps,
   per-model pricing, and a halt on HTTP 429.
 

@@ -10,7 +10,7 @@
     "evaluations/phase03_hosts.py": "fe8d167d11748f72ebb1f2175e1ebf944cb9c7c1e693c552f4fc5d0fc87a19b9",
     "evaluations/phase03/records.json": "ede03aa9e006781539678b2c7a4034cf24bcb2af6ba6b0eb1178b4c0881d0abe",
     "examples/multi_domain.py": "c776c3f014c1e510a785ad8b8ab8d63600f682a29477e6da137c2b7898eff816",
-    "evaluations/phase06/cases.v3.json": "b355e699fb88400c43626a0bcfa627b8d6f49b3b77a5cd6b0881246563e2b732"
+    "evaluations/phase06/cases.v3.json": "a49e58d1be94a1c67dd1a8c81e4f19bf4e23633cb4279100163f642e0f2fc7f9"
   },
   "counts": {
     "assessment": 26,

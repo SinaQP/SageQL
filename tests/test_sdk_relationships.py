@@ -399,7 +399,8 @@ def test_source_revocation_during_interpretation_prevents_execution(database):
 
 
 def test_relational_diagnostics_redact_first_policy_parameter(tmp_path):
-    from sageql_rahtal.diagnostics import DiagnosticCursor, Trace, _trace
+    diagnostics = pytest.importorskip("sageql_rahtal.diagnostics")
+    DiagnosticCursor, Trace, _trace = diagnostics.DiagnosticCursor, diagnostics.Trace, diagnostics._trace
 
     class Cursor:
         def execute(self, *args):

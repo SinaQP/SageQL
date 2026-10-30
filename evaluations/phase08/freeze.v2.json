@@ -20,10 +20,10 @@
     "evaluations/phase03_hosts.py": "fe8d167d11748f72ebb1f2175e1ebf944cb9c7c1e693c552f4fc5d0fc87a19b9",
     "evaluations/phase03/records.json": "ede03aa9e006781539678b2c7a4034cf24bcb2af6ba6b0eb1178b4c0881d0abe",
     "examples/multi_domain.py": "c776c3f014c1e510a785ad8b8ab8d63600f682a29477e6da137c2b7898eff816",
-    "evaluations/phase08/cases.v1.json": "a5f1c45564addbb80d8778bc07daf90041563ac99902cf43b03b2d2504057be2",
-    "evaluations/phase08/expectations.v1.json": "92ee5207472cecbff87bf609404d64fd79790927d3d7ac0ae0cc5adb002667e2",
-    "evaluations/phase08/cases.v2.json": "f915e30613ccf2609386a608b0b433fd8919501db7b221529dc42452f4d45b48",
-    "evaluations/phase08/expectations.v2.json": "572ee68904fdf96eb71bcf07477931d58c084caa22f81493293266d18093482b"
+    "evaluations/phase08/cases.v1.json": "292f2e22a2bf369f63b160976e6fb3668e13b2bf531c40e73dbb852b1f96b3b7",
+    "evaluations/phase08/expectations.v1.json": "9e966e46181d8f65809dd0b5f370e7b8cd7621b36ded97c1dc9f2052e4c3c61b",
+    "evaluations/phase08/cases.v2.json": "1927d30210213d23a8d6042678142cb4ac11afb36183628ca0cf834f731573e3",
+    "evaluations/phase08/expectations.v2.json": "627a8360297c9aac1aee1a8e93e20d62e83d4fdf9a06e9c5a6b8af6a1e1f04d5"
   },
   "frozen_before_first_v2_execution": true,
   "correction": "Only A07 oracle composition corrected; v1 and first result retained. No production repair or question change."

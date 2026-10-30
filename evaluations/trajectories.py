@@ -18,6 +18,7 @@ from types import SimpleNamespace
 from sageql import LLMConfig
 from sageql.sdk import (AccessScope, Interpretation, OpenAIReportAgent, UserFilter,
                         PeriodSelection, ReportSpec, SageQL, SDKError, SQLiteSessionStore)
+from evaluations.frozen import file_digest
 from evaluations.phase03_hosts import ACTOR, ROOT, TODAY, host
 from evaluations.runner import RecordingAdapter, RecordingProvider, ScriptedClient, extracted, ready, specification
 from evaluations.scoring import assess
@@ -27,7 +28,7 @@ def load_trajectories(cohort):
     manifest = json.loads((ROOT / "freeze.v2.json").read_text(encoding="utf-8"))
     base = ROOT.parents[1]
     for name, digest in manifest["files"].items():
-        if sha256((base / name).read_bytes()).hexdigest() != digest:
+        if file_digest(base / name) != digest:
             raise ValueError("Frozen assessment inputs changed; version and justify corrections")
     corpus = json.loads((ROOT / "cases.v2.json").read_text(encoding="utf-8"))
     cases = corpus["cases"]

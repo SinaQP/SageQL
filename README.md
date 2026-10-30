@@ -1,87 +1,137 @@
 # SageQL
 
-SageQL is an embedded reporting SDK: authorized users ask for reports in chat
-(Persian by default, English supported), and SageQL turns each request into a
-validated, deterministic, parameterized SELECT over host-registered tables.
-Models never write SQL, choose joins or see result rows.
+[![CI](https://github.com/SinaQP/SageQL/actions/workflows/compatibility.yml/badge.svg)](https://github.com/SinaQP/SageQL/actions/workflows/compatibility.yml)
+![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-**Status (2026-10-29).** The deterministic side (authorization, compilation,
-read-only execution, sessions, snapshot reads) is solid and heavily tested
-offline. Request understanding is the current bottleneck. The best measured cheap
-setup is `gpt-5-mini` for intent, a locally compiled report spec and no reviewer
-call, at low reasoning effort: 22/27 correct synthetic reports versus 8/27 for nano
-alone, in about 7 s and one model call per typical turn ([comparison](docs/MODEL_COMPARISON_NANO_MINI.md)). Next steps are in the
-[roadmap](docs/ROADMAP.md) and the [improvement plan](docs/IMPROVEMENT_RECOMMENDATIONS.md).
+**Chat-driven reporting you can embed in a backend, where the language model never
+writes SQL.**
 
-Tests are [SQLite-first](docs/SQLITE_FIRST_TESTING.md) and run offline with
-synthetic data. Native SQL Server tests need an explicit pytest flag and a
-separately approved synthetic target ([procedure](docs/SQLSERVER_INTEGRATION_TESTING.md)).
-Production credentials and the Rahtal `.env` are never test inputs.
+A manager asks «ساعات فعالیت روزانه در سپتامبر ۲۰۲۶» ("daily activity hours in
+September 2026") or the English equivalent. SageQL turns the request into a typed
+report specification, checks it against the host's registered catalog and the
+user's access policy, and compiles a parameterized, read-only `SELECT` itself. The
+host gets back a typed table or chart payload. Persian is the default language;
+English is fully supported.
 
-Saved reports re-run with zero model calls and moving dates ([saved reports](docs/SDK_SAVED_REPORTS.md)).
+## Why models never write SQL
 
-Key contracts: [embedding guide](docs/SDK.md), [agents and model settings](docs/SDK_AGENTS.md),
-[SQL Server execution](docs/SDK_SQL_SERVER.md), [reliability](docs/SDK_RELIABILITY.md),
-[read consistency](docs/SDK_READ_CONSISTENCY.md), [value vocabulary](docs/SDK_VALUE_VOCABULARY.md),
-[release](docs/SDK_RELEASE.md). Offline evaluations: [evaluations/README.md](evaluations/README.md).
+Most text-to-SQL tools let the model write a query and then try to guard it.
+That leaves the hardest problems with the model: picking join keys, applying
+tenant filters, avoiding exfiltration through clever SQL. SageQL moves the trust
+boundary:
 
-SageQL is a Python SDK that a developer embeds in their backend to let authorized users create and refine reports through chat. The host registers SQL Server tables or trusted reporting views, approved metrics/dimensions/filters, model infrastructure, and per-user access policies. SageQL interprets a report specification, validates it, generates parameterized SQL itself, and returns a typed table/chart payload for your frontend.
+| The model does | Deterministic code does |
+|---|---|
+| Extract intent: measures, groupings, period, filters, ranking | Authorize every dataset, column and row policy for the actor |
+| Ask a clarifying question when something material is missing | Resolve dates and Jalali months locally, look up entity names |
+| | Compile parameterized SQL for SQL Server or SQLite and run it read-only, with row and time limits |
 
-The new `sageql.sdk` API includes persistent conversations, clarification, report refinement, revision checks and idempotent retries. SQL Server is the production adapter target; SQLite supplies an offline reference. The [embedding guide](docs/SDK.md) documents installation, configuration, the JSON contract and limits. The [architecture](docs/ARCHITECTURE.md) records the broader design. The existing staged CLI/API and Rahtal real-data pilot remain available.
+The model never sees result rows and never names a table or join it was not
+given. A wrong interpretation produces a wrong *report*, which is shown to the
+user as a plain-language interpretation line. It cannot produce an unauthorized
+*query*.
 
-Live reference hosts use `OpenAIReportAgent`: independent intent extraction fixes
-the effective measures/grouping, a planner proposes a report, a reviewer checks
-its meaning, and bounded
-feedback can revise the plan or clarification. Registered vocabulary checks
-locally preserve explicit business measures and supported period selections;
-the shared agents still plan and review reports. Register another catalog to
-reuse the same pipeline.
-Local checks reject unavailable cross-source combinations, silent grouping changes
-and repeated structured clarification after an answer. Intent extraction remains
-model-dependent. Authorization, lookup uniqueness and parameterized SQL execution remain enforced
-by the SDK. See the [agent contract](docs/SDK_AGENTS.md) for configuration, call
-budgets, limitations and custom backends.
-
-The [registered relationship extension](docs/SDK_RELATIONSHIPS.md) supports
-management reports across host-defined dimensional sources: multiple measures,
-multiple related groupings/filters, aggregate thresholds, period comparisons and
-rankings after complete aggregation. The same pipeline works with employee,
-customer, product or organizational catalogs. Models never invent join keys;
-duplicate dimension keys fail closed. Rolling date windows such as the last
-three months resolve locally. Rahtal exposes current job position on activity
-reports through this general registration API.
-
-The fixed [participant-mean metric](docs/SDK_PARTICIPANT_MEANS.md) supports a
-registered amount divided by distinct participating identities in the same group.
-For example, Rahtal uses it for average recorded hours per participating employee,
-while ordinary average activity duration keeps its own meaning.
-Only trusted hosts register the source columns; models choose the business ID.
-
-[Matching-day counts](docs/SDK_MATCHING_DAY_COUNTS.md) can accompany daily entity
-reports: group registered measures, apply typed aggregate conditions, count the
-remaining days per identity/period, then sort/limit and resolve names. Thresholds
-and periods remain report inputs. The additive flag defaults to false, preserving
-organization totals, comparisons, rankings and per-participant means.
-
-Persian is the default conversation and report presentation language. The
-reference frontend uses RTL, Persian labels and display digits. Ask naturally,
-for example «نام کارکنان را نشان بده» or «ساعات فعالیت روزانه در سپتامبر ۲۰۲۶».
-English input remains supported; hosts can explicitly select English output.
-Register Persian business labels for your own datasets; see the
-[language contract](docs/SDK.md#persian-by-default). Dates still use the approved
-Gregorian storage and grouping. The [explicit Jalali month extension](docs/SDK_JALALI_MONTHS.md)
-accepts a Persian month and year and resolves date bounds locally; broader Solar
-Hijri grouping and timestamp conversion remain outside its scope.
-
-## Try the embedded report flow
-
-To use the **existing Rahtal SQL Server database and real model**, run:
-
-```powershell
-.\.venv\Scripts\python.exe sageql_rahtal/web.py --port 8766
+```mermaid
+flowchart LR
+    U["User message<br/>(Persian or English)"] --> I["Intent extraction<br/>(LLM)"]
+    I -->|missing detail| Q[Clarifying question]
+    Q --> U
+    I --> S["Typed ReportSpec"]
+    S --> V["Validate against catalog<br/>+ actor policy"]
+    V --> C["Compile parameterized SELECT"]
+    C --> X["Read-only execution<br/>(row, time limits)"]
+    X --> R["Typed table / chart<br/>+ interpretation line"]
 ```
 
-Open `http://127.0.0.1:8766`. The server saves a local workspace token in `.venv/rahtal-web/host-token.txt`; use it in the sign-in dialog. This mode reads the registered existing employee/profile, activity and activity-topic tables and never falls back to synthetic data. It defaults to total recorded work and Persian business dates, including bounded monthly trends. See the [Rahtal frontend instructions](sageql_rahtal/README.md#local-frontend-on-the-real-database) and [manager reporting contract](docs/SDK_MANAGER_REPORTS.md). VPN access to the configured SQL Server is required when it is on the internal network.
+## Results
+
+Measured on frozen synthetic multi-turn conversations (27 scored reports, low
+reasoning effort; [full comparison](docs/MODEL_COMPARISON_NANO_MINI.md)):
+
+| Setup | Correct reports | Model calls / 40 turns | Median turn |
+|---|---:|---:|---:|
+| `gpt-5-nano` for every stage | 8/27 | 76 | 8–21 s |
+| `gpt-5-mini` intent, nano planner and reviewer | 15/27 | 87 | 16–21 s |
+| **`gpt-5-mini` intent, locally compiled spec, no reviewer** | **22/27** | **34** | **~7 s** |
+
+Compiling a complete intent into the report spec locally, instead of asking a
+second model to plan it, removed more than half the model calls and roughly
+tripled accuracy over the nano baseline. Remaining failures are intent
+extraction mistakes (a lost filter, a wrong period or limit); see the
+[roadmap](docs/ROADMAP.md) for the next steps. The deterministic side is covered
+by about 2,200 offline tests that run in CI on Linux and Windows, Python 3.10–3.15.
+
+## Quickstart (offline, no API key)
+
+```bash
+git clone https://github.com/SinaQP/SageQL.git && cd SageQL
+python -m venv .venv && . .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -e ".[dev]"
+python examples/sdk_demo.py        # Persian three-turn conversation on synthetic data
+python examples/web/server.py --demo   # chat UI at http://127.0.0.1:8765
+```
+
+Both use synthetic SQLite data and a scripted interpreter, so they make no
+network calls. In the web demo, ask «ساعات فعالیت روزانه در سپتامبر», answer
+«۲۰۲۶», then say «به تفکیک کارمند نمایش بده» ("break it down by employee").
+
+## Embedding it
+
+The host registers what may be reported on and who may see what; SageQL does the
+rest. A condensed version of [examples/sdk_demo.py](examples/sdk_demo.py):
+
+```python
+from sageql import Column, SageQL, Table
+from sageql.sdk import (AccessScope, DatasetAccess, DatasetDefinition, DimensionDefinition,
+                        MetricDefinition, ReportingCatalog, RowPolicy, SQLiteAdapter,
+                        SQLiteSessionStore, TimeDefinition)
+
+table = Table("activities")
+catalog = ReportingCatalog((DatasetDefinition(
+    "activities", "Activities", table,
+    tuple(Column(table.key, name, kind) for name, kind in (
+        ("tenant_id", "int"), ("employee", "text"), ("activity_date", "date"), ("hours", "decimal"))),
+    metrics=(MetricDefinition("activity_hours", "Activity hours", "sum", "hours", "h"),),
+    dimensions=(DimensionDefinition("employee", "Employee", "employee"),),
+    time=TimeDefinition("activity_date"),
+),))
+
+def policy(actor):  # every query is bound to the caller's tenant
+    return AccessScope((DatasetAccess("activities", policies=(
+        RowPolicy("tenant_id", "eq", (int(actor.tenant_id),)),)),))
+
+engine = SageQL(catalog=catalog, database=SQLiteAdapter("data.sqlite"), provider=my_provider,
+                policy=policy, sessions=SQLiteSessionStore("sessions.sqlite"),
+                execution="validated")
+session = engine.create_session(actor)  # actor comes from the host's authentication
+reply = engine.submit(session.session_id, "daily activity hours in September 2026",
+                      actor, "request-1", session.revision)
+```
+
+Sessions support clarification, refinement ("now group it by employee"),
+revision checks, idempotent retries and saved reports that re-run with zero model
+calls. SQL Server is the production target; SQLite is the offline reference.
+
+## Documentation
+
+- [Embedding guide](docs/SDK.md) and [architecture](docs/ARCHITECTURE.md)
+- [Agents and model settings](docs/SDK_AGENTS.md), [reliability](docs/SDK_RELIABILITY.md)
+- [SQL Server execution](docs/SDK_SQL_SERVER.md), [read consistency](docs/SDK_READ_CONSISTENCY.md)
+- [Relationships](docs/SDK_RELATIONSHIPS.md), [entity lookups](docs/SDK_ENTITY_LOOKUPS.md),
+  [Jalali months](docs/SDK_JALALI_MONTHS.md), [saved reports](docs/SDK_SAVED_REPORTS.md)
+- [Full capability list](docs/CAPABILITIES.md), [testing](docs/SQLITE_FIRST_TESTING.md),
+  [evaluations](evaluations/README.md), [roadmap](docs/ROADMAP.md)
+
+**Out of scope by design:** model-written SQL, model-selected joins, arbitrary
+formulas, database writes. Production authentication belongs to the host.
+
+## Detailed guides
+
+The sections below cover the reference hosts, the earlier staged CLI and the
+lower-level Python API.
+
+## Try the embedded report flow
 
 The following offline commands exercise the same SDK using synthetic data and a scripted interpreter:
 
@@ -299,10 +349,6 @@ print("Validation:", prepared.validation.checks_passed, prepared.validation.revi
 ```
 
 `conversation.history` contains successful user and assistant turns. You can inject another object with `assess(messages)`, `resolve_context(messages, understanding)`, `select_query_space(understanding, context, candidates)`, and `propose_query_plan(understanding, context, candidates)` methods to use a different provider or test offline.
-
-## Rahtal live test pilot
-
-For a locally configured daily-performance question against the Rahtal SQL Server database, use the isolated [Rahtal test app](sageql_rahtal/README.md). Edit its ignored `local_config.py` for the question and run options; credentials stay in `.env`. It saves a stage-by-stage report per run. The historical general CLI remains SQLite-only; the pilot and the separately scoped SDK adapter provide SQL Server paths.
 
 ## Current scope and privacy
 

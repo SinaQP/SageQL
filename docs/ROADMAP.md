@@ -34,7 +34,7 @@ between runs is about ±2 reports. See [the comparison](MODEL_COMPARISON_NANO_MI
 $0.61 settled plus $1.49 reserved for rate-limited calls); new live runs need
 new approval.
 
-**Real data:** a scored manual pass on Rahtal is ready ([guide](RAHTAL_MANUAL_TEST.md)); results pending.
+**Real data:** a scored manual pass on Rahtal is ready (private guide); results pending.
 
 **Unverified:** native SQL Server behavior (blocked on an approved synthetic
 target), production authorization, behavior on fresh unseen wording.
@@ -44,7 +44,7 @@ target), production authorization, behavior on fresh unseen wording.
 Each step: offline tests first, then a small approved live check on the frozen
 cohorts with the same budget discipline (nano/mini only unless the user approves more).
 
-1. **Collect the Rahtal manual test results** ([guide](RAHTAL_MANUAL_TEST.md)) and
+1. **Collect the Rahtal manual test results** (private guide) and
    turn every real failure into an offline regression.
 2. **Reduce intent extraction errors** (lost filters, wrong periods/limits).
    `intent_samples` (parallel samples with an agreement vote) is implemented but

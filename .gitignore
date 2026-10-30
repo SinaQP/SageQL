@@ -5,6 +5,9 @@ __pycache__/
 dist/
 *.egg-info/
 .env
-sageql_rahtal/reports/
-sageql_rahtal/local_config.py
+# Private Rahtal host: kept locally, never published.
+sageql_rahtal/
+docs/RAHTAL_MANUAL_TEST.md
+tests/test_rahtal_*.py
+tests/test_tsql_rahtal.py
 .claude/

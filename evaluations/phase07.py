@@ -1,9 +1,9 @@
 """Frozen clarification-continuation evaluation; reuse Phase 06 durable runner."""
 import argparse
-from hashlib import sha256
 import json
 from pathlib import Path
 
+from evaluations.frozen import file_digest
 from evaluations.phase06 import run as run_evaluation
 
 
@@ -14,7 +14,7 @@ VERSION = 'v2'
 def load_cases(cohort='all', case_ids=None):
     freeze = json.loads((ROOT / f'freeze.{VERSION}.json').read_text(encoding='utf-8'))
     for name, expected in freeze['files'].items():
-        if sha256((ROOT.parents[1] / name).read_bytes()).hexdigest() != expected:
+        if file_digest(ROOT.parents[1] / name) != expected:
             raise ValueError('Frozen Phase 07 inputs changed; preserve and version corrections')
     cases = json.loads((ROOT / f'cases.{VERSION}.json').read_text(encoding='utf-8'))['cases']
     if len({case['id'] for case in cases}) != len(cases):

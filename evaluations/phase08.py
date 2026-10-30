@@ -1,10 +1,10 @@
 """Focused Phase 08 selection; reuse the Phase 06 runner and exact approval gate."""
 import argparse
 from copy import deepcopy
-from hashlib import sha256
 import json
 from pathlib import Path
 
+from evaluations.frozen import file_digest
 from evaluations.phase06 import approval_template, configuration, run as run_evaluation
 
 ROOT = Path(__file__).with_name('phase08')
@@ -17,7 +17,7 @@ def load_cases(cohort='all', case_ids=None, *, corpus_root=None, corpus_version=
     version = VERSION if corpus_version is None else corpus_version
     freeze = json.loads((root / f'freeze.{version}.json').read_text(encoding='utf-8'))
     for name, expected in freeze['files'].items():
-        if sha256((root.parents[1] / name).read_bytes()).hexdigest() != expected:
+        if file_digest(root.parents[1] / name) != expected:
             raise ValueError('Frozen inputs changed; preserve and version corrections')
     questions = json.loads((root / f'cases.{version}.json').read_text(encoding='utf-8'))['cases']
     answers = json.loads((root / f'expectations.{version}.json').read_text(encoding='utf-8'))['cases']

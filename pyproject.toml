@@ -5,12 +5,30 @@ build-backend = "hatchling.build"
 [project]
 name = "sageql"
 version = "0.2.0"
-description = "Plan database reports with AI and user-supplied schema metadata"
+description = "Embedded chat reporting SDK: LLMs extract intent, deterministic code compiles authorized, parameterized SQL"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
-authors = [{name = "SageQL contributors"}]
+authors = [{name = "Sina Qasempour"}]
+keywords = ["text-to-sql", "nl2sql", "llm", "reporting", "sql-server", "sqlite", "persian", "sdk"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Natural Language :: Persian",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Database :: Front-Ends",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = ["sqlglot>=26,<31", "python-dotenv>=1.2,<2"]
+
+[project.urls]
+Homepage = "https://github.com/SinaQP/SageQL"
+Documentation = "https://github.com/SinaQP/SageQL/blob/main/docs/SDK.md"
+Changelog = "https://github.com/SinaQP/SageQL/blob/main/CHANGELOG.md"
+Issues = "https://github.com/SinaQP/SageQL/issues"
 
 [project.optional-dependencies]
 openai = ["openai>=1.99,<3"]

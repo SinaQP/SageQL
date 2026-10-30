@@ -27,8 +27,8 @@ jobs:
           SOURCE_DATE_EPOCH: '1735689600'
       - run: >-
           python tools/release_check.py archives --source .
-          --wheel dist/packages/sageql-0.1.0-py3-none-any.whl
-          --sdist dist/packages/sageql-0.1.0.tar.gz
+          --wheel dist/packages/sageql-*-py3-none-any.whl
+          --sdist dist/packages/sageql-*.tar.gz
           --output dist/inventory.json
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
@@ -115,7 +115,7 @@ jobs:
       - run: python -m pip --isolated install --index-url https://pypi.org/simple 'build>=1,<2'
       - run: python -m build --outdir dist/packages
       - run: python -m venv dist/from-sdist
-      - run: dist/from-sdist/bin/python -m pip --isolated install --index-url https://pypi.org/simple dist/packages/sageql-0.1.0.tar.gz
+      - run: dist/from-sdist/bin/python -m pip --isolated install --index-url https://pypi.org/simple dist/packages/sageql-*.tar.gz
       - run: dist/from-sdist/bin/python -I tools/release_check.py smoke --source . --core-only --output dist/sdist-smoke.json
       - run: python -m venv dist/editable
       - run: dist/editable/bin/python -m pip --isolated install --index-url https://pypi.org/simple -e .

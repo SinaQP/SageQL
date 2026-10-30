@@ -32,13 +32,8 @@ execution opt-in still apply.
 
 ## Offline demonstration
 
-For the actual Rahtal database with a real model, run:
-
-```powershell
-.\.venv\Scripts\python.exe sageql_rahtal/web.py --env-file E:\Coding\rahtal-be\.env --port 8766
-```
-
-Open `http://127.0.0.1:8766` and sign in using the local token saved to `.venv/rahtal-web/host-token.txt`. This registers the existing approved Rahtal profile/activity sources, not the generic sample view. See the [Rahtal guide](../../sageql_rahtal/README.md#local-frontend-on-the-real-database) for its configuration, scope and network requirements. `python examples/web/server.py --rahtal --env-file ...` is equivalent.
+A private Rahtal host (`--rahtal`) is used for real-data testing; its package is
+not published.
 
 In Rahtal mode the report panel has **نتیجه گزارش** and **مراحل و جزئیات اجرا**
 tabs. Logs show each completed attempt's recorded stages, timings, redacted SQL

@@ -9,6 +9,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from evaluations.frozen import file_digest
 from evaluations import phase06, phase07
 
 
@@ -79,7 +80,7 @@ def test_independent_replacement_is_frozen_and_not_the_original_question():
             'evaluations/phase07/cases.v1.json']
     assert freeze['live_exposure'] == 'none'
     for name, expected in freeze['files'].items():
-        assert sha256(Path(name).read_bytes()).hexdigest() == expected, name
+        assert file_digest(Path(name)) == expected, name
 
 
 def test_phase07_offline_run_uses_new_hashes_without_constructing_a_live_client(tmp_path, monkeypatch):
