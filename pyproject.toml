@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sageql"
-version = "0.1.0"
+version = "0.2.0"
 description = "Plan database reports with AI and user-supplied schema metadata"
 readme = "README.md"
 requires-python = ">=3.10"

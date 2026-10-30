@@ -20,10 +20,10 @@ def artifacts(tmp_path, mutation=None):
     files = {"sageql/" + p.relative_to(ROOT / "src/sageql").as_posix(): p.read_bytes()
              for p in (ROOT / "src/sageql").rglob("*.py")}
     wheel = dict(files)
-    info = "sageql-0.1.0.dist-info/"
-    wheel[info + "METADATA"] = b'''Metadata-Version: 2.4
+    info = f"sageql-{checks.VERSION}.dist-info/"
+    wheel[info + "METADATA"] = f'''Metadata-Version: 2.4
 Name: sageql
-Version: 0.1.0
+Version: {checks.VERSION}
 Requires-Python: >=3.10
 Provides-Extra: dev
 Provides-Extra: odbc
@@ -34,7 +34,7 @@ Requires-Dist: build<2,>=1; extra == "dev"
 Requires-Dist: pytest<10,>=8; extra == "dev"
 Requires-Dist: pyodbc<6,>=5.2; extra == "odbc"
 Requires-Dist: openai<3,>=1.99; extra == "openai"
-'''
+'''.encode()
     wheel[info + "licenses/LICENSE"] = (ROOT / "LICENSE").read_bytes()
     wheel[info + "entry_points.txt"] = b"[console_scripts]\nsageql = sageql.cli:main\n"
     if mutation == "private":
@@ -62,11 +62,11 @@ Requires-Dist: openai<3,>=1.99; extra == "openai"
         source[name] = (ROOT / name).read_bytes()
     with tarfile.open(sp, "w:gz") as z:
         for n, b in source.items():
-            entry = tarfile.TarInfo("sageql-0.1.0/" + n)
+            entry = tarfile.TarInfo(f"sageql-{checks.VERSION}/" + n)
             entry.size = len(b)
             z.addfile(entry, BytesIO(b))
         if mutation == "link":
-            entry = tarfile.TarInfo("sageql-0.1.0/linked")
+            entry = tarfile.TarInfo(f"sageql-{checks.VERSION}/linked")
             entry.type = tarfile.SYMTYPE
             entry.linkname = "../../outside"
             z.addfile(entry)

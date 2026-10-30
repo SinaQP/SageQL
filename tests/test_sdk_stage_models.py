@@ -107,3 +107,12 @@ def test_single_interpreter_accepts_optional_reasoning_effort():
     assert client.calls[0]["reasoning_effort"] == "low"
     with pytest.raises(ValueError):
         OpenAIReportInterpreter(CONFIG, client=Client(), reasoning_effort="max")
+
+
+def test_recommended_preset_uses_measured_setup_and_allows_overrides():
+    agent = OpenAIReportAgent.recommended(CONFIG, client=Client())
+    assert agent._compile_intent is True and agent._review is False
+    assert agent._backend._stage_options("intent") == {"model": "gpt-5-mini", "reasoning_effort": "low"}
+    assert agent._backend._stage_options("planner") == {"model": "cheap-model", "reasoning_effort": "low"}
+    same = OpenAIReportAgent.recommended(CONFIG, client=Client(), intent_model=None, review=True)
+    assert same._review is True and same._backend._stage_options("intent")["model"] == "cheap-model"

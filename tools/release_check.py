@@ -27,6 +27,9 @@ import time
 import zipfile
 from email.parser import BytesParser
 
+# The release version comes from the checked source, never a hardcoded copy.
+VERSION = re.search(r'^version = "([^"]+)"', (Path(__file__).parents[1] / "pyproject.toml").read_text(encoding="utf-8"), re.M).group(1)
+
 
 def write(path, value):
     path = Path(path)
@@ -115,7 +118,7 @@ def archives(args):
     assert not [n for n in (*wheel, *sdist) if unsafe_member(n)]
     meta_name = next(n for n in wheel if n.endswith(".dist-info/METADATA"))
     meta = BytesParser().parsebytes(wheel[meta_name])
-    assert meta["Name"] == "sageql" and meta["Version"] == "0.1.0"
+    assert meta["Name"] == "sageql" and meta["Version"] == VERSION
     assert meta["Requires-Python"] == ">=3.10"
     assert set(meta.get_all("Provides-Extra")) == {"dev", "odbc", "openai"}
     requirements = {re.sub(r"\s+", "", r).replace("'", '"')
@@ -125,9 +128,9 @@ def archives(args):
         'build<2,>=1;extra=="dev"', 'pytest<10,>=8;extra=="dev"',
         'pyodbc<6,>=5.2;extra=="odbc"', 'openai<3,>=1.99;extra=="openai"',
     }, requirements
-    assert wheel['sageql-0.1.0.dist-info/entry_points.txt'].decode().strip() == '[console_scripts]\nsageql = sageql.cli:main'
+    assert wheel[f'sageql-{VERSION}.dist-info/entry_points.txt'].decode().strip() == '[console_scripts]\nsageql = sageql.cli:main'
     prefix = "sageql-" + meta["Version"] + "/"
-    source_roots = {".env.example", ".github", ".gitignore", "AGENTS.md", "LICENSE",
+    source_roots = {".env.example", ".github", ".gitignore", "AGENTS.md", "CHANGELOG.md", "LICENSE",
                     "README.md", "agent-rules", "docs", "evaluations", "examples",
                     "main.py", "pyproject.toml", "sageql_rahtal", "schema.example.json",
                     "src", "tests", "tools", "PKG-INFO"}
@@ -135,7 +138,7 @@ def archives(args):
     expected = {"sageql/" + p.relative_to(args.source / "src/sageql").as_posix(): p.read_bytes()
                 for p in (args.source / "src/sageql").rglob("*.py")}
     assert {n: b for n, b in wheel.items() if n.startswith("sageql/")} == expected
-    assert all(n.startswith(("sageql/", "sageql-0.1.0.dist-info/")) for n in wheel)
+    assert all(n.startswith(("sageql/", f"sageql-{VERSION}.dist-info/")) for n in wheel)
     for name, content in expected.items():
         assert sdist[prefix + "src/" + name] == content
     for name in ("LICENSE", "README.md", "pyproject.toml", "examples/multi_domain.py",

@@ -983,3 +983,18 @@ class OpenAIReportAgent(AgentReportInterpreter):
         self.language = backend.language
         backend._usage_observer = lambda stage, model, counts: self._observe(
             "model_usage", "complete", agent_stage=stage, model=model, **counts)
+
+    @classmethod
+    def recommended(cls, config: LLMConfig, client: Any = None, *, intent_model: str | None = "gpt-5-mini",
+                    **options: Any) -> "OpenAIReportAgent":
+        """The measured cheap setup: stronger intent model, compiled spec, no reviewer call.
+
+        ``config.model`` (e.g. gpt-5-nano) only plans when the intent is incomplete.
+        ``intent_model=None`` keeps ``config.model`` for intent too. Reasoning effort
+        defaults to low, which needs a reasoning-capable endpoint. Any option can
+        be overridden. See docs/MODEL_COMPARISON_NANO_MINI.md for measurements.
+        """
+        defaults: dict[str, Any] = {"compile_intent": True, "review": False, "reasoning_effort": "low"}
+        if intent_model is not None:
+            defaults["stage_models"] = {"intent": intent_model}
+        return cls(config, client, **{**defaults, **options})
