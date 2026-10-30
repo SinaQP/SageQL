@@ -5,20 +5,20 @@ cleanly. Steps 1–2 need no money; steps 3–5 need about **$0.15** of AvalAI c
 
 ## 1. Offline housekeeping (Claude, $0)
 
-- [ ] Bump version `0.1.0` → `0.2.0` in `pyproject.toml`.
-- [ ] Write `CHANGELOG.md` (per-stage models, compiled intent, no reviewer call,
+- [x] Bump version `0.1.0` → `0.2.0` in `pyproject.toml`.
+- [x] Write `CHANGELOG.md` (per-stage models, compiled intent, no reviewer call,
       report interpretation, saved reports, test levels, cleanup).
-- [ ] Make the measured setup the SDK default (`compile_intent=True`,
-      `review=False`, low reasoning effort) and update scripted tests.
-- [ ] Build wheel + sdist, install in a fresh venv, run the offline examples
+- [x] Measured setup available as `OpenAIReportAgent.recommended()`; SDK
+      defaults kept for backward compatibility (flipping them broke 232 scripted tests).
+- [x] Build wheel + sdist, install in a fresh venv, run the offline examples
       (`examples/sdk_demo.py`, `examples/multi_domain.py`).
-- [ ] Full offline suite green.
+- [x] Full offline suite green.
 
 ## 2. Release-blocker review (Claude, $0)
 
-- [ ] Re-read README "Try it" and Rahtal commands; run them in demo mode.
-- [ ] Check every doc link; remove stale statements.
-- [ ] Check the web page in demo mode: chat, report, interpretation line, save,
+- [x] Re-read README "Try it" and Rahtal commands; run them in demo mode.
+- [x] Check every doc link; remove stale statements.
+- [x] Check the web page in demo mode: chat, report, interpretation line, save,
       run saved, delete.
 
 ## 3. Live smoke test (you approve, ~$0.01)
@@ -28,6 +28,9 @@ python -m evaluations.model_comparison --level smoke --output dist/eval/release-
 ```
 
 Pass: 4 of 5 turns correct, no wrong accepted report, no rate-limit errors.
+
+**Result (2026-10-30): passed.** Smoke 5/5 turns, 3 calls, $0.0066. Standard
+(legacy A01–A12): 21/21 turns, 14/14 reports, 0 wrong, 18 calls, $0.034.
 
 ## 4. Rahtal manual test (you run, ~$0.05)
 
