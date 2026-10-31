@@ -49,12 +49,25 @@
         <a href="https://www.linkedin.com/in/sina-qasempour-8967b2264/">LinkedIn</a></p>
     </section>
 
-    <section class="stats" aria-label="Key results">
-      <div class="stat"><strong>22/27</strong><span>correct reports on the multi-turn benchmark, up from 8/27</span></div>
-      <div class="stat"><strong>55%</strong><span>fewer model calls (76 → 34 per 40 turns)</span></div>
-      <div class="stat"><strong>~7 s</strong><span>median turn with <code>gpt-5-mini</code></span></div>
-      <div class="stat"><strong>~2,200</strong><span>offline tests in CI on Linux and Windows</span></div>
-      <div class="stat"><strong id="stat-leaks">0</strong><span id="stat-leaks-label">table or column names sent to the model in the recorded examples</span></div>
+    <section class="proofs" aria-label="What the examples show">
+      <a class="proof" href="#examples">
+        <strong>The model never sees your schema</strong>
+        <span id="proof-schema">No table names, column names or policy values in any recorded model input.
+          Checked automatically.</span>
+        <em>See the recorded examples →</em>
+      </a>
+      <a class="proof" href="#attacks">
+        <strong>Attacks don't become queries</strong>
+        <span id="proof-attacks">Prompt injection, SQL in the chat, an invented column and SQL hidden in a
+          filter: none produced an unauthorized query.</span>
+        <em>Try to break it →</em>
+      </a>
+      <a class="proof" href="#results">
+        <strong>Less model, better reports</strong>
+        <span>Nearly 3× more correct reports with half the model calls, after planning moved from the
+          model into code.</span>
+        <em>Measured results →</em>
+      </a>
     </section>
 
     <section id="difference" class="difference">
@@ -134,6 +147,8 @@
       <p class="muted">Compiling a complete intent locally, instead of asking a second model to plan it,
         removed more than half the calls and nearly tripled accuracy over the nano baseline.
         <a href="https://github.com/SinaQP/SageQL/blob/main/docs/MODEL_COMPARISON_NANO_MINI.md">Full comparison</a>.</p>
+      <p class="muted">Everything after the model (validation, policy, SQL compilation and execution) is
+        covered by about 2,200 offline tests that run in CI on Linux and Windows, Python 3.10–3.15.</p>
     </section>
 
     <section id="story" class="story">

@@ -241,6 +241,7 @@ def build(record=False, output=OUTPUT):
         RECORDING.write_text(json.dumps(recording, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     data = {"sageql_version": _version(), "today": host.TODAY.isoformat(),
             "hidden_from_model": list(host.HIDDEN_FROM_MODEL), "policy_columns": list(host.POLICY_COLUMNS),
+            "actor_store": host.ACTOR.attributes["store"],
             "recorded_at": recording.get("recorded_at"), "examples": examples}
     Path(output).write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(f"Wrote {Path(output).name}: {len(examples)} examples, {total_calls} model calls", file=sys.stderr)

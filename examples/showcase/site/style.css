@@ -85,10 +85,16 @@ h2 { font-size: 1.45rem; margin: 0 0 18px; }
 .byline strong { color: var(--text); }
 .intro { max-width: 760px; margin: -6px 0 18px; }
 
-.stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding-top: 28px; }
-.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
-.stat strong { display: block; font-size: 1.7rem; line-height: 1.2; color: var(--accent); }
-.stat span { display: block; color: var(--muted); font-size: 0.86rem; margin-top: 4px; }
+.proofs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding-top: 28px; }
+.proof {
+  display: flex; flex-direction: column; gap: 6px; background: var(--surface); border: 1px solid var(--line);
+  border-top: 3px solid var(--accent); border-radius: var(--radius); padding: 16px 18px;
+  color: var(--text); text-decoration: none;
+}
+.proof:hover { border-color: var(--accent); }
+.proof strong { font-size: 1.05rem; }
+.proof span { color: var(--muted); font-size: 0.92rem; }
+.proof em { margin-top: auto; padding-top: 4px; font-style: normal; color: var(--accent); font-size: 0.88rem; font-weight: 600; }
 
 .compare { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
 .compare th, .compare td { white-space: normal; vertical-align: top; padding: 10px 14px; }
@@ -215,7 +221,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 28px 20px 48px; color: var(
 footer p { margin: 4px 0; }
 
 @media (max-width: 900px) {
-  .stats { grid-template-columns: repeat(2, 1fr); }
+  .proofs { grid-template-columns: 1fr; }
   .attack-grid { grid-template-columns: 1fr; }
   .flow { grid-template-columns: 1fr 1fr; }
   .explorer { grid-template-columns: 1fr; }
@@ -224,7 +230,6 @@ footer p { margin: 4px 0; }
 }
 
 @media (max-width: 520px) {
-  .stats { grid-template-columns: 1fr; }
   .compare thead { display: none; }
   .compare tr, .compare tbody th, .compare td { display: block; width: auto; }
   .compare tr { border-bottom: 1px solid var(--line); padding: 8px 0; }

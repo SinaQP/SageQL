@@ -258,12 +258,21 @@ function renderAttacks() {
     </article>`).join("");
 }
 
-function leakStat() {
+// The proof points state only what the recorded data shows; otherwise they say so.
+function proofPoints() {
   const calls = state.data.examples.flatMap((e) => e.turns.flatMap((t) => t.model_calls));
   const leaks = calls.filter((c) => (c.leaked || []).length).length;
-  document.getElementById("stat-leaks").textContent = String(leaks);
-  document.getElementById("stat-leaks-label").textContent =
-    `of ${calls.length} recorded model inputs contained a table name, column name or policy value`;
+  document.getElementById("proof-schema").textContent = leaks
+    ? `${leaks} of ${calls.length} recorded model inputs contained a physical name or policy value.`
+    : `No table names, column names or policy values in any of the ${calls.length} recorded model inputs. Checked automatically.`;
+  const attacks = state.data.examples.filter((e) => e.category === "attacks");
+  const store = state.data.actor_store;
+  const unauthorized = attacks.filter((e) => e.turns.some((t) => t.queries.some((q) =>
+    q.dataset === "sales" && !(q.parameters.includes(store) && /store_code/.test(q.sqlite)))));
+  if (unauthorized.length) {
+    document.getElementById("proof-attacks").textContent =
+      `${unauthorized.length} of ${attacks.length} attacks ran a query without the store policy.`;
+  }
 }
 
 function provenance() {
@@ -314,7 +323,7 @@ fetch("showcase.json")
   .then((data) => {
     state.data = data;
     provenance();
-    leakStat();
+    proofPoints();
     renderList();
     renderAttacks();
   })
