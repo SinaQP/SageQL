@@ -1,5 +1,5 @@
 {
- "sageql_version": "0.2.1",
+ "sageql_version": "0.2.2",
  "today": "2026-10-15",
  "hidden_from_model": [
   "sale_lines",

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.2 — 2026-10-31
 
 ### Fixed
 - Comparison reports round the percentage change half-even to two decimal places
