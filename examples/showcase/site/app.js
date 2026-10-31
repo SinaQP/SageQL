@@ -221,6 +221,51 @@ function renderDetail(example) {
     <p>${escapeHtml(example.summary)}</p>${banner(example)}${turns}`;
 }
 
+// The outcome line is read from the recorded run, never written by hand.
+function attackOutcome(example) {
+  const turn = example.turns[example.turns.length - 1];
+  const status = turn.reply.status;
+  if (!turn.queries.length && status === "unsupported") return "Declined as unsupported. No SQL was generated.";
+  if (!turn.queries.length) return "Rejected before any SQL existed.";
+  const values = turn.queries.flatMap((q) => q.parameters).filter((v) => typeof v === "string");
+  const user = (turn.user || "").toLowerCase();
+  const smuggled = values.find((v) => /['";]|--/.test(v));
+  if (smuggled) return `Ran only as a parameterized query: ${JSON.stringify(smuggled)} was a bound value and matched nothing.`;
+  if (/drop|delete|;/.test(user)) return "Only the registered report ran, read-only and with the store policy. The SQL text was ignored.";
+  return "Ran only with the store policy from the authenticated user.";
+}
+
+// For a simulated attack the hostile part is the model's reply, not the user's message.
+function attackAttempt(example) {
+  const turn = example.turns[0];
+  if (example.source !== "simulated") return turn.user;
+  let reply;
+  try { reply = JSON.parse(turn.model_calls[0].output); } catch (error) { return turn.user; }
+  const parts = (reply.metrics || []).map((m) => `measure: ${m.concept_id}`)
+    .concat((reply.filters || []).map((f) => `${f.filter_id} = ${JSON.stringify(f.values.join(", "))}`));
+  return `Model replied with ${parts.join("; ")}`;
+}
+
+function renderAttacks() {
+  const attacks = state.data.examples.filter((e) => e.category === "attacks");
+  document.getElementById("attack-list").innerHTML = attacks.map((e) => `
+    <article class="attack">
+      <span class="tag ${e.source}">${SOURCE_TAGS[e.source]}</span>
+      <h3 dir="${direction(e.title)}">${escapeHtml(e.title)}</h3>
+      <p class="attempt" dir="${direction(attackAttempt(e))}">${escapeHtml(attackAttempt(e))}</p>
+      <p class="outcome">${escapeHtml(attackOutcome(e))}</p>
+      <button type="button" class="link" data-open="${e.id}">See it step by step →</button>
+    </article>`).join("");
+}
+
+function leakStat() {
+  const calls = state.data.examples.flatMap((e) => e.turns.flatMap((t) => t.model_calls));
+  const leaks = calls.filter((c) => (c.leaked || []).length).length;
+  document.getElementById("stat-leaks").textContent = String(leaks);
+  document.getElementById("stat-leaks-label").textContent =
+    `of ${calls.length} recorded model inputs contained a table name, column name or policy value`;
+}
+
 function provenance() {
   const sources = new Set(state.data.examples.map((e) => e.source));
   const version = `SageQL ${state.data.sageql_version}, business date ${state.data.today}.`;
@@ -233,6 +278,15 @@ function provenance() {
 document.addEventListener("click", (event) => {
   const item = event.target.closest("#example-list button");
   if (item) return select(item.dataset.id);
+  const open = event.target.closest("[data-open]");
+  if (open) {
+    state.filter = "all";
+    document.querySelectorAll(".chip").forEach((c) => c.classList.toggle("active", c.dataset.filter === "all"));
+    renderList();
+    select(open.dataset.open);
+    document.getElementById("detail").scrollIntoView({ block: "start" });
+    return;
+  }
   const chip = event.target.closest(".chip");
   if (chip) {
     state.filter = chip.dataset.filter;
@@ -260,7 +314,9 @@ fetch("showcase.json")
   .then((data) => {
     state.data = data;
     provenance();
+    leakStat();
     renderList();
+    renderAttacks();
   })
   .catch(() => {
     document.getElementById("detail").innerHTML = `<p class="refusal">The example data could not be loaded.</p>`;

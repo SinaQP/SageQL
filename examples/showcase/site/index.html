@@ -3,8 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SageQL Showcase</title>
-  <meta name="description" content="Recorded examples of SageQL, an embedded chat reporting SDK where the language model never writes SQL.">
+  <title>SageQL: Text-to-SQL Without Model SQL</title>
+  <meta name="description" content="SageQL is an open-source Python SDK for natural-language reporting. A language model only interprets the request; deterministic code authorizes it and writes parameterized, read-only SQL.">
+  <meta property="og:title" content="SageQL: text-to-SQL, without letting the model write SQL">
+  <meta property="og:description" content="A language model interprets the request; deterministic code authorizes it and writes the SQL. Recorded examples, attacks and measured results.">
+  <meta property="og:url" content="https://sinaqp.github.io/SageQL/">
+  <meta property="og:type" content="website">
+  <meta name="author" content="Sina Qasempour">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600&display=swap" rel="stylesheet">
@@ -14,26 +19,57 @@
   <header class="top">
     <a class="brand" href="#">SageQL</a>
     <nav>
+      <a href="#difference">Why it's different</a>
       <a href="#examples">Examples</a>
-      <a href="#how">How it works</a>
+      <a href="#attacks">Attacks</a>
       <a href="#results">Results</a>
+      <a href="#story">Story</a>
       <a href="https://github.com/SinaQP/SageQL">GitHub</a>
     </nav>
   </header>
 
   <main>
     <section class="hero">
-      <p class="eyebrow">Embedded chat reporting for Python backends</p>
-      <h1>Ask for a report in plain language.<br>The model never writes the SQL.</h1>
-      <p class="lede">SageQL turns a Persian or English request into a typed report specification,
-        checks it against what the host registered and what the user may see, then writes a
-        parameterized, read-only query itself. Below are real runs, stage by stage.</p>
+      <p class="eyebrow">Open-source Python SDK · Persian and English</p>
+      <h1>Text-to-SQL, without letting the model write&nbsp;SQL.</h1>
+      <p class="lede">SageQL lets managers ask for reports in Persian or English. A language model only
+        chooses from what the host registered; deterministic code checks permissions, writes
+        parameterized SQL and runs it read-only. A wrong or manipulated model can produce a wrong
+        report, never an unauthorized query.</p>
       <div class="hero-actions">
+        <a class="button" href="#examples">See recorded examples</a>
         <button class="install" type="button" data-copy="pip install sageql">
           <code>pip install sageql</code><span class="copy-label">Copy</span>
         </button>
-        <a class="button" href="https://github.com/SinaQP/SageQL">Source on GitHub</a>
-        <a class="button ghost" href="https://pypi.org/project/sageql/">PyPI</a>
+        <a class="button ghost" href="https://github.com/SinaQP/SageQL">Source on GitHub</a>
+      </div>
+      <p class="byline">Designed and built by <strong>Sina Qasempour</strong> ·
+        <a href="https://sina-qasempour-portfolio-website.vercel.app/">Portfolio</a> ·
+        <a href="https://sina-qasempour-portfolio-website.vercel.app/Sina-Qasempour-Resume.pdf">Résumé</a> ·
+        <a href="https://www.linkedin.com/in/sina-qasempour-8967b2264/">LinkedIn</a></p>
+    </section>
+
+    <section class="stats" aria-label="Key results">
+      <div class="stat"><strong>22/27</strong><span>correct reports on the multi-turn benchmark, up from 8/27</span></div>
+      <div class="stat"><strong>55%</strong><span>fewer model calls (76 → 34 per 40 turns)</span></div>
+      <div class="stat"><strong>~7 s</strong><span>median turn with <code>gpt-5-mini</code></span></div>
+      <div class="stat"><strong>~2,200</strong><span>offline tests in CI on Linux and Windows</span></div>
+      <div class="stat"><strong id="stat-leaks">0</strong><span id="stat-leaks-label">table or column names sent to the model in the recorded examples</span></div>
+    </section>
+
+    <section id="difference" class="difference">
+      <h2>What changes when the model doesn't write SQL</h2>
+      <div class="table-wrap">
+        <table class="compare">
+          <thead><tr><th></th><th>Model-written SQL</th><th>SageQL</th></tr></thead>
+          <tbody>
+            <tr><th>Who writes the query</th><td data-label="Model-written SQL">The model</td><td data-label="SageQL">SageQL's compiler, from registered IDs</td></tr>
+            <tr><th>Joins</th><td data-label="Model-written SQL">Chosen by the model</td><td data-label="SageQL">Only relationships the host registered</td></tr>
+            <tr><th>Row and tenant filters</th><td data-label="Model-written SQL">Requested in the prompt, or checked afterwards</td><td data-label="SageQL">Added to every query from the authenticated user</td></tr>
+            <tr><th>What the model sees</th><td data-label="Model-written SQL">Table and column names, often sample rows</td><td data-label="SageQL">Business labels and IDs; never rows, SQL or physical names</td></tr>
+            <tr><th>When the model is wrong or manipulated</th><td data-label="Model-written SQL">A wrong or unauthorized query can run</td><td data-label="SageQL">A wrong report at worst; anything unregistered is rejected before SQL exists</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
@@ -55,9 +91,12 @@
 
     <section id="examples" class="examples">
       <div class="section-head">
-        <h2>Examples</h2>
+        <h2>Recorded examples</h2>
         <p id="provenance" class="muted"></p>
       </div>
+      <p class="muted intro">Each turn shows what the model received and returned, the SQL SageQL wrote
+        with the store policy highlighted, and the reply. All data is invented: a two-store bookshop
+        and café, viewed as the manager of the north store.</p>
       <div class="filters" role="tablist" aria-label="Filter examples">
         <button type="button" class="chip active" data-filter="all">All</button>
         <button type="button" class="chip" data-filter="conversation">Conversations</button>
@@ -71,9 +110,17 @@
       </div>
     </section>
 
+    <section id="attacks" class="attacks">
+      <h2>Try to break it</h2>
+      <p class="muted intro">Two attempts by a user, recorded against a real model, and two replies from a
+        deliberately hostile model, written by hand. The outcomes below are read from the recorded runs.</p>
+      <div id="attack-list" class="attack-grid"></div>
+    </section>
+
     <section id="results" class="results">
       <h2>Measured results</h2>
-      <p class="muted">Frozen synthetic multi-turn conversations, 27 scored reports, low reasoning effort.</p>
+      <p class="muted">27 scored reports across fixed synthetic multi-turn conversations, all models at low
+        reasoning effort.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Setup</th><th>Correct reports</th><th>Model calls / 40 turns</th><th>Median turn</th></tr></thead>
@@ -84,10 +131,43 @@
           </tbody>
         </table>
       </div>
-      <p class="muted">Compiling a complete intent locally, instead of asking a second model to plan
-        it, removed more than half the calls. The deterministic side is covered by about 2,200
-        offline tests in CI on Linux and Windows, Python 3.10–3.15.
+      <p class="muted">Compiling a complete intent locally, instead of asking a second model to plan it,
+        removed more than half the calls and nearly tripled accuracy over the nano baseline.
         <a href="https://github.com/SinaQP/SageQL/blob/main/docs/MODEL_COMPARISON_NANO_MINI.md">Full comparison</a>.</p>
+    </section>
+
+    <section id="story" class="story">
+      <h2>Why I built it</h2>
+      <div class="story-body">
+        <p>In July 2026 I built <a href="https://github.com/SinaQP/QuerySmith">QuerySmith</a>: a language
+          model wrote T-SQL for SQL Server, and a guard checked it. It allowed one <code>SELECT</code>, no
+          comments or extra statements, only columns inside a scope, plus access profiles and result
+          masking. Each protection meant recognizing one more pattern in SQL the model had invented.</p>
+        <p>In September I started SageQL by inverting that design. The model never writes SQL. It picks
+          registered concepts by ID, and SageQL compiles the query itself, so tenant filters, joins and
+          limits come from code instead of from text a model produced. The question changed from "is this
+          SQL safe?" to "is this a report the host allowed?", which is much easier to answer exactly.</p>
+        <p>The reports I had in mind are the ones managers ask for in Persian, with Solar Hijri dates, so
+          Persian is the default and the calendar is resolved locally rather than by the model.</p>
+      </div>
+    </section>
+
+    <section id="limits" class="limits">
+      <h2>Limitations and next steps</h2>
+      <ul class="limit-list">
+        <li><strong>The benchmark is small.</strong> 27 scored synthetic reports; results vary by about
+          ±2 reports between runs.</li>
+        <li><strong>Understanding still fails sometimes.</strong> The model can drop a filter or pick the
+          wrong period or limit. Every report states its interpretation, so a user can catch it.</li>
+        <li><strong>Only registered operations.</strong> No arbitrary formulas, share-of-total or
+          model-chosen joins yet; those requests are declined rather than approximated.</li>
+        <li><strong>SQL Server is compiled and checked offline,</strong> but not yet tested end to end
+          against a live server in CI; SQLite runs every test.</li>
+        <li><strong>Authentication belongs to the host.</strong> SageQL enforces the policy it is given.</li>
+      </ul>
+      <p class="muted">Next: letting users correct an interpretation in one click, a library of verified
+        questions, more report operations, and a larger public evaluation.
+        <a href="https://github.com/SinaQP/SageQL/blob/main/docs/ROADMAP.md">Roadmap</a>.</p>
     </section>
   </main>
 
