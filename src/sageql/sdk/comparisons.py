@@ -170,6 +170,10 @@ def make_change_report(report: ReportArtifact, spec: ReportSpec, *, language: st
     for index, metric in enumerate(report.fields[1:]):
         current, reference = periods["base"][index], periods["comparison"][index]
         absolute, percent, status = calculate_change(current, reference)
+        if percent is not None:
+            # The report carries two decimal places; calculate_change stays exact.
+            with localcontext(Context(prec=500, rounding=ROUND_HALF_EVEN)):
+                percent = percent.quantize(Decimal("0.01"))
         # Float sources retain their existing concise numeric presentation.
         if metric.type == "number" and absolute is not None:
             approximate = float(absolute)

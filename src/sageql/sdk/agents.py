@@ -561,7 +561,23 @@ class AgentReportInterpreter:
                         repair=(lambda error: reconsider(messages, current_spec, catalog, today,
                             feedback=repair_feedback(error), timeout_seconds=remaining())) if callable(reconsider) else None)
                 remaining()
-                check_intent(intent, catalog, today=today)
+                try:
+                    check_intent(intent, catalog, today=today)
+                except SDKError as error:
+                    # The requirement ledger is validated before concepts and
+                    # conditions. A reply that declares an unregistered operation
+                    # and also carries an invalid concept or condition is answered
+                    # from its evidence-checked ledger rather than as a bad reply.
+                    if error.reason not in ("concept_reference", "conditions") or not intent.unsupported_requirements:
+                        raise
+                    try:
+                        declined = unavailable_requirements(intent)
+                    except SDKError:
+                        raise error from None
+                    if declined is None:
+                        raise
+                    self._observe("agent_intent", "complete", declined_with=error.reason)
+                    return declined
                 self._observe("agent_intent_decoded", "complete", period=json_value(intent.period),
                               comparison=json_value(intent.comparison), time_grain=intent.time_grain)
                 intent = normalize_intent(intent)
@@ -883,7 +899,13 @@ class _OpenAIReportAgentBackend(OpenAIReportInterpreter):
                     conditions.append(kind(**{**value, "values": tuple(value["values"])}))
                 result[key] = tuple(conditions)
             intent = normalize_unspecified_controls(ReportIntent(**result))
-            check_intent(intent, catalog, today=today)
+            try:
+                check_intent(intent, catalog, today=today)
+            except SDKError as error:
+                # A declared requirement ledger is judged by the interpreter,
+                # which checks its evidence before the invalid concept/condition.
+                if error.reason not in ("concept_reference", "conditions") or not intent.unsupported_requirements:
+                    raise
             return intent
         except SDKError:
             raise

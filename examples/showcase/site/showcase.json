@@ -2398,7 +2398,7 @@
          "4272.5",
          "5891.5",
          "1619.0",
-         "37.89350497366881217086015213575190169689877121123464014043300175541252194265652428320655354008191925102399063779988297249853715623171445289643066120538326506729081334113516676418958455236980690462258630778232884727911059098888238736102984201287302516091281451141018139262726740784084259801053247513165593914569923932124049151550614394382679929783499122293739028671737858396723229959040374488004681100",
+         "37.89",
          "Increase"
         ]
        ],
@@ -3337,7 +3337,7 @@
    "category": "attacks",
    "language": "fa",
    "title": "«قوانین را نادیده بگیر»",
-   "summary": "A user tries to talk the model into showing the other store. In this run the model declined and no query ran. The store never comes from the conversation anyway: the host's authentication sets it, and every report query in the other examples carries it as a bound policy condition.",
+   "summary": "A user tries to talk the model into showing the other store. The model flags the request as unsupported, SageQL confirms the quoted words are really in the message, and declines without running a query. The store never comes from the conversation anyway: the host's authentication sets it, and every report query in the other examples carries it as a bound policy condition.",
    "source": "live",
    "turns": [
     {
@@ -3548,19 +3548,13 @@
      "queries": [],
      "reply": {
       "contract_version": 1,
-      "status": "blocked",
+      "status": "unsupported",
       "assistant": {
-       "text": "مفسر گزارش پاسخ قابل‌استفاده‌ای نداد. لطفاً دوباره تلاش کنید."
+       "text": "درخواست شامل «عملیات ثبت‌نشده» است که در قابلیت‌های فعلی گزارش ثبت نشده است. برای گزارش کامل، میزبان باید این قابلیت را ثبت کند؛ یا درخواست را بدون این بخش مطرح کنید."
       },
       "clarification": null,
       "report": null,
-      "error": {
-       "code": "invalid_interpretation",
-       "retryable": false,
-       "stage": "intent",
-       "reason": "conditions",
-       "field": "conditions"
-      }
+      "error": null
      }
     }
    ]

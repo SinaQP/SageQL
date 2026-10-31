@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- Comparison reports round the percentage change half-even to two decimal places
+  instead of returning the full 400-digit quotient; `calculate_change` stays exact.
+- A model reply that declares an unregistered operation (with user-quoted evidence)
+  but also carries an invalid concept or condition now returns `unsupported` with
+  the operation message, instead of a generic "invalid reply, try again" error.
+
 ## 0.2.1 — 2026-10-30
 
 First release published to PyPI (`pip install sageql`). No SDK behavior changes.

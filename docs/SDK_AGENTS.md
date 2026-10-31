@@ -230,6 +230,10 @@ user text; assistant suggestions and invented evidence are rejected. A checked
 unavailable operation returns `unsupported` without asking the reviewer to veto
 it or executing a supported subset. Recognized fa/en operation phrases can stop
 before any model call. The ledger is model-dependent for other wording/languages.
+A reply that declares a ledger but also names an unregistered concept or an
+invalid condition is answered from its evidence-checked ledger as `unsupported`,
+not reported as an invalid reply; without checked evidence the original
+`invalid_interpretation` stands. No SQL runs in either case.
 
 To supply another backend, construct
 `AgentReportInterpreter(backend, timeout_seconds=30, max_revisions=1)`. The

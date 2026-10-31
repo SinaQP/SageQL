@@ -41,9 +41,10 @@ label would be misleading. Otherwise status is increase, decrease or unchanged.
 These fixed statuses are localized without a model call. No missing duration is
 silently treated as zero. Non-finite/unsupported result values fail closed.
 
-Decimal values and locally calculated decimal changes serialize as precise
-strings. The frontend rounds percentage strings to two decimals for display only,
-using decimal text operations rather than floating-point conversion. Source
+Decimal values and the absolute change serialize as precise strings. The
+percentage change is computed exactly, then rounded half-even to two decimal
+places in the report, so every host receives a bounded value (for example
+`37.89`, not the full 400-digit quotient). Source
 decimal strings retain their existing exact display. Numeric float measures still
 use the existing two-decimal presentation. Model context contains only permitted
 business metadata/messages/specifications; execution results and calculated
