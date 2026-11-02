@@ -1,6 +1,6 @@
 import pytest
 
-from sageql import InvalidSQL, validate_sql
+from sageql.legacy import InvalidSQL, validate_sql
 
 
 @pytest.mark.parametrize(

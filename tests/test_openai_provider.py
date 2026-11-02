@@ -2,7 +2,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from sageql import GenerationError
+from sageql.legacy import GenerationError
 from sageql.openai_provider import OpenAIProvider
 
 

@@ -1,5 +1,29 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `sageql demo`: the offline Persian three-turn SDK conversation now ships in the
+  package (`sageql.demo`), printing each reply, the report tables and the
+  parameterized SQL SageQL compiled; `--json` prints the final reply contract.
+- `sageql.legacy`: the staged 0.1 API (understanding, discovery, planning, SQL
+  helpers and the experimental model-written `generate_sql`) in one module.
+- `sageql --version`.
+
+### Changed
+- The bare `sageql` command describes the SDK instead of expecting a question for
+  the experimental model-written SQL path. That path is `sageql legacy sql`; the
+  staged chat is `sageql legacy chat`.
+- The top-level `sageql` package exports only `SageQL`, `Column`, `Table`,
+  `LLMConfig` and `Message`.
+- README covers the SDK only; the staged workflow guide moved to `docs/LEGACY.md`.
+
+### Deprecated
+- Importing staged 0.1 names from `sageql` (for example `sageql.generate_sql`,
+  `sageql.ChatConfig`) emits `DeprecationWarning`; import them from
+  `sageql.legacy`. `sageql chat` and `sageql "question" --schema ...` still work
+  with a notice. Both old forms are removed in 0.3.
+
 ## 0.2.2 — 2026-10-31
 
 ### Fixed

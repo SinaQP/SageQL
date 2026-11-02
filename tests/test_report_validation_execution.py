@@ -4,7 +4,7 @@ from dataclasses import replace
 
 import pytest
 
-from sageql import (
+from sageql.legacy import (
     Column, QueryExecutionError, QueryPlan, QuerySpace, QueryValidationError,
     RequiredFilter, ResolvedContext, SQLQuery, Table, execute_sqlite_report,
     generate_sql_from_plan, prepare_report_query, validate_report_query,

@@ -100,7 +100,7 @@ During development use `python -m pip install -e ".[openai,odbc,dev]"` from this
 Run the complete offline embedding example or the frontend:
 
 ```powershell
-.\.venv\Scripts\python.exe examples/sdk_demo.py
+sageql demo                     # or: .\.venv\Scripts\python.exe examples/sdk_demo.py (JSON)
 .\.venv\Scripts\python.exe examples/web/server.py --demo
 ```
 

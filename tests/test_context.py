@@ -1,6 +1,6 @@
 import pytest
 
-from sageql import ChatConfig, ChatError, DatabaseConfig, LLMConfig, Message
+from sageql.legacy import ChatConfig, ChatError, DatabaseConfig, LLMConfig, Message
 from sageql.context import ContextResolution, ContextResolutionSession, ResolvedContext
 
 

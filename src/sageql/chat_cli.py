@@ -95,7 +95,7 @@ def _schema_paths(values: list[str]) -> dict[str, str]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="sageql chat", description="Discuss a report request with an AI assistant"
+        prog="sageql legacy chat", description="Discuss a report request with an AI assistant"
     )
     parser.add_argument("--no-discovery", action="store_true", help="stop after context resolution")
     parser.add_argument("--no-planning", action="store_true", help="stop after query-space discovery")

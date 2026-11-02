@@ -3,7 +3,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from sageql import ChatError, LLMConfig, Message
+from sageql.legacy import ChatError, LLMConfig, Message
 from sageql.chat_provider import OpenAIChatProvider
 from sageql.context import ResolvedContext
 from sageql.discovery import DiscoveryCandidates, DiscoveryError, QuerySpace

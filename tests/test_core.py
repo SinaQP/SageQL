@@ -1,6 +1,6 @@
 import pytest
 
-from sageql import Candidate, GenerationError, InvalidSQL, generate_sql
+from sageql.legacy import Candidate, GenerationError, InvalidSQL, generate_sql
 
 
 class FakeProvider:

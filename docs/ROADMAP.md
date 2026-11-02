@@ -14,7 +14,7 @@ interpret requests; deterministic code authorizes, compiles and executes.
 **Solid:** registered catalog and policies, deterministic SQL Server/SQLite
 compilation, read-only bounded execution, relationships, entity lookups and
 labels, Jalali periods, comparisons, sessions with revisions and idempotent
-receipts, snapshot read consistency. About 2,440 offline tests pass.
+receipts, snapshot read consistency. About 2,500 offline tests pass.
 
 **Bottleneck:** understanding requests. On the frozen synthetic cohorts:
 
@@ -55,17 +55,24 @@ cohorts with the same budget discipline (nano/mini only unless the user approves
    measure, grouping) instead of retyping.
 4. **Make `compile_intent=True, review=False` the SDK default** once scripted tests
    are updated to the shorter call sequence.
-4. **Persist a report draft with provenance** (user said / inherited / default /
+5. **Persist a report draft with provenance** (user said / inherited / default /
    pending) instead of re-deriving context from the transcript each turn.
-5. **Prompt and schema cleanup.** Short structured prompts with worked examples,
+6. **Prompt and schema cleanup.** Short structured prompts with worked examples,
    evidence-quote fields before decisions, tri-state controls.
-6. **Verified question library** for few-shot retrieval and user corrections.
-7. **General report operations** (share of total, ratios, top-N per group,
+7. **Verified question library** for few-shot retrieval and user corrections.
+8. **General report operations** (share of total, ratios, top-N per group,
    absence, extrema) as one typed design.
+9. **Remove the staged 0.1 names from the top-level package** in 0.3
+   (`sageql.legacy` and `sageql legacy …` remain).
 
 Full rationale: [IMPROVEMENT_RECOMMENDATIONS.md](IMPROVEMENT_RECOMMENDATIONS.md).
 
 ## Recently done
+
+- SDK front door: `pip install sageql && sageql demo` runs the offline SDK
+  conversation and shows the compiled SQL; the staged 0.1 API and CLI moved to
+  `sageql.legacy` / `sageql legacy …` with deprecation shims; README is SDK-only.
+- 0.2.1/0.2.2 published to PyPI; recorded showcase site.
 
 - Saved reports: save a finished report once, re-run it with zero model calls,
   with dynamic dates and optional overrides ([contract](SDK_SAVED_REPORTS.md)).

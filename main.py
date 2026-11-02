@@ -21,7 +21,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from sageql import (
+from sageql.legacy import (
     ChatConfig,
     ChatError,
     ContextResolutionSession,

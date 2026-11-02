@@ -1,6 +1,6 @@
 import pytest
 
-from sageql import (
+from sageql.legacy import (
     ChatConfig,
     ChatError,
     DatabaseConfig,

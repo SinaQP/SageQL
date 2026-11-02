@@ -3,7 +3,7 @@ from dataclasses import replace
 
 import pytest
 
-from sageql import (
+from sageql.legacy import (
     PlanProposal, ProposedFilter, ProposedJoin, ProposedMeasure, QuerySpace,
     ResolvedContext, SQLGenerationError, QueryPlan, Table, catalog_from_dict, create_query_plan,
     generate_sql_from_plan,
